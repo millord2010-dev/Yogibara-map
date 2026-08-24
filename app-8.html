@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6f0e4">
+<title>YOGIBARA V8</title>
+<style>
+:root{
+  --bg:#f6f0e4; --paper:#fffaf2; --ink:#43382b; --muted:#8c7e6b;
+  --line:#dfd2bd; --olive:#7b7a45; --gold:#b8873b; --rose:#b66f68;
+  --sage:#87977e; --soft:#efe5d5; --shadow:0 12px 30px rgba(74,57,34,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.app{max-width:720px;margin:auto;min-height:100vh;background:
+ radial-gradient(circle at 18% 0%,rgba(214,181,120,.13),transparent 28%),
+ var(--paper);padding-bottom:88px}
+header{padding:18px 18px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand b{font-family:Georgia,serif;font-size:22px;color:#6a542f;letter-spacing:.03em}
+.brand small{display:block;margin-top:3px;color:var(--muted);font-size:10px}
+.profile-btn{border:1px solid var(--line);background:#fffaf7;border-radius:999px;padding:8px 12px;color:var(--ink);font-weight:700;font-size:11px}
+.page{display:none;padding:0 16px 22px}.page.active{display:block}
+.hero{padding:16px;border:1px solid var(--line);border-radius:26px;background:#fffdf8;box-shadow:var(--shadow);margin-bottom:12px}
+.kicker{font-size:9px;letter-spacing:.18em;color:var(--gold);font-weight:800}
+h1{font-family:Georgia,serif;font-size:30px;font-weight:600;margin:6px 0 8px}
+.sub{font-size:12px;line-height:1.65;color:var(--muted)}
+.core-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.core-card{border:1px solid var(--line);background:#fffdf8;border-radius:22px;padding:14px;min-height:116px;text-align:left;color:var(--ink)}
+.core-card .ico{font-size:24px}.core-card b{display:block;margin-top:9px;font-size:14px}.core-card span{display:block;margin-top:5px;color:var(--muted);font-size:10px;line-height:1.45}
+.avatar-home{display:grid;grid-template-columns:145px 1fr;gap:14px;align-items:center;margin:12px 0}
+.avatar-card{border:1px solid var(--line);border-radius:24px;background:#f4eadc;min-height:220px;display:grid;place-items:center;position:relative;overflow:hidden}
+.avatar-card:after{content:"";position:absolute;left:24%;right:24%;bottom:16px;height:12px;background:#6d583019;border-radius:50%;filter:blur(5px)}
+.avatar-meta b{font:600 24px Georgia,serif}.avatar-meta p{color:var(--muted);font-size:11px;line-height:1.6}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:11px}
+.stat{border:1px solid var(--line);border-radius:15px;padding:9px;text-align:center;background:#fffaf4}.stat strong{display:block;font-size:16px}.stat small{font-size:8px;color:var(--muted)}
+.section-title{display:flex;justify-content:space-between;align-items:end;margin:18px 2px 8px}.section-title b{font-size:16px}.section-title small{font-size:9px;color:var(--muted)}
+.card{background:#fffdf8;border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:var(--shadow)}
+.form{display:grid;gap:10px}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+label{font-size:10px;color:var(--muted);font-weight:700}
+input,select,textarea{width:100%;margin-top:5px;border:1px solid var(--line);background:#fffaf5;border-radius:14px;padding:11px;color:var(--ink)}
+textarea{min-height:82px;resize:vertical}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:11px 15px;min-height:44px}
+.btn.primary{background:var(--olive);border-color:var(--olive);color:white;font-weight:800}.btn.gold{background:var(--gold);border-color:var(--gold);color:white;font-weight:800}
+.btn.wide{width:100%}
+.timeline{display:grid;gap:8px}.entry{border-left:3px solid #c2aa82;padding:10px 12px;background:#fffaf4;border-radius:0 16px 16px 0}.entry b{font-size:12px}.entry small{display:block;color:var(--muted);font-size:9px;margin-top:4px}
+.empty{padding:22px;text-align:center;color:var(--muted);font-size:11px;border:1px dashed var(--line);border-radius:18px}
+.journey-box{display:grid;gap:10px}.place{border:1px solid var(--line);border-radius:18px;padding:12px;background:#fffaf4}.place b{font-size:12px}.place span{display:block;color:var(--muted);font-size:9px;margin-top:5px}
+.relay{background:linear-gradient(135deg,#fff7ef,#f0e4cf);border:1px solid var(--line);border-radius:24px;padding:16px}.relay h2{font:600 24px Georgia,serif;margin:4px 0}.bar{height:10px;background:#e8ddcb;border-radius:999px;overflow:hidden;margin:10px 0}.bar i{display:block;height:100%;background:var(--rose);width:34%}
+.connection-list{display:grid;gap:8px}.friend{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);background:#fffaf4;border-radius:18px;padding:11px}.friend .mini{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#eee2ce}
+.bottom{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(720px,100%);display:grid;grid-template-columns:repeat(5,1fr);background:#fffaf7ed;backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:7px 4px max(7px,env(safe-area-inset-bottom));z-index:30}
+.bottom button{border:0;background:transparent;color:#756957;padding:6px 2px;font-size:8px}.bottom button i{display:block;font-style:normal;font-size:19px;line-height:1.2}.bottom button.active{color:#5e4a2c;font-weight:900}
+.sheet{position:fixed;inset:0;background:#2d241c66;display:none;align-items:flex-end;justify-content:center;z-index:60}.sheet.open{display:flex}
+.sheet-panel{width:min(720px,100%);max-height:88vh;overflow:auto;background:var(--paper);border-radius:28px 28px 0 0;padding:18px 16px 28px}
+.sheet-head{display:flex;justify-content:space-between;align-items:center}.sheet-head h2{font:600 28px Georgia,serif;margin:0}.close{border:0;background:#eee3d3;border-radius:50%;width:38px;height:38px}
+.custom-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.optbox{border:1px solid var(--line);background:#fffdf8;border-radius:18px;padding:12px}.optbox b{font-size:11px}.swatches{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}.sw{width:34px;height:34px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}.sw.active{box-shadow:0 0 0 3px var(--gold)}
+.shop-note{margin-top:12px;background:#efe7d8;border-radius:18px;padding:12px;font-size:10px;color:#756957;line-height:1.55}
+.yogi-svg{width:132px;height:200px;position:relative;z-index:2;overflow:visible}
+.yogi-svg.small{width:110px;height:170px}
+@media(min-width:600px){.core-card{min-height:126px}.avatar-home{grid-template-columns:180px 1fr}.avatar-card{min-height:260px}.yogi-svg{width:155px;height:230px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand"><b>YOGIBARA</b><small>수련은, 나에게서 끝나지 않는다.</small></div>
+  <button class="profile-btn" id="openProfile">MY YOGI · 꾸미기</button>
+</header>
+
+<main>
+<section class="page active" id="home">
+  <div class="hero">
+    <div class="kicker">TODAY · PRACTICE. SHARE. PEACE.</div>
+    <h1>오늘의 수련이<br>하나의 결이 됩니다.</h1>
+    <div class="sub">아바타는 작고 귀엽게. 중심은 수련 기록, 여정, 나눔과 연결입니다.</div>
+  </div>
+
+  <div class="avatar-home">
+    <div class="avatar-card" id="homeAvatar"></div>
+    <div class="avatar-meta">
+      <small class="kicker">MY YOGI</small>
+      <b id="yogiName">바라요기</b>
+      <p id="todayText">오늘의 수련을 기록하면 이곳에 흔적이 쌓입니다.</p>
+      <div class="stat-row">
+        <div class="stat"><strong id="sPractice">0</strong><small>수련</small></div>
+        <div class="stat"><strong id="sJourney">0</strong><small>여정</small></div>
+        <div class="stat"><strong id="sShare">0</strong><small>나눔</small></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="core-grid">
+    <button class="core-card" data-go="practice"><div class="ico">◌</div><b>나의 수련 기록</b><span>요가 · 명상 · 호흡 · 걷기. 오늘의 몸과 마음을 남겨요.</span></button>
+    <button class="core-card" data-go="journey"><div class="ico">⌖</div><b>나의 여정</b><span>수련한 공간과 제주에서 만난 장소의 흔적을 이어갑니다.</span></button>
+    <button class="core-card" data-go="share"><div class="ico">♡</div><b>나눔 기록</b><span>릴레이와 실제 나눔이 어디까지 이어졌는지 확인해요.</span></button>
+    <button class="core-card" data-go="connect"><div class="ico">∞</div><b>연결 · 공유</b><span>팔로워 대신 ‘연’을 맺고 서로의 수련을 응원합니다.</span></button>
+  </div>
+</section>
+
+<section class="page" id="practice">
+  <div class="hero"><div class="kicker">PRACTICE RECORD</div><h1>나의 수련</h1><div class="sub">잘했는지 평가하지 않고, 오늘 무엇을 했는지만 차곡차곡 남깁니다.</div></div>
+  <div class="card">
+    <div class="form">
+      <div class="row">
+        <label>수련<select id="ptype"><option>요가</option><option>명상</option><option>호흡</option><option>걷기</option><option>마음공부</option><option>나눔</option></select></label>
+        <label>시간(분)<input id="minutes" type="number" min="1" value="30"></label>
+      </div>
+      <label>장소<input id="place" placeholder="집, 아난드요가, 제주 바다…"></label>
+      <label>오늘의 한 줄<textarea id="note" placeholder="몸과 마음에 남은 것을 짧게 적어보세요."></textarea></label>
+      <button class="btn primary wide" id="savePractice">오늘의 수련 기록하기</button>
+    </div>
+  </div>
+  <div class="section-title"><b>나의 수련 기록</b><small id="practiceCount">0개의 기록</small></div>
+  <div class="timeline" id="timeline"></div>
+</section>
+
+<section class="page" id="journey">
+  <div class="hero"><div class="kicker">JOURNEY</div><h1>나의 여정</h1><div class="sub">장소를 소비하는 지도가 아니라, 실제로 수련하고 머문 흔적이 이어지는 여정입니다.</div></div>
+  <div class="journey-box">
+    <div class="place"><b>YOGIBARA MAP · JEJU</b><span>제주 요가원과 파트너 공간을 살펴보고 나의 여정에 연결합니다.</span><button class="btn gold" style="margin-top:10px" onclick="location.href='./index.html'">제주 지도 열기</button></div>
+    <div class="place"><b>수련 공간의 흔적</b><span>같은 공간을 여러 번 찾아도 깊은 수련으로 기록됩니다. 새로운 공간은 여정의 폭을 넓혀줍니다.</span></div>
+    <div class="place"><b>로컬 파트너의 흔적</b><span>차, 음식, 숙소, 브랜드 경험도 작은 디지털 아이템이나 배경으로 이어질 수 있습니다.</span></div>
+  </div>
+</section>
+
+<section class="page" id="share">
+  <div class="hero"><div class="kicker">SHARE</div><h1>나눔 기록</h1><div class="sub">나의 수련이 릴레이가 되고, 릴레이가 실제 나눔으로 이어지는 과정을 기록합니다.</div></div>
+  <div class="relay">
+    <small class="kicker">108 HEART RELAY · DEMO</small>
+    <h2><span id="relayCount">37</span> / 108</h2>
+    <div class="bar"><i id="relayBar"></i></div>
+    <div class="sub">내가 몇 번째 연결이었는지 남고, 릴레이의 흐름을 함께 봅니다.</div>
+    <button class="btn primary" id="joinRelay" style="margin-top:12px">내 수련을 릴레이에 연결</button>
+  </div>
+  <div class="section-title"><b>나의 나눔 흔적</b><small>실제 결제·기부 연동 전 데모</small></div>
+  <div class="timeline" id="shareTimeline"></div>
+</section>
+
+<section class="page" id="connect">
+  <div class="hero"><div class="kicker">CONNECT</div><h1>연결 · 공유</h1><div class="sub">좋아요 숫자보다 ‘연’을 남깁니다. 친구의 수련 공간을 방문하고 작은 응원을 건넬 수 있어요.</div></div>
+  <div class="connection-list" id="friends">
+    <div class="friend"><div style="display:flex;gap:10px;align-items:center"><div class="mini">🌿</div><div><b>바람요기</b><small style="display:block;color:var(--muted)">호흡 · 걷기</small></div></div><button class="btn connectBtn">연 맺기</button></div>
+    <div class="friend"><div style="display:flex;gap:10px;align-items:center"><div class="mini">☕</div><div><b>숨요기</b><small style="display:block;color:var(--muted)">요가 · 마음공부</small></div></div><button class="btn connectBtn">연 맺기</button></div>
+  </div>
+  <div class="section-title"><b>공유는 이렇게</b><small>평가보다 경험</small></div>
+  <div class="card sub">별점이나 순위 대신, “오늘 이곳에서 무엇을 느꼈는지”, “어떤 수련을 했는지”를 짧은 PRACTICE NOTE로 나눕니다.</div>
+</section>
+</main>
+
+<nav class="bottom">
+  <button class="active" data-go="home"><i>⌂</i>HOME</button>
+  <button data-go="practice"><i>◌</i>PRACTICE</button>
+  <button data-go="journey"><i>⌖</i>JOURNEY</button>
+  <button data-go="share"><i>♡</i>SHARE</button>
+  <button data-go="connect"><i>∞</i>CONNECT</button>
+</nav>
+</div>
+
+<div class="sheet" id="profileSheet">
+  <div class="sheet-panel">
+    <div class="sheet-head"><div><small class="kicker">MY YOGI</small><h2>작고 귀엽게, 단순하게.</h2></div><button class="close" id="closeProfile">×</button></div>
+    <div class="avatar-home">
+      <div class="avatar-card" id="sheetAvatar"></div>
+      <div class="avatar-meta"><b id="sheetName">바라요기</b><p>얼굴형·눈·코를 따로 조립하지 않습니다. 기본 캐릭터는 그대로 두고 헤어·옷·매트·소품만 가볍게 바꿉니다.</p></div>
+    </div>
+    <label>YOGI 이름<input id="nameInput" value="바라요기"></label>
+
+    <div class="custom-grid">
+      <div class="optbox"><b>피부</b><div class="swatches" data-group="skin">
+        <button class="sw active" data-value="#efc6a8" style="background:#efc6a8"></button>
+        <button class="sw" data-value="#d9aa82" style="background:#d9aa82"></button>
+        <button class="sw" data-value="#b97d5e" style="background:#b97d5e"></button>
+      </div></div>
+      <div class="optbox"><b>헤어</b><div class="swatches" data-group="hair">
+        <button class="sw active" data-value="#4a382d" style="background:#4a382d"></button>
+        <button class="sw" data-value="#2b2927" style="background:#2b2927"></button>
+        <button class="sw" data-value="#8a5c36" style="background:#8a5c36"></button>
+      </div></div>
+      <div class="optbox"><b>상의</b><div class="swatches" data-group="top">
+        <button class="sw active" data-value="#f4eee3" style="background:#f4eee3"></button>
+        <button class="sw" data-value="#8a977a" style="background:#8a977a"></button>
+        <button class="sw" data-value="#b86f59" style="background:#b86f59"></button>
+      </div></div>
+      <div class="optbox"><b>하의</b><div class="swatches" data-group="bottom">
+        <button class="sw active" data-value="#b7824b" style="background:#b7824b"></button>
+        <button class="sw" data-value="#6d6b60" style="background:#6d6b60"></button>
+        <button class="sw" data-value="#7b7190" style="background:#7b7190"></button>
+      </div></div>
+      <div class="optbox"><b>매트</b><div class="swatches" data-group="mat">
+        <button class="sw active" data-value="#8d7c9d" style="background:#8d7c9d"></button>
+        <button class="sw" data-value="#7c927f" style="background:#7c927f"></button>
+        <button class="sw" data-value="#b78d63" style="background:#b78d63"></button>
+      </div></div>
+      <div class="optbox"><b>소품</b><div class="swatches" data-group="item">
+        <button class="sw active" data-value="none" style="background:#f4ede0">–</button>
+        <button class="sw" data-value="cup" style="background:#d9b47a">☕</button>
+        <button class="sw" data-value="heart" style="background:#d98e88">♡</button>
+      </div></div>
+    </div>
+    <div class="shop-note"><b>SHOP 방향</b><br>샵은 메인 정체성이 아니라 MY YOGI 안의 작은 즐거움으로 둡니다. 옷, 매트, 텀블러, 요가백, 로컬 파트너 아이템처럼 귀엽게 확장할 수 있습니다.</div>
+    <button class="btn primary wide" id="saveProfile" style="margin-top:12px">저장</button>
+  </div>
+</div>
+
+<script>
+const KEY='yogibara_v8';
+const defaultState={name:'바라요기',skin:'#efc6a8',hair:'#4a382d',top:'#f4eee3',bottom:'#b7824b',mat:'#8d7c9d',item:'none',practices:[],relay:37,shares:[],connections:0};
+let state={...defaultState,...JSON.parse(localStorage.getItem(KEY)||'{}')};
+
+function avatarSVG(cls=''){
+  const item = state.item==='cup'
+    ? `<g transform="translate(106 111)"><rect x="0" y="0" width="16" height="22" rx="4" fill="#d8b37c"/><path d="M16 5c9 0 9 12 0 12" fill="none" stroke="#8a6944" stroke-width="3"/></g>`
+    : state.item==='heart'
+    ? `<path d="M108 118c-8-10-23 2-9 15l9 8 9-8c14-13-1-25-9-15z" fill="#d98e88"/>`
+    : '';
+  return `
+  <svg class="yogi-svg ${cls}" viewBox="0 0 140 210" aria-label="귀여운 YOGI 아바타">
+    <ellipse cx="70" cy="194" rx="51" ry="9" fill="${state.mat}" opacity=".95"/>
+    <ellipse cx="70" cy="194" rx="43" ry="4" fill="none" stroke="#ffffff55"/>
+    <g>
+      <path d="M52 118 Q47 146 50 184" stroke="${state.skin}" stroke-width="13" stroke-linecap="round" fill="none"/>
+      <path d="M88 118 Q94 147 91 184" stroke="${state.skin}" stroke-width="13" stroke-linecap="round" fill="none"/>
+      <ellipse cx="49" cy="186" rx="14" ry="5" fill="${state.skin}"/>
+      <ellipse cx="92" cy="186" rx="14" ry="5" fill="${state.skin}"/>
+      <path d="M46 107 Q70 99 94 107 L88 148 Q70 155 52 148Z" fill="${state.bottom}"/>
+      <path d="M52 144 L50 178" stroke="${state.bottom}" stroke-width="17" stroke-linecap="round"/>
+      <path d="M88 144 L91 178" stroke="${state.bottom}" stroke-width="17" stroke-linecap="round"/>
+      <path d="M47 76 Q70 64 93 76 L96 116 Q70 124 44 116Z" fill="${state.top}"/>
+      <path d="M48 82 Q34 92 30 116" stroke="${state.skin}" stroke-width="11" stroke-linecap="round" fill="none"/>
+      <path d="M92 82 Q105 92 110 115" stroke="${state.skin}" stroke-width="11" stroke-linecap="round" fill="none"/>
+      <circle cx="70" cy="50" r="29" fill="${state.hair}"/>
+      <circle cx="84" cy="28" r="16" fill="${state.hair}"/>
+      <ellipse cx="70" cy="55" rx="25" ry="28" fill="${state.skin}"/>
+      <path d="M47 48 Q55 23 79 28 Q95 31 96 50 Q85 39 71 40 Q58 41 47 48Z" fill="${state.hair}"/>
+      <path d="M48 52 Q43 72 54 79" fill="none" stroke="${state.hair}" stroke-width="8" stroke-linecap="round"/>
+      <circle cx="61" cy="55" r="2.3" fill="#45382f"/>
+      <circle cx="79" cy="55" r="2.3" fill="#45382f"/>
+      <path d="M64 68 Q70 72 76 68" fill="none" stroke="#9b5d55" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="53" cy="63" r="4" fill="#d99284" opacity=".25"/>
+      <circle cx="87" cy="63" r="4" fill="#d99284" opacity=".25"/>
+      <path d="M68 79 L68 89" stroke="${state.skin}" stroke-width="10" stroke-linecap="round"/>
+      <circle cx="71" cy="97" r="5" fill="#c79a4c" opacity=".9"/>
+      ${item}
+    </g>
+  </svg>`;
+}
+
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function render(){
+  homeAvatar.innerHTML=avatarSVG('');
+  sheetAvatar.innerHTML=avatarSVG('');
+  yogiName.textContent=state.name;
+  sheetName.textContent=state.name;
+  nameInput.value=state.name;
+  sPractice.textContent=state.practices.length;
+  const uniquePlaces=[...new Set(state.practices.map(x=>x.place).filter(Boolean))];
+  sJourney.textContent=uniquePlaces.length;
+  sShare.textContent=state.shares.length;
+  practiceCount.textContent=state.practices.length+'개의 기록';
+  timeline.innerHTML=state.practices.length?state.practices.slice().reverse().map(p=>`<div class="entry"><b>${p.type} · ${p.min}분</b><small>${p.place||'장소 없음'} · ${p.date}</small><small>${p.note||'한 줄 기록 없음'}</small></div>`).join(''):`<div class="empty">아직 기록이 없습니다. 오늘의 수련부터 시작해보세요.</div>`;
+  shareTimeline.innerHTML=state.shares.length?state.shares.slice().reverse().map(s=>`<div class="entry"><b>${s.order}번째 연결</b><small>${s.date} · 108 HEART RELAY</small></div>`).join(''):`<div class="empty">아직 나눔 흔적이 없습니다.</div>`;
+  relayCount.textContent=state.relay;
+  relayBar.style.width=Math.min(100,state.relay/108*100)+'%';
+  todayText.textContent=state.practices.length?`최근 수련 · ${state.practices[state.practices.length-1].type} ${state.practices[state.practices.length-1].min}분`:'오늘의 수련을 기록하면 이곳에 흔적이 쌓입니다.';
+  document.querySelectorAll('.swatches').forEach(g=>{ const k=g.dataset.group; g.querySelectorAll('.sw').forEach(b=>b.classList.toggle('active',b.dataset.value===state[k]))})
+}
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));
+  document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.go===id));
+  scrollTo({top:0,behavior:'smooth'})
+}
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
+openProfile.onclick=()=>profileSheet.classList.add('open');
+closeProfile.onclick=()=>profileSheet.classList.remove('open');
+profileSheet.addEventListener('click',e=>{if(e.target===profileSheet)profileSheet.classList.remove('open')});
+document.querySelectorAll('.sw').forEach(b=>b.onclick=()=>{state[b.parentElement.dataset.group]=b.dataset.value;render()});
+saveProfile.onclick=()=>{state.name=nameInput.value.trim()||'바라요기';save();render();profileSheet.classList.remove('open')};
+savePractice.onclick=()=>{
+  const p={type:ptype.value,min:+minutes.value||30,place:place.value.trim(),note:note.value.trim(),date:new Date().toLocaleDateString('ko-KR')};
+  state.practices.push(p);save();place.value='';note.value='';render();alert('오늘의 수련이 기록되었습니다.');
+};
+joinRelay.onclick=()=>{
+  if(state.relay>=108){alert('이 데모 릴레이는 이미 완성되었습니다.');return}
+  state.relay++;state.shares.push({order:state.relay,date:new Date().toLocaleDateString('ko-KR')});save();render();alert(`당신은 ${state.relay}번째 연결입니다.`);
+};
+document.querySelectorAll('.connectBtn').forEach(b=>b.onclick=()=>{if(b.dataset.done)return;b.dataset.done='1';b.textContent='연결됨';state.connections++;save()});
+render();
+</script>
+</body>
+</html>

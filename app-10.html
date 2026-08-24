@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5efe3">
+<title>YOGIBARA V10</title>
+<style>
+:root{
+  --bg:#f5efe3; --paper:#fffaf2; --ink:#40362b; --muted:#8d7e6b;
+  --line:#dfd1bc; --olive:#7b7a45; --gold:#b9853a; --rose:#ae6e68;
+  --sage:#81927c; --soft:#efe5d5; --dark:#332a22; --shadow:0 12px 30px rgba(67,51,31,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+button,input,textarea,select{font:inherit} button{cursor:pointer}
+.app{max-width:720px;margin:auto;min-height:100vh;background:radial-gradient(circle at 15% 0%,rgba(221,188,124,.12),transparent 28%),var(--paper);padding-bottom:86px}
+header{padding:18px 18px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand b{font:700 22px Georgia,serif;letter-spacing:.03em;color:#6c5530}.brand small{display:block;margin-top:3px;font-size:10px;color:var(--muted)}
+.profile-btn{border:1px solid var(--line);background:#fffaf6;border-radius:999px;padding:9px 12px;font-size:11px;color:var(--ink);font-weight:800}
+.page{display:none;padding:0 16px 22px}.page.active{display:block}
+.hero{padding:17px;border:1px solid var(--line);border-radius:26px;background:#fffdf8;box-shadow:var(--shadow);margin-bottom:12px}
+.kicker{font-size:9px;letter-spacing:.18em;color:var(--gold);font-weight:900}
+h1{font:600 30px Georgia,serif;margin:6px 0 8px;line-height:1.25}
+.sub{font-size:12px;color:var(--muted);line-height:1.65}
+.core-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.core-card{border:1px solid var(--line);background:#fffdf8;border-radius:22px;padding:14px;min-height:118px;text-align:left;color:var(--ink)}
+.core-card .ico{font-size:24px}.core-card b{display:block;margin-top:10px;font-size:14px}.core-card span{display:block;margin-top:5px;font-size:10px;line-height:1.45;color:var(--muted)}
+.avatar-home{display:grid;grid-template-columns:145px 1fr;gap:14px;align-items:center;margin:12px 0 14px}
+.avatar-card{min-height:220px;border:1px solid var(--line);border-radius:24px;background:var(--avatar-bg,#f3eadc);display:grid;place-items:center;position:relative;overflow:hidden;transition:background .2s ease}
+.avatar-card:after{content:"";position:absolute;left:18%;right:18%;bottom:17px;height:10px;border-radius:50%;background:rgba(87,66,41,.08);filter:blur(5px);z-index:0}
+#yogiSheet .avatar-home{position:sticky;top:-18px;z-index:7;background:linear-gradient(180deg,var(--paper) 78%,rgba(255,250,242,.92));padding:14px 0 10px;margin-top:0;border-bottom:1px solid rgba(223,209,188,.65)}
+#yogiSheet .avatar-card{box-shadow:0 10px 24px rgba(74,55,31,.08)}
+.layer-note{font-size:9px;line-height:1.55;color:var(--muted);margin-top:7px}
+.item-toggle-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.item-toggle{border:1px solid var(--line);background:#fffaf4;border-radius:15px;padding:10px;font-size:10px;color:var(--ink)}
+.item-toggle.active{border:2px solid var(--gold);background:#fbf0df}
+.avatar-meta b{font:600 24px Georgia,serif}.avatar-meta p{font-size:11px;line-height:1.6;color:var(--muted)}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:11px}.stat{border:1px solid var(--line);border-radius:15px;background:#fffaf4;padding:9px;text-align:center}.stat strong{display:block;font-size:16px}.stat small{font-size:8px;color:var(--muted)}
+.yogi-svg{width:132px;height:205px;overflow:visible}
+.section-title{display:flex;justify-content:space-between;align-items:end;margin:18px 2px 8px}.section-title b{font-size:16px}.section-title small{font-size:9px;color:var(--muted)}
+.card{border:1px solid var(--line);background:#fffdf8;border-radius:22px;padding:14px;box-shadow:var(--shadow)}
+.form{display:grid;gap:10px}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+label{font-size:10px;color:var(--muted);font-weight:800}
+input,select,textarea{width:100%;margin-top:5px;border:1px solid var(--line);background:#fffaf5;border-radius:14px;padding:11px 12px;color:var(--ink)}
+textarea{min-height:82px;resize:vertical}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:11px 15px;min-height:44px}
+.btn.primary{background:var(--olive);border-color:var(--olive);color:#fff;font-weight:900}.btn.gold{background:var(--gold);border-color:var(--gold);color:#fff;font-weight:900}.btn.ghost{background:#fffaf4}.btn.wide{width:100%}
+.timeline{display:grid;gap:9px}.entry{border:1px solid var(--line);background:#fffaf4;border-radius:18px;padding:12px}.entry-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.entry b{font-size:12px}.entry small{display:block;color:var(--muted);font-size:9px;margin-top:4px;line-height:1.5}.status{font-size:8px;border-radius:999px;padding:5px 8px;background:#eee3d1;color:#75644d;white-space:nowrap}.status.ok{background:#e5eadc;color:#5f704d}.status.used{background:#f0ddd9;color:#8a5751}
+.entry-actions{display:flex;gap:7px;margin-top:9px}.entry-actions button{min-height:36px;padding:7px 10px;font-size:9px}
+.empty{padding:24px;text-align:center;border:1px dashed var(--line);border-radius:18px;color:var(--muted);font-size:11px}
+.journey-box{display:grid;gap:10px}.placebox{border:1px solid var(--line);border-radius:18px;background:#fffaf4;padding:12px}.placebox b{font-size:12px}.placebox span{display:block;margin-top:5px;font-size:9px;color:var(--muted);line-height:1.5}
+.relay-card{background:linear-gradient(135deg,#fff8ef,#f0e2cb);border:1px solid var(--line);border-radius:24px;padding:16px}.relay-card h2{font:600 26px Georgia,serif;margin:5px 0}.bar{height:10px;border-radius:999px;background:#e6dac7;overflow:hidden;margin:10px 0}.bar i{display:block;height:100%;background:var(--rose)}
+.eligible{display:grid;gap:8px;margin-top:10px}.eligible .entry{background:#fffdf8}
+.relay-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:5px;margin-top:12px}.rnum{aspect-ratio:1;border:1px solid var(--line);border-radius:50%;background:#f8f1e5;color:#aa9b87;font-size:8px}.rnum.done{background:#efe1c6;color:#6e5630;border-color:#d5bb86;font-weight:900}.rnum.mine{background:var(--olive);color:#fff;border:2px solid #d9d8b0}
+.connection-list{display:grid;gap:8px}.friend{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);background:#fffaf4;border-radius:18px;padding:11px}.mini{width:38px;height:38px;border-radius:50%;background:#eee2cf;display:grid;place-items:center}
+.bottom{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(720px,100%);display:grid;grid-template-columns:repeat(5,1fr);background:#fffaf7ed;backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:7px 4px max(7px,env(safe-area-inset-bottom));z-index:30}
+.bottom button{border:0;background:transparent;color:#756957;padding:6px 2px;font-size:8px}.bottom button i{display:block;font-style:normal;font-size:19px;line-height:1.2}.bottom button.active{color:#5d492d;font-weight:900}
+.sheet{position:fixed;inset:0;background:#2d241c66;display:none;align-items:flex-end;justify-content:center;z-index:80}.sheet.open{display:flex}.sheet-panel{width:min(720px,100%);max-height:90vh;overflow:auto;background:var(--paper);border-radius:28px 28px 0 0;padding:18px 16px 28px}
+.sheet-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.sheet-head h2{font:600 25px Georgia,serif;margin:0}.close{border:0;background:#eee3d3;border-radius:50%;width:38px;height:38px}
+.custom-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.optbox{border:1px solid var(--line);background:#fffdf8;border-radius:18px;padding:12px}.optbox b{font-size:11px}.swatches{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.sw{width:34px;height:34px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}.sw.active{box-shadow:0 0 0 3px var(--gold)}
+.gender-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gender-row button.active{background:var(--olive);color:#fff;border-color:var(--olive)}
+.hair-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.hair-opt{border:1px solid var(--line);background:#fffaf4;border-radius:14px;padding:9px;font-size:10px}.hair-opt.active{border:2px solid var(--gold)}
+.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.shop-item{border:1px solid var(--line);background:#fffdf8;border-radius:18px;padding:12px}.shop-item .emoji{font-size:28px}.shop-item b{display:block;font-size:11px;margin-top:7px}.shop-item span{display:block;font-size:9px;color:var(--muted);margin-top:4px}.shop-item button{width:100%;margin-top:9px;min-height:36px;font-size:9px}
+.verify-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}.vm{border:1px solid var(--line);background:#fffaf4;border-radius:14px;padding:10px;font-size:9px}.vm.active{border:2px solid var(--gold);background:#fbf0df}
+.photo-preview{margin-top:10px;border-radius:16px;overflow:hidden;border:1px solid var(--line);display:none}.photo-preview img{width:100%;display:block}
+.cert{display:grid;gap:8px;margin-top:12px}.cert-row{display:grid;grid-template-columns:86px 1fr;gap:8px;border-bottom:1px solid #eee2d2;padding:8px 0;font-size:11px}.cert-row span{color:var(--muted)}
+.timerbox{margin-top:10px;text-align:center;padding:14px;border:1px solid var(--line);border-radius:16px;background:#fffaf4}.timerbox strong{font:600 28px Georgia,serif}
+.shop-note{margin-top:12px;padding:12px;border-radius:16px;background:#efe7d8;color:#756957;font-size:10px;line-height:1.55}
+@media(min-width:600px){.avatar-home{grid-template-columns:180px 1fr}.avatar-card{min-height:250px}.yogi-svg{width:150px;height:225px}.relay-grid{grid-template-columns:repeat(12,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand"><b>YOGIBARA</b><small>수련은, 나에게서 끝나지 않는다.</small></div>
+  <button class="profile-btn" id="openYogi">MY YOGI · 꾸미기</button>
+</header>
+
+<main>
+<section class="page active" id="home">
+  <div class="hero">
+    <div class="kicker">TODAY · PRACTICE. SHARE. PEACE.</div>
+    <h1>오늘의 수련이<br>하나의 결이 됩니다.</h1>
+    <div class="sub">오늘의 수련을 기록하고, 그 수련이 머문 장소와 사람, 나눔의 흔적을 이어갑니다.</div>
+  </div>
+
+  <div class="avatar-home">
+    <div class="avatar-card" id="homeAvatar"></div>
+    <div class="avatar-meta">
+      <small class="kicker">MY YOGI</small>
+      <b id="yogiName">바라요기</b>
+      <p id="recentText">오늘의 수련을 기록해보세요.</p>
+      <div class="stat-row">
+        <div class="stat"><strong id="statPractice">0</strong><small>수련</small></div>
+        <div class="stat"><strong id="statJourney">0</strong><small>여정</small></div>
+        <div class="stat"><strong id="statShare">0</strong><small>나눔</small></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="core-grid">
+    <button class="core-card" data-go="practice"><div class="ico">◌</div><b>나의 수련 기록</b><span>오늘의 수련을 남기고 인증합니다.</span></button>
+    <button class="core-card" data-go="journey"><div class="ico">⌖</div><b>나의 여정</b><span>수련한 공간과 머문 장소의 흔적을 이어갑니다.</span></button>
+    <button class="core-card" data-go="share"><div class="ico">♡</div><b>나눔 기록</b><span>인증된 수련으로 릴레이를 잇고 나눔을 기록합니다.</span></button>
+    <button class="core-card" data-go="connect"><div class="ico">∞</div><b>연결 · 공유</b><span>‘연’을 맺고 서로의 수련을 응원합니다.</span></button>
+  </div>
+</section>
+
+<section class="page" id="practice">
+  <div class="hero"><div class="kicker">PRACTICE</div><h1>나의 수련</h1><div class="sub">수련을 먼저 기록하고, 필요한 경우 인증합니다. 인증된 수련만 릴레이에 연결할 수 있습니다.</div></div>
+  <div class="card form">
+    <div class="row">
+      <label>수련<select id="ptype"><option>요가</option><option>명상</option><option>호흡</option><option>걷기</option><option>마음공부</option><option>나눔</option></select></label>
+      <label>시간(분)<input id="minutes" type="number" min="1" value="30"></label>
+    </div>
+    <label>장소<input id="place" placeholder="집, 아난드요가, 제주 바다…"></label>
+    <label>오늘의 한 줄<textarea id="note" placeholder="몸과 마음에 남은 것을 짧게 적어보세요."></textarea></label>
+    <button class="btn primary wide" id="savePractice">수련 기록하기</button>
+  </div>
+  <div class="section-title"><b>수련 기록</b><small id="practiceCount">0개의 기록</small></div>
+  <div class="timeline" id="practiceTimeline"></div>
+</section>
+
+<section class="page" id="journey">
+  <div class="hero"><div class="kicker">JOURNEY</div><h1>나의 여정</h1><div class="sub">새로운 장소도, 한 공간에서 이어가는 깊은 수련도 모두 나의 여정으로 남습니다.</div></div>
+  <div class="journey-box">
+    <div class="placebox"><b>YOGIBARA MAP · JEJU</b><span>제주 요가원과 파트너 공간을 찾아보고 실제 수련 기록과 연결합니다.</span><button class="btn gold" style="margin-top:10px" onclick="location.href='./index.html'">제주 지도 열기</button></div>
+    <div class="placebox"><b>수련 공간의 흔적</b><span>같은 공간을 반복해서 찾아도 괜찮습니다. 반복은 깊이로, 새로운 공간은 여정의 폭으로 남습니다.</span></div>
+    <div class="placebox"><b>로컬 파트너</b><span>차, 음식, 숙소, 브랜드 경험은 나중에 MY YOGI의 텀블러·가방·배경 같은 작은 아이템으로 이어질 수 있습니다.</span></div>
+  </div>
+</section>
+
+<section class="page" id="share">
+  <div class="hero"><div class="kicker">SHARE</div><h1>나눔 기록</h1><div class="sub">버튼만 눌러서는 릴레이에 참여할 수 없습니다. 인증을 마친 수련을 선택해야 다음 번호가 이어집니다.</div></div>
+  <div class="relay-card">
+    <div class="kicker">108 HEART RELAY · DEMO</div>
+    <h2><span id="relayCount">37</span> / 108</h2>
+    <div class="bar"><i id="relayBar"></i></div>
+    <div class="sub">채워진 번호를 누르면 누가, 어떤 수련을 어떻게 인증했는지 확인할 수 있습니다.</div>
+    <div id="relayGrid" class="relay-grid"></div>
+  </div>
+
+  <div class="section-title"><b>릴레이에 연결할 수련</b><small>인증 완료 + 아직 미사용</small></div>
+  <div id="eligibleList" class="eligible"></div>
+
+  <div class="section-title"><b>나의 나눔 흔적</b><small>실제 기부 연동 전 프로토타입</small></div>
+  <div id="shareTimeline" class="timeline"></div>
+</section>
+
+<section class="page" id="connect">
+  <div class="hero"><div class="kicker">CONNECT</div><h1>연결 · 공유</h1><div class="sub">좋아요 숫자보다 ‘연’을 남깁니다. 수련을 평가하기보다 서로의 기록을 가볍게 응원합니다.</div></div>
+  <div class="connection-list">
+    <div class="friend"><div style="display:flex;gap:10px;align-items:center"><div class="mini">🌿</div><div><b>바람요기</b><small style="display:block;color:var(--muted)">호흡 · 걷기</small></div></div><button class="btn connectBtn">연 맺기</button></div>
+    <div class="friend"><div style="display:flex;gap:10px;align-items:center"><div class="mini">☕</div><div><b>숨요기</b><small style="display:block;color:var(--muted)">요가 · 마음공부</small></div></div><button class="btn connectBtn">연 맺기</button></div>
+  </div>
+  <div class="section-title"><b>PRACTICE NOTE</b><small>별점 대신 경험</small></div>
+  <div class="card sub">친구의 수련 기록에 차 한 잔, 꽃 한 송이, 응원 한마디처럼 작은 반응을 남기는 방식으로 확장합니다.</div>
+</section>
+</main>
+
+<nav class="bottom">
+  <button class="active" data-go="home"><i>⌂</i>HOME</button>
+  <button data-go="practice"><i>◌</i>PRACTICE</button>
+  <button data-go="journey"><i>⌖</i>JOURNEY</button>
+  <button data-go="share"><i>♡</i>SHARE</button>
+  <button data-go="connect"><i>∞</i>CONNECT</button>
+</nav>
+</div>
+
+<!-- MY YOGI -->
+<div class="sheet" id="yogiSheet"><div class="sheet-panel">
+  <div class="sheet-head">
+    <div><div class="kicker">MY YOGI</div><h2>나의 YOGI 꾸미기</h2></div>
+    <button class="close" data-close="yogiSheet">×</button>
+  </div>
+
+  <div class="avatar-home">
+    <div class="avatar-card" id="sheetAvatar"></div>
+    <div class="avatar-meta">
+      <b id="sheetName">바라요기</b>
+      <p>헤어, 옷, 매트와 소품을 하나씩 골라보세요.</p>
+      <div class="layer-note">미리보기는 화면을 따라옵니다. 선택한 파츠만 따로 바뀝니다.</div>
+    </div>
+  </div>
+
+  <label>YOGI 이름<input id="nameInput" value="바라요기"></label>
+
+  <div class="section-title"><b>기본 타입</b><small>얼굴은 고정</small></div>
+  <div class="gender-row">
+    <button class="btn active" data-gender="yogini">YOGINI</button>
+    <button class="btn" data-gender="yogi">YOGI</button>
+  </div>
+
+  <div class="section-title"><b>헤어스타일</b><small>머리만 교체</small></div>
+  <div class="hair-row">
+    <button class="hair-opt active" data-hairStyle="soft">소프트 번</button>
+    <button class="hair-opt" data-hairStyle="bob">내추럴 단발</button>
+    <button class="hair-opt" data-hairStyle="lowtie">낮은 묶음</button>
+  </div>
+
+  <div class="custom-grid">
+    <div class="optbox"><b>피부톤</b><div class="swatches" data-group="skin">
+      <button class="sw active" data-value="#e8bea0" style="background:#e8bea0"></button>
+      <button class="sw" data-value="#d29e7b" style="background:#d29e7b"></button>
+      <button class="sw" data-value="#aa7357" style="background:#aa7357"></button>
+    </div></div>
+    <div class="optbox"><b>헤어색</b><div class="swatches" data-group="hair">
+      <button class="sw active" data-value="#5a4335" style="background:#5a4335"></button>
+      <button class="sw" data-value="#2e2b29" style="background:#2e2b29"></button>
+      <button class="sw" data-value="#8a6548" style="background:#8a6548"></button>
+    </div></div>
+    <div class="optbox"><b>배경</b><div class="swatches" data-group="avatarBg">
+      <button class="sw active" data-value="#f3eadc" style="background:#f3eadc"></button>
+      <button class="sw" data-value="#e9ecdf" style="background:#e9ecdf"></button>
+      <button class="sw" data-value="#efe1d2" style="background:#efe1d2"></button>
+    </div></div>
+  </div>
+
+  <div class="section-title"><b>수련의 흔적</b><small>판매하지 않는 아이템</small></div>
+  <div class="item-toggle-row">
+    <button class="item-toggle" id="braceletToggle">◌ 숨결 팔찌</button>
+    <button class="item-toggle" id="badgeToggle">♡ RELAY 뱃지</button>
+  </div>
+
+  <div class="section-title"><b>MY YOGI SHOP</b><small>옷 · 매트 · 소품</small></div>
+  <div id="shopGrid" class="shop-grid"></div>
+  <div class="shop-note">옷, 매트, 텀블러와 요가백은 각각 다른 레이어입니다. 하나를 바꿔도 다른 파츠는 그대로 유지됩니다.</div>
+
+  <button class="btn primary wide" id="saveYogi" style="margin-top:12px">MY YOGI 저장</button>
+</div></div>
+
+<!-- VERIFY -->
+<div class="sheet" id="verifySheet"><div class="sheet-panel">
+  <div class="sheet-head"><div><div class="kicker">PRACTICE VERIFY</div><h2>수련 인증</h2></div><button class="close" data-close="verifySheet">×</button></div>
+  <div id="verifyPracticeInfo" class="card sub" style="margin-top:12px"></div>
+  <div class="section-title"><b>인증 방식</b><small>프로토타입</small></div>
+  <div class="verify-methods">
+    <button class="vm active" data-vmethod="partner">PARTNER</button>
+    <button class="vm" data-vmethod="photo">PHOTO</button>
+    <button class="vm" data-vmethod="timer">TIMER</button>
+  </div>
+  <div id="verifyBody"></div>
+  <button class="btn primary wide" id="completeVerify" style="margin-top:12px">이 수련 인증 완료</button>
+</div></div>
+
+<!-- CERT -->
+<div class="sheet" id="certSheet"><div class="sheet-panel">
+  <div class="sheet-head"><div><div class="kicker">108 HEART RELAY</div><h2 id="certTitle">001번째 연결</h2></div><button class="close" data-close="certSheet">×</button></div>
+  <div id="certBody" class="cert"></div>
+</div></div>
+
+<script>
+const KEY='yogibara_v10';
+const OLD_KEY='yogibara_v9';
+const demoNames=['바람요기','숨요기','하루요기','달요기','소담요기','모아요기','산요기','해온요기'];
+const demoPlaces=['아난드요가','요가로움','쁘라즈나요가','바라보다요가','집','함덕 바다'];
+const demoTypes=['하타요가','빈야사','명상','호흡'];
+const defaults={
+  name:'바라요기',gender:'yogini',hairStyle:'soft',
+  skin:'#e8bea0',hair:'#5a4335',avatarBg:'#f3eadc',
+  topStyle:'tee',top:'#f7f2e8',
+  bottomStyle:'aladdin',bottom:'#c58d43',
+  mat:'#8b9272',item:'none',bag:false,bracelet:false,badge:false,
+  owned:['top_white','bottom_ochre','mat_sage'],practices:[],shares:[],connections:0
+};
+const savedRaw=localStorage.getItem(KEY)||localStorage.getItem(OLD_KEY)||'{}';
+let state={...defaults,...JSON.parse(savedRaw)};
+let verifyPracticeId=null, verifyMethod='partner', timerPassed=false, timerInt=null, pendingPhoto='';
+
+function demoRelay(){
+  return Array.from({length:37},(_,i)=>({
+    number:i+1,yogi:demoNames[i%demoNames.length],type:demoTypes[i%demoTypes.length],
+    min:[30,45,60,20][i%4],place:demoPlaces[i%demoPlaces.length],
+    verify:['PARTNER','PHOTO','TIMER'][i%3],note:['오늘의 한 번을 이어봅니다.','조용히 마음을 보냅니다.','나의 수련이 누군가에게 닿기를.'][i%3],
+    date:'2026. 8. '+String(10+(i%14))+'.',mine:false,photo:''
+  }));
+}
+function allRelay(){
+  return [...demoRelay(),...state.shares.map(s=>({...s,mine:true}))];
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+
+function avatarSVG(){
+  const isYogi=state.gender==='yogi';
+  const line='#8d765e';
+
+  // HAIR BACK LAYER
+  let hairBack='';
+  if(state.hairStyle==='soft'){
+    hairBack = isYogi
+      ? `<path d="M77 66 Q80 36 110 33 Q139 34 144 65 Q133 53 113 51 Q93 50 77 66Z" fill="${state.hair}" stroke="${line}" stroke-width="1.8"/>`
+      : `<path d="M75 73 Q74 40 108 34 Q142 32 148 69 Q146 88 139 100 Q133 86 125 71 Q111 61 97 72 Q89 88 80 101 Q73 89 75 73Z" fill="${state.hair}" stroke="${line}" stroke-width="1.8"/>
+         <path d="M117 35 Q126 18 144 25 Q157 34 148 48 Q135 55 122 45Z" fill="${state.hair}" stroke="${line}" stroke-width="1.8"/>`;
+  }else if(state.hairStyle==='bob'){
+    hairBack = `<path d="M72 69 Q73 37 108 33 Q146 33 151 70 L146 107 Q137 118 127 113 L124 79 Q111 63 96 78 L91 112 Q80 117 73 105Z" fill="${state.hair}" stroke="${line}" stroke-width="1.8"/>`;
+  }else{
+    hairBack = `<path d="M76 67 Q79 38 109 34 Q141 35 146 68 Q135 54 113 53 Q93 53 76 67Z" fill="${state.hair}" stroke="${line}" stroke-width="1.8"/>
+       <path d="M106 101 Q101 129 111 152 Q121 132 117 101Z" fill="${state.hair}" stroke="${line}" stroke-width="1.8"/>`;
+  }
+
+  // HAIR FRONT LAYER
+  const hairFront = state.hairStyle==='bob'
+    ? `<path d="M82 63 Q95 41 119 46 Q137 49 143 66 Q127 58 113 61 Q98 61 84 73Z" fill="${state.hair}" stroke="${line}" stroke-width="1.5"/>
+       <path d="M80 67 Q75 84 83 100" fill="none" stroke="${state.hair}" stroke-width="7" stroke-linecap="round"/>`
+    : state.hairStyle==='lowtie'
+    ? `<path d="M82 62 Q94 42 114 44 Q135 46 142 65 Q129 56 114 59 Q99 58 84 70Z" fill="${state.hair}" stroke="${line}" stroke-width="1.5"/>
+       <path d="M82 70 Q76 86 84 98" fill="none" stroke="${state.hair}" stroke-width="6" stroke-linecap="round"/>`
+    : `<path d="M81 63 Q95 42 116 45 Q136 49 142 67 Q130 57 115 60 Q100 60 84 72Z" fill="${state.hair}" stroke="${line}" stroke-width="1.5"/>
+       <path d="M82 70 Q77 86 85 98" fill="none" stroke="${state.hair}" stroke-width="6" stroke-linecap="round"/>`;
+
+  // BAG BACK + FRONT LAYERS
+  const bagBack = state.bag
+    ? `<g id="layer-bag-back"><path d="M64 139 Q45 176 53 225" fill="none" stroke="#7b674d" stroke-width="4" stroke-linecap="round"/>
+       <rect x="34" y="207" width="38" height="49" rx="8" fill="#b18d64" stroke="${line}" stroke-width="1.7"/></g>`:'';
+  const bagFront = state.bag
+    ? `<g id="layer-bag-front"><path d="M64 139 Q95 157 139 170" fill="none" stroke="#7b674d" stroke-width="3" stroke-linecap="round" opacity=".9"/></g>`:'';
+
+  // BODY / FIXED FACE LAYER
+  const body = `<g id="layer-body">
+      <path d="M93 108 L93 124" stroke="${state.skin}" stroke-width="15" stroke-linecap="round"/>
+      <ellipse cx="111" cy="82" rx="34" ry="39" fill="${state.skin}" stroke="${line}" stroke-width="1.8"/>
+      <path d="M92 80 Q98 75 104 80" fill="none" stroke="#4f4338" stroke-width="2" stroke-linecap="round"/>
+      <path d="M118 80 Q124 75 130 80" fill="none" stroke="#4f4338" stroke-width="2" stroke-linecap="round"/>
+      <path d="M110 84 Q108 90 111 93" fill="none" stroke="#a97863" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M101 98 Q111 104 121 98" fill="none" stroke="#a46560" stroke-width="2" stroke-linecap="round"/>
+      ${!isYogi?`<circle cx="91" cy="94" r="5" fill="#dc9788" opacity=".18"/><circle cx="131" cy="94" r="5" fill="#dc9788" opacity=".18"/>`:''}
+      <path d="M78 151 Q58 169 57 204" stroke="${state.skin}" stroke-width="13" stroke-linecap="round" fill="none"/>
+      <path d="M143 151 Q161 169 164 201" stroke="${state.skin}" stroke-width="13" stroke-linecap="round" fill="none"/>
+      <path d="M91 247 L89 286" stroke="${state.skin}" stroke-width="14" stroke-linecap="round"/>
+      <path d="M132 247 L134 286" stroke="${state.skin}" stroke-width="14" stroke-linecap="round"/>
+      <ellipse cx="84" cy="291" rx="20" ry="6" fill="${state.skin}" stroke="${line}" stroke-width="1.2"/>
+      <ellipse cx="139" cy="291" rx="20" ry="6" fill="${state.skin}" stroke="${line}" stroke-width="1.2"/>
+    </g>`;
+
+  // BOTTOM LAYER
+  const pants = state.bottomStyle==='straight'
+    ? `<g id="layer-bottom"><path d="M78 194 Q111 202 145 194 L141 264 Q128 270 116 263 L110 226 L105 263 Q91 271 80 263Z" fill="${state.bottom}" stroke="${line}" stroke-width="1.8"/></g>`
+    : `<g id="layer-bottom"><path d="M76 192 Q111 202 147 192 Q156 224 147 263 Q139 278 122 272 L112 231 L102 272 Q84 278 76 263 Q67 224 76 192Z" fill="${state.bottom}" stroke="${line}" stroke-width="1.8"/>
+       <path d="M78 201 Q111 208 145 201" fill="none" stroke="#9e6f35" stroke-width="1.3" opacity=".55"/></g>`;
+
+  // TOP LAYER
+  const shirt = state.topStyle==='relaxed'
+    ? `<g id="layer-top"><path d="M76 131 Q111 118 146 131 L151 191 Q112 204 72 191Z" fill="${state.top}" stroke="${line}" stroke-width="1.8"/>
+       <path d="M76 137 L59 154 L73 169 L83 151" fill="${state.top}" stroke="${line}" stroke-width="1.8"/>
+       <path d="M146 137 L163 154 L149 169 L139 151" fill="${state.top}" stroke="${line}" stroke-width="1.8"/></g>`
+    : `<g id="layer-top"><path d="M78 131 Q111 119 144 131 L147 190 Q111 199 75 190Z" fill="${state.top}" stroke="${line}" stroke-width="1.8"/>
+       <path d="M79 137 L62 153 L75 166 L84 151" fill="${state.top}" stroke="${line}" stroke-width="1.8"/>
+       <path d="M143 137 L160 153 L147 166 L138 151" fill="${state.top}" stroke="${line}" stroke-width="1.8"/></g>`;
+
+  // HELD PROP LAYER
+  const prop = state.item==='tumbler'
+    ? `<g id="layer-prop"><rect x="160" y="190" width="18" height="34" rx="5" fill="#c6b59c" stroke="${line}" stroke-width="1.5"/><rect x="162" y="186" width="14" height="6" rx="2" fill="#62605a"/></g>`
+    : state.item==='flower'
+    ? `<g id="layer-prop"><path d="M169 222 L164 194" stroke="#6f8a66" stroke-width="2"/><circle cx="164" cy="190" r="7" fill="#d69b94"/></g>`:'';
+
+  // REWARD ACCESSORY LAYER
+  const rewards = `<g id="layer-rewards">
+      ${state.bracelet?`<ellipse cx="160" cy="198" rx="8" ry="4" fill="none" stroke="#9f784e" stroke-width="3"/>`:''}
+      ${state.badge?`<circle cx="134" cy="153" r="7" fill="#fff7e8" stroke="#b37d61" stroke-width="1.5"/><path d="M134 157c-7-5-7-11 0-6 7-5 7 1 0 6z" fill="#b36e68"/>`:''}
+    </g>`;
+
+  return `<svg class="yogi-svg" viewBox="0 0 220 320" aria-label="MY YOGI">
+    <g id="layer-mat">
+      <g transform="translate(38 286) skewX(-8)">
+        <rect width="150" height="20" rx="4" fill="${state.mat}" stroke="${line}" stroke-width="1.5"/>
+        <rect x="7" y="5" width="136" height="10" rx="2" fill="none" stroke="#ffffff66"/>
+      </g>
+    </g>
+    ${bagBack}
+    <g id="layer-hair-back">${hairBack}</g>
+    ${body}
+    ${pants}
+    ${shirt}
+    <g id="layer-hair-front">${hairFront}</g>
+    ${bagFront}
+    ${prop}
+    ${rewards}
+  </svg>`;
+}
+
+const shopItems=[
+ {id:'top_white',name:'화이트 기본 티',emoji:'◻',type:'top',style:'tee',value:'#f7f2e8',owned:true},
+ {id:'top_olive',name:'올리브 릴랙스 티',emoji:'◻',type:'top',style:'relaxed',value:'#8b9775'},
+ {id:'bottom_ochre',name:'황토 알라딘 팬츠',emoji:'▥',type:'bottom',style:'aladdin',value:'#c58d43',owned:true},
+ {id:'bottom_charcoal',name:'차콜 스트레이트 팬츠',emoji:'▥',type:'bottom',style:'straight',value:'#696760'},
+ {id:'mat_sage',name:'세이지 요가매트',emoji:'▱',type:'mat',value:'#8b9272',owned:true},
+ {id:'mat_ocean',name:'오션 요가매트',emoji:'▱',type:'mat',value:'#789aa0'},
+ {id:'tumbler',name:'YOGIBARA 텀블러',emoji:'☕',type:'item',value:'tumbler'},
+ {id:'yogabag',name:'요가백',emoji:'▰',type:'bag',value:true},
+ {id:'flower',name:'로컬 꽃',emoji:'✿',type:'item',value:'flower'}
+];
+
+function render(){
+  homeAvatar.style.setProperty('--avatar-bg',state.avatarBg);
+  sheetAvatar.style.setProperty('--avatar-bg',state.avatarBg);
+  homeAvatar.innerHTML=avatarSVG(); sheetAvatar.innerHTML=avatarSVG();
+  yogiName.textContent=state.name; sheetName.textContent=state.name; nameInput.value=state.name;
+  statPractice.textContent=state.practices.length;
+  statJourney.textContent=[...new Set(state.practices.map(p=>p.place).filter(Boolean))].length;
+  statShare.textContent=state.shares.length;
+  recentText.textContent=state.practices.length?`최근 수련 · ${state.practices.at(-1).type} ${state.practices.at(-1).min}분`:'오늘의 수련을 기록해보세요.';
+  braceletToggle.classList.toggle('active',!!state.bracelet);
+  badgeToggle.classList.toggle('active',!!state.badge);
+  renderPractice(); renderRelay(); renderShop(); restoreYogiControls();
+}
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));
+  document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.go===id));
+  window.scrollTo({top:0,behavior:'smooth'})
+}
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+
+savePractice.onclick=()=>{
+  const p={id:Date.now(),type:ptype.value,min:+minutes.value||30,place:place.value.trim(),note:note.value.trim(),date:new Date().toLocaleDateString('ko-KR'),verified:false,verifyMethod:'',photo:'',used:false};
+  state.practices.push(p);save();place.value='';note.value='';render();alert('수련이 기록되었습니다. 릴레이에 연결하려면 먼저 인증해주세요.');
+};
+
+function renderPractice(){
+  practiceCount.textContent=state.practices.length+'개의 기록';
+  practiceTimeline.innerHTML=state.practices.length?state.practices.slice().reverse().map(p=>`
+  <div class="entry">
+    <div class="entry-top"><div><b>${esc(p.type)} · ${p.min}분</b><small>${esc(p.place||'장소 없음')} · ${esc(p.date)}</small><small>${esc(p.note||'한 줄 기록 없음')}</small></div>
+    <span class="status ${p.used?'used':p.verified?'ok':''}">${p.used?'릴레이 연결됨':p.verified?'인증 완료':'미인증'}</span></div>
+    <div class="entry-actions">
+      ${!p.verified?`<button class="btn primary" onclick="openVerify(${p.id})">수련 인증</button>`:`<button class="btn ghost" onclick="showPracticeCert(${p.id})">인증 보기</button>`}
+      ${p.verified&&!p.used?`<button class="btn gold" onclick="go('share')">릴레이로 이동</button>`:''}
+    </div>
+  </div>`).join(''):`<div class="empty">아직 수련 기록이 없습니다.</div>`;
+}
+
+function openVerify(id){
+  verifyPracticeId=id; verifyMethod='partner'; timerPassed=false; pendingPhoto='';
+  document.querySelectorAll('.vm').forEach(b=>b.classList.toggle('active',b.dataset.vmethod==='partner'));
+  const p=state.practices.find(x=>x.id===id);
+  verifyPracticeInfo.innerHTML=`<b>${esc(p.type)} · ${p.min}분</b><br>${esc(p.place||'장소 없음')} · ${esc(p.date)}`;
+  renderVerifyBody(); verifySheet.classList.add('open');
+}
+document.querySelectorAll('.vm').forEach(b=>b.onclick=()=>{verifyMethod=b.dataset.vmethod;document.querySelectorAll('.vm').forEach(x=>x.classList.toggle('active',x===b));timerPassed=false;pendingPhoto='';renderVerifyBody()});
+function renderVerifyBody(){
+  clearInterval(timerInt);
+  if(verifyMethod==='partner'){
+    verifyBody.innerHTML=`<label style="display:block;margin-top:12px">파트너 인증번호<input id="partnerCode" inputmode="numeric" maxlength="4" placeholder="프로토타입 번호 1080"></label>`;
+  }else if(verifyMethod==='photo'){
+    verifyBody.innerHTML=`<label style="display:block;margin-top:12px">수련 인증 사진<input id="proofPhoto" type="file" accept="image/*"></label><div class="photo-preview" id="photoPreview"><img id="photoPreviewImg"></div>`;
+    proofPhoto.onchange=()=>compressPhoto(proofPhoto.files[0]);
+  }else{
+    verifyBody.innerHTML=`<div class="timerbox"><div class="sub">실서비스에서는 실제 수련 시간으로 동작합니다.<br>지금은 기능 확인을 위한 10초 데모입니다.</div><strong id="timerNum">10</strong><br><button class="btn gold" id="startTimer" style="margin-top:9px">10초 타이머 시작</button></div>`;
+    startTimer.onclick=()=>startDemoTimer();
+  }
+}
+function startDemoTimer(){
+  let n=10;timerNum.textContent=n;startTimer.disabled=true;
+  timerInt=setInterval(()=>{n--;timerNum.textContent=n;if(n<=0){clearInterval(timerInt);timerPassed=true;timerNum.textContent='완료';}},1000)
+}
+function compressPhoto(file){
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const max=520,scale=Math.min(1,max/img.width),c=document.createElement('canvas');
+      c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      pendingPhoto=c.toDataURL('image/jpeg',.72);
+      photoPreviewImg.src=pendingPhoto;photoPreview.style.display='block';
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+completeVerify.onclick=()=>{
+  const p=state.practices.find(x=>x.id===verifyPracticeId);if(!p)return;
+  if(verifyMethod==='partner' && document.getElementById('partnerCode')?.value.trim()!=='1080')return alert('프로토타입 인증번호 1080을 입력해주세요.');
+  if(verifyMethod==='photo' && !pendingPhoto)return alert('수련 사진을 선택해주세요.');
+  if(verifyMethod==='timer' && !timerPassed)return alert('타이머 인증을 먼저 완료해주세요.');
+  p.verified=true;p.verifyMethod=verifyMethod.toUpperCase();p.photo=pendingPhoto||'';
+  save();verifySheet.classList.remove('open');render();alert('수련 인증이 완료되었습니다.');
+};
+function showPracticeCert(id){
+  const p=state.practices.find(x=>x.id===id);if(!p)return;
+  certTitle.textContent='수련 인증 기록';
+  certBody.innerHTML=certHtml({yogi:state.name,type:p.type,min:p.min,place:p.place,date:p.date,note:p.note,verify:p.verifyMethod,photo:p.photo});
+  certSheet.classList.add('open');
+}
+
+function renderRelay(){
+  const relay=allRelay(),count=relay.length;
+  relayCount.textContent=count;relayBar.style.width=Math.min(100,count/108*100)+'%';
+  const map=new Map(relay.map(x=>[x.number,x]));
+  relayGrid.innerHTML=Array.from({length:108},(_,i)=>{
+    const n=i+1,p=map.get(n);return `<button class="rnum ${p?'done':''} ${p?.mine?'mine':''}" ${p?'':'disabled'} onclick="${p?`openRelayCert(${n})`:''}">${String(n).padStart(3,'0')}</button>`;
+  }).join('');
+  const eligible=state.practices.filter(p=>p.verified&&!p.used);
+  eligibleList.innerHTML=eligible.length?eligible.map(p=>`<div class="entry"><div class="entry-top"><div><b>${esc(p.type)} · ${p.min}분</b><small>${esc(p.place||'장소 없음')} · ${esc(p.date)}</small></div><span class="status ok">인증 완료</span></div><button class="btn primary wide" style="margin-top:9px" onclick="joinRelay(${p.id})">이 수련으로 릴레이 잇기</button></div>`).join(''):`<div class="empty">연결 가능한 수련이 없습니다.<br>먼저 PRACTICE에서 수련을 기록하고 인증해주세요.</div>`;
+  shareTimeline.innerHTML=state.shares.length?state.shares.slice().reverse().map(s=>`<div class="entry"><b>${s.number}번째 연결 · ${esc(s.type)} ${s.min}분</b><small>${esc(s.place)} · ${esc(s.date)} · ${esc(s.verify)}</small></div>`).join(''):`<div class="empty">아직 나눔 흔적이 없습니다.</div>`;
+}
+function joinRelay(id){
+  const p=state.practices.find(x=>x.id===id);
+  if(!p||!p.verified||p.used)return alert('인증이 완료된 미사용 수련만 연결할 수 있습니다.');
+  const next=allRelay().length+1;if(next>108)return alert('릴레이가 완성되었습니다.');
+  state.shares.push({number:next,yogi:state.name,type:p.type,min:p.min,place:p.place,date:p.date,note:p.note||'오늘의 수련을 이어봅니다.',verify:p.verifyMethod,photo:p.photo||''});
+  state.badge=true;
+  p.used=true;save();render();alert(`수련 인증 기록으로 ${next}번째 릴레이가 이어졌습니다.`);
+}
+function openRelayCert(n){
+  const r=allRelay().find(x=>x.number===n);if(!r)return;
+  certTitle.textContent=String(n).padStart(3,'0')+'번째 연결';
+  certBody.innerHTML=certHtml(r);certSheet.classList.add('open');
+}
+function certHtml(r){
+  return `<div class="cert-row"><span>YOGI</span><b>${esc(r.yogi)}</b></div>
+  <div class="cert-row"><span>수련</span><b>${esc(r.type)} · ${r.min}분</b></div>
+  <div class="cert-row"><span>장소</span><b>${esc(r.place||'장소 없음')}</b></div>
+  <div class="cert-row"><span>날짜</span><b>${esc(r.date)}</b></div>
+  <div class="cert-row"><span>인증</span><b>${esc(r.verify)} VERIFIED</b></div>
+  <div class="cert-row"><span>한마디</span><b>${esc(r.note||'')}</b></div>
+  ${r.photo?`<div class="photo-preview" style="display:block"><img src="${r.photo}" alt="수련 인증 사진"></div>`:''}`;
+}
+
+openYogi.onclick=()=>yogiSheet.classList.add('open');
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.close).classList.remove('open'));
+document.querySelectorAll('.sheet').forEach(s=>s.addEventListener('click',e=>{if(e.target===s)s.classList.remove('open')}));
+
+document.querySelectorAll('[data-gender]').forEach(b=>b.onclick=()=>{state.gender=b.dataset.gender;render()});
+document.querySelectorAll('[data-hairStyle]').forEach(b=>b.onclick=()=>{state.hairStyle=b.dataset.hairstyle||b.getAttribute('data-hairStyle');render()});
+document.querySelectorAll('.sw').forEach(b=>b.onclick=()=>{state[b.parentElement.dataset.group]=b.dataset.value;render()});
+braceletToggle.onclick=()=>{state.bracelet=!state.bracelet;save();render()};
+badgeToggle.onclick=()=>{state.badge=!state.badge;save();render()};
+saveYogi.onclick=()=>{state.name=nameInput.value.trim()||'바라요기';save();render();yogiSheet.classList.remove('open')};
+
+function renderShop(){
+  shopGrid.innerHTML=shopItems.map(it=>{
+    const owned=state.owned.includes(it.id)||it.owned;
+    let equipped=false;
+    if(it.type==='top')equipped=state.top===it.value && state.topStyle===(it.style||'tee');
+    if(it.type==='bottom')equipped=state.bottom===it.value && state.bottomStyle===(it.style||'aladdin');
+    if(it.type==='mat')equipped=state.mat===it.value;
+    if(it.type==='item')equipped=state.item===it.value;
+    if(it.type==='bag')equipped=state.bag===true;
+    return `<div class="shop-item"><div class="emoji">${it.emoji}</div><b>${it.name}</b><span>${owned?'보유 중':'체험 구매 가능'}</span><button class="btn ${equipped?'primary':''}" onclick="shopAction('${it.id}')">${equipped?'착용 중':owned?'착용하기':'보유하기(데모)'}</button></div>`;
+  }).join('');
+}
+function shopAction(id){
+  const it=shopItems.find(x=>x.id===id);if(!it)return;
+  if(!state.owned.includes(id))state.owned.push(id);
+  if(it.type==='top'){state.top=it.value;state.topStyle=it.style||'tee';}
+  if(it.type==='bottom'){state.bottom=it.value;state.bottomStyle=it.style||'aladdin';}
+  if(it.type==='mat')state.mat=it.value;
+  if(it.type==='item')state.item=state.item===it.value?'none':it.value;
+  if(it.type==='bag')state.bag=!state.bag;
+  save();render();
+}
+function restoreYogiControls(){
+  document.querySelectorAll('[data-gender]').forEach(b=>b.classList.toggle('active',b.dataset.gender===state.gender));
+  document.querySelectorAll('[data-hairStyle]').forEach(b=>b.classList.toggle('active',(b.dataset.hairstyle||b.getAttribute('data-hairStyle'))===state.hairStyle));
+  document.querySelectorAll('.swatches').forEach(g=>{const k=g.dataset.group;g.querySelectorAll('.sw').forEach(b=>b.classList.toggle('active',b.dataset.value===state[k]))});
+}
+document.querySelectorAll('.connectBtn').forEach(b=>b.onclick=()=>{if(b.dataset.done)return;b.dataset.done='1';b.textContent='연결됨';state.connections++;save()});
+
+render();
+</script>
+</body>
+</html>

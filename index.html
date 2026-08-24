@@ -3,13 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
 <title>YOGIBARA MAP</title>
 
-<meta name="description" content="제주의 요가 공간과 나눔을 잇는 YOGIBARA MAP. 요가원을 찾고 나만의 Jeju Yoga Journey를 만들어보세요.">
+<meta
+  name="description"
+  content="제주의 요가 공간과 나눔을 잇는 YOGIBARA MAP. 제주 요가원을 찾고 나만의 Jeju Yoga Journey를 만들어보세요."
+>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+>
 
 <style>
+
 :root{
   --bg:#f5f0e6;
   --paper:#fffdf8;
@@ -17,89 +25,137 @@
   --muted:#778079;
   --line:#ddd6c7;
 
-  /* 요청하신 컬러 */
-  --partner:#7b7a45;   /* OLIVE */
-  --brand:#2f887a;     /* EMERALD */
-  --normal:#8b918c;    /* 일반 요가원 */
+  /* 일반 요가원 */
+  --normal:#8b918c;
+
+  /* YOGIBARA PARTNER */
+  --partner:#7b7a45;
+
+  /* BRAND PARTNER */
+  --brand:#2f887a;
+
+  /* 아난드 + 한주훈 특별 마커 */
+  --special:#665b74;
 }
 
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
 
 body{
   margin:0;
   background:var(--bg);
   color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif
+  font-family:
+  -apple-system,
+  BlinkMacSystemFont,
+  "Apple SD Gothic Neo",
+  "Noto Sans KR",
+  sans-serif;
+}
+
+button,
+input{
+  font:inherit;
 }
 
 .app{
   max-width:900px;
   margin:auto;
+  min-height:100vh;
   background:var(--paper);
-  min-height:100vh
 }
+
+
+/* =====================================================
+   HEADER
+===================================================== */
 
 header{
   padding:24px 18px 14px;
   border-bottom:1px solid var(--line);
+  background:rgba(255,253,248,.97);
   position:relative;
   z-index:10;
-  background:rgba(255,253,248,.96)
 }
 
 .kicker{
   font-size:10px;
   font-weight:800;
   letter-spacing:.22em;
-  color:var(--muted)
+  color:var(--muted);
 }
 
 h1{
   font:500 34px Georgia,serif;
-  margin:7px 0 4px
+  margin:7px 0 4px;
 }
 
 .sub{
   font-size:12px;
   color:var(--muted);
-  line-height:1.55
+  line-height:1.55;
 }
 
-/* SEARCH */
+
+/* =====================================================
+   SEARCH
+===================================================== */
 
 .search-wrap{
   display:flex;
   gap:7px;
-  margin-top:14px
+  margin-top:14px;
 }
 
 .search-wrap input{
-  flex:1;
+  width:100%;
   min-width:0;
-  border:1px solid var(--line);
+
   background:#fff;
+  border:1px solid var(--line);
   border-radius:999px;
-  padding:11px 14px;
+
+  padding:12px 15px;
+
   font-size:12px;
   color:var(--ink);
-  outline:none
+
+  outline:none;
 }
 
 .search-wrap input:focus{
-  border-color:#9d9a86
+  border-color:#999881;
 }
+
+.search-info{
+  font-size:9px;
+  color:var(--muted);
+  margin:6px 3px 0;
+}
+
+
+/* =====================================================
+   FILTER
+===================================================== */
 
 .filters{
   display:flex;
   gap:7px;
   overflow-x:auto;
+
   padding-bottom:3px;
   margin-top:9px;
-  scrollbar-width:none
+
+  scrollbar-width:none;
 }
 
 .filters::-webkit-scrollbar{
-  display:none
+  display:none;
 }
 
 .pill,
@@ -109,14 +165,18 @@ h1{
   border:1px solid var(--line);
   background:#fff;
   color:var(--ink);
+
   border-radius:999px;
+
   padding:9px 12px;
+
   font-size:11px;
-  cursor:pointer
+
+  cursor:pointer;
 }
 
 .pill{
-  flex:0 0 auto
+  flex:0 0 auto;
 }
 
 .pill.active,
@@ -124,514 +184,763 @@ h1{
 .action.dark{
   background:var(--ink);
   color:#fff;
-  border-color:var(--ink)
+  border-color:var(--ink);
 }
 
-/* LEGEND */
+
+/* =====================================================
+   LEGEND
+===================================================== */
 
 .legend{
   display:flex;
   flex-wrap:wrap;
   gap:11px;
+
   margin-top:12px;
+
+  color:var(--muted);
   font-size:9px;
-  color:var(--muted)
 }
 
 .legend-item{
   display:flex;
   align-items:center;
-  gap:5px
+  gap:5px;
 }
 
 .legend-dot{
   width:10px;
   height:10px;
-  border-radius:50%
+  border-radius:50%;
 }
 
-.legend-dot.normal{background:var(--normal)}
-.legend-dot.partner{background:var(--partner)}
-.legend-dot.brand{background:var(--brand)}
+.legend-dot.normal{
+  background:var(--normal);
+}
 
-/* MAP */
+.legend-dot.partner{
+  background:var(--partner);
+}
+
+.legend-dot.brand{
+  background:var(--brand);
+}
+
+.legend-dot.special{
+  background:var(--special);
+  border-radius:3px;
+  transform:rotate(45deg);
+}
+
+
+/* =====================================================
+   MAP
+===================================================== */
 
 .map-shell{
-  padding:14px
+  padding:14px;
 }
 
 #map{
   height:46vh;
   min-height:360px;
   max-height:540px;
+
   border-radius:24px;
   overflow:hidden;
-  border:1px solid #cbc7bb
+
+  border:1px solid #cbc7bb;
 }
 
 .toolbar{
   display:flex;
-  gap:7px;
   flex-wrap:wrap;
-  margin-top:9px
+  gap:7px;
+
+  margin-top:9px;
 }
+
+
+/* =====================================================
+   MARKERS
+===================================================== */
 
 .ym{
   background:transparent;
-  border:0
+  border:0;
 }
 
 .mw{
   display:flex;
   flex-direction:column;
-  align-items:center
+  align-items:center;
 }
 
 .dot{
   width:30px;
   height:30px;
+
   border-radius:50%;
+
   display:grid;
   place-items:center;
+
   color:#fff;
+
   font-size:9px;
   font-weight:800;
+
   border:2px solid #fff;
-  box-shadow:0 3px 10px #0003
+
+  box-shadow:0 3px 10px #0003;
 }
 
 .dot.normal{
   width:22px;
   height:22px;
+
   background:var(--normal);
-  font-size:0
+
+  font-size:0;
 }
 
 .dot.normal::after{
   content:"";
+
   width:7px;
   height:7px;
+
   background:white;
-  border-radius:50%
+
+  border-radius:50%;
 }
 
 .dot.partner{
-  background:var(--partner)
+  background:var(--partner);
 }
 
 .dot.brand{
   background:var(--brand);
-  border-radius:8px
+
+  border-radius:8px;
+}
+
+.dot.special{
+  background:var(--special);
+
+  border-radius:8px;
+
+  transform:rotate(45deg);
+}
+
+.dot.special span{
+  transform:rotate(-45deg);
+
+  font-size:12px;
 }
 
 .mname{
   margin-top:3px;
+
   background:#fffdf8ee;
+
   padding:3px 6px;
+
   border-radius:7px;
+
   font-size:9px;
   font-weight:700;
+
   white-space:nowrap;
-  box-shadow:0 1px 5px #00000012
+
+  box-shadow:0 1px 5px #00000012;
 }
 
 .bottari-map{
   margin-top:2px;
+
   background:#253830;
   color:#fff;
+
   padding:3px 7px;
+
   border-radius:999px;
+
   font-size:8px;
   font-weight:800;
-  white-space:nowrap
+
+  white-space:nowrap;
 }
 
-/* JOURNEY */
+
+/* =====================================================
+   JOURNEY
+===================================================== */
 
 .route{
   position:sticky;
   top:0;
+
   z-index:1200;
+
   margin:0 14px 14px;
+
+  padding:10px 12px;
+
+  background:rgba(251,247,238,.97);
+
   border:1px solid var(--line);
   border-radius:0 0 20px 20px;
-  background:rgba(251,247,238,.97);
-  padding:10px 12px;
+
   box-shadow:0 8px 22px #25383014;
-  backdrop-filter:blur(12px)
+
+  backdrop-filter:blur(12px);
 }
 
 .route-top{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:10px
+
+  gap:10px;
 }
 
 .route-title{
   display:flex;
   align-items:center;
+
   gap:8px;
-  min-width:0
+
+  min-width:0;
 }
 
 .route h2{
-  font:500 19px Georgia,serif;
   margin:0;
-  white-space:nowrap
+
+  font:500 19px Georgia,serif;
+
+  white-space:nowrap;
 }
 
 .route-count{
-  display:inline-grid;
-  place-items:center;
   min-width:24px;
   height:24px;
+
+  display:inline-grid;
+  place-items:center;
+
   border-radius:999px;
+
   background:var(--ink);
   color:#fff;
+
   font-size:10px;
-  font-weight:800
+  font-weight:800;
 }
 
 .route-toggle{
+  flex:0 0 auto;
+
   padding:7px 10px;
-  flex:0 0 auto
 }
 
 .route p{
-  font-size:10px;
+  margin:8px 0;
+
   color:#657069;
+
+  font-size:10px;
   line-height:1.5;
-  margin:8px 0
 }
 
 .stops{
   display:flex;
   gap:6px;
+
   overflow-x:auto;
+
   min-height:34px;
+
   padding:4px 0 2px;
-  scrollbar-width:none
+
+  scrollbar-width:none;
 }
 
 .stops::-webkit-scrollbar{
-  display:none
+  display:none;
 }
 
 .stop{
   padding:7px 9px;
-  white-space:nowrap
+
+  white-space:nowrap;
 }
 
 .stop b{
   display:inline-grid;
   place-items:center;
+
   width:17px;
   height:17px;
+
+  margin-right:5px;
+
   border-radius:50%;
+
   background:var(--ink);
   color:#fff;
-  margin-right:5px;
-  font-size:9px
+
+  font-size:9px;
 }
 
 .empty{
-  font-size:10px;
-  color:var(--muted);
   padding:7px 2px;
-  white-space:nowrap
+
+  color:var(--muted);
+
+  font-size:10px;
+
+  white-space:nowrap;
 }
 
 .route-details{
   overflow:hidden;
-  max-height:230px;
+
+  max-height:260px;
+
   opacity:1;
-  transition:max-height .2s ease,opacity .2s ease
+
+  transition:
+  max-height .2s ease,
+  opacity .2s ease;
 }
 
 .route.collapsed .route-details{
   max-height:0;
-  opacity:0
+
+  opacity:0;
 }
 
 .route.collapsed{
-  padding-bottom:8px
+  padding-bottom:8px;
 }
 
 .route .actions{
-  margin-top:8px
+  margin-top:8px;
 }
 
-/* CARDS */
+
+/* =====================================================
+   CARDS
+===================================================== */
 
 .section{
-  padding:4px 14px 32px
+  padding:4px 14px 32px;
 }
 
 .head{
   display:flex;
   justify-content:space-between;
   align-items:end;
-  margin:7px 4px 10px
+
+  margin:7px 4px 10px;
 }
 
 .head h2{
+  margin:0;
+
   font:500 23px Georgia,serif;
-  margin:0
 }
 
 .head span{
+  color:var(--muted);
+
   font-size:10px;
-  color:var(--muted)
 }
 
 .cards{
   display:grid;
-  gap:10px
+
+  gap:10px;
 }
 
 .card{
+  padding:14px;
+
   background:#fff;
+
   border:1px solid var(--line);
   border-radius:18px;
-  padding:14px
 }
 
 .card.partner{
-  border-left:4px solid var(--partner)
+  border-left:4px solid var(--partner);
 }
 
 .card.brand{
-  border-left:4px solid var(--brand)
+  border-left:4px solid var(--brand);
+}
+
+.card.special{
+  border-left:4px solid var(--special);
 }
 
 .type{
+  color:var(--muted);
+
   font-size:9px;
-  letter-spacing:.12em;
   font-weight:800;
-  color:var(--muted)
+
+  letter-spacing:.12em;
 }
 
 .type.partner{
-  color:var(--partner)
+  color:var(--partner);
 }
 
 .type.brand{
-  color:var(--brand)
+  color:var(--brand);
+}
+
+.type.special{
+  color:var(--special);
 }
 
 .card h3{
+  margin:5px 0;
+
   font-size:16px;
-  margin:5px 0
 }
 
-.addr,
-.desc{
-  font-size:10px;
+.addr{
   color:var(--muted);
-  line-height:1.45
+
+  font-size:10px;
+  line-height:1.45;
 }
 
 .desc{
-  font-size:11px;
+  margin-top:6px;
+
   color:#52605a;
-  margin-top:6px
+
+  font-size:11px;
+  line-height:1.5;
 }
 
 .region-tag{
   display:inline-block;
+
   margin-top:8px;
+
   padding:4px 7px;
+
   border:1px solid var(--line);
   border-radius:999px;
+
+  color:var(--muted);
+
   font-size:9px;
-  color:var(--muted)
 }
 
 .bottari-card{
   display:inline-block;
+
   margin-top:8px;
-  background:#f0e5ce;
-  border:1px solid #d8c6a3;
-  color:#544a38;
-  border-radius:999px;
+
   padding:5px 8px;
+
+  background:#f0e5ce;
+
+  border:1px solid #d8c6a3;
+  border-radius:999px;
+
+  color:#544a38;
+
   font-size:9px;
-  font-weight:800
+  font-weight:800;
 }
 
 .actions{
   display:flex;
-  gap:6px;
   flex-wrap:wrap;
-  margin-top:11px
+
+  gap:6px;
+
+  margin-top:11px;
 }
 
 .action{
-  border-radius:10px;
   padding:8px 10px;
-  text-decoration:none
+
+  border-radius:10px;
+
+  text-decoration:none;
 }
 
 .action.added{
   background:#e8ecdf;
-  border-color:#9da474
+
+  border-color:#9da474;
 }
 
-/* BOTTOM SHEET */
+.no-result{
+  text-align:center;
+
+  padding:26px 16px;
+
+  color:var(--muted);
+
+  font-size:12px;
+}
+
+
+/* =====================================================
+   SHEET
+===================================================== */
 
 .back{
+  display:none;
+
   position:fixed;
   inset:0;
+
+  z-index:2000;
+
   background:#18261f55;
-  display:none;
-  z-index:2000
 }
 
 .back.show{
-  display:block
+  display:block;
 }
 
 .sheet{
   position:absolute;
   left:50%;
   bottom:0;
+
   transform:translateX(-50%);
+
   width:min(900px,100%);
+
+  padding:
+  20px
+  20px
+  max(20px,env(safe-area-inset-bottom));
+
   background:#fff;
+
   border-radius:25px 25px 0 0;
-  padding:20px 20px max(20px,env(safe-area-inset-bottom))
 }
 
 .sheet h2{
+  margin:6px 0;
+
   font:500 27px Georgia,serif;
-  margin:6px 0
 }
 
-/* FULL MAP */
+
+/* =====================================================
+   FULL MAP
+===================================================== */
 
 .map-full{
   position:fixed!important;
+
   inset:0!important;
+
   z-index:3000!important;
+
+  padding:0!important;
+
   background:#fff!important;
-  padding:0!important
 }
 
 .map-full #map{
   height:100vh!important;
+
   max-height:none!important;
-  border-radius:0
+
+  border-radius:0;
 }
 
 .map-full .toolbar{
   position:absolute;
+
   z-index:3100;
+
   left:10px;
   bottom:18px;
-  background:#ffffffe6;
+
   padding:7px;
-  border-radius:14px
+
+  background:#ffffffe6;
+
+  border-radius:14px;
 }
 
+
+/* =====================================================
+   MOBILE / DESKTOP
+===================================================== */
+
 @media(min-width:700px){
+
   .cards{
-    grid-template-columns:1fr 1fr
+    grid-template-columns:1fr 1fr;
   }
 
   #map{
-    height:570px
+    height:570px;
   }
+
 }
+
 </style>
 </head>
+
 
 <body>
 
 <div class="app">
 
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
 <header>
 
-<div class="kicker">PRACTICE · SHARE · PEACE</div>
+<div class="kicker">
+PRACTICE · SHARE · PEACE
+</div>
 
-<h1>YOGIBARA MAP</h1>
+<h1>
+YOGIBARA MAP
+</h1>
 
 <div class="sub">
 수련은, 나에게서 끝나지 않는다.<br>
 제주의 요가 공간과 나눔을 잇는 지도
 </div>
 
+
 <div class="search-wrap">
+
 <input
   id="search"
   type="search"
-  placeholder="요가원 이름 또는 지역 검색"
-  autocomplete="off">
+  placeholder="요가원 이름 · 지역 · 주소 검색"
+  autocomplete="off"
+>
+
 </div>
+
+<div class="search-info">
+제주에서 수련하고 싶은 공간을 검색해보세요.
+</div>
+
 
 <div class="filters" id="typeFilters">
 
-<button class="pill active" data-f="all">
+<button
+  class="pill active"
+  data-f="all">
 ALL
 </button>
 
-<button class="pill" data-f="normal">
+<button
+  class="pill"
+  data-f="normal">
 제주 요가원
 </button>
 
-<button class="pill" data-f="partner">
+<button
+  class="pill"
+  data-f="partner">
 YOGIBARA PARTNER
 </button>
 
-<button class="pill" data-f="brand">
+<button
+  class="pill"
+  data-f="brand">
 BRAND PARTNER
 </button>
 
-<button class="pill" data-f="bottari">
+<button
+  class="pill"
+  data-f="bottari">
 요가보따리
 </button>
 
 </div>
 
+
 <div class="filters" id="regionFilters">
 
-<button class="pill active" data-r="all">
+<button
+  class="pill active"
+  data-r="all">
 제주 전체
 </button>
 
-<button class="pill" data-r="제주시">
+<button
+  class="pill"
+  data-r="제주시">
 제주시
 </button>
 
-<button class="pill" data-r="애월">
+<button
+  class="pill"
+  data-r="애월">
 애월
 </button>
 
-<button class="pill" data-r="한림">
+<button
+  class="pill"
+  data-r="한림">
 한림·협재
 </button>
 
-<button class="pill" data-r="조천">
+<button
+  class="pill"
+  data-r="한경">
+한경
+</button>
+
+<button
+  class="pill"
+  data-r="조천">
 조천·함덕
 </button>
 
-<button class="pill" data-r="구좌">
+<button
+  class="pill"
+  data-r="구좌">
 구좌
 </button>
 
-<button class="pill" data-r="성산">
+<button
+  class="pill"
+  data-r="성산">
 성산
 </button>
 
-<button class="pill" data-r="표선">
+<button
+  class="pill"
+  data-r="표선">
 표선
 </button>
 
-<button class="pill" data-r="서귀포">
+<button
+  class="pill"
+  data-r="서귀포">
 서귀포
 </button>
 
 </div>
+
 
 <div class="legend">
 
@@ -650,10 +959,20 @@ YOGIBARA PARTNER
 BRAND PARTNER
 </div>
 
+<div class="legend-item">
+<span class="legend-dot special"></span>
+SPECIAL
+</div>
+
 </div>
 
 </header>
 
+
+
+<!-- =====================================================
+     MAP
+===================================================== -->
 
 <div class="map-shell">
 
@@ -661,19 +980,27 @@ BRAND PARTNER
 
 <div class="toolbar">
 
-<button class="btn primary" id="fit">
+<button
+  class="btn primary"
+  id="fit">
 제주 전체 보기
 </button>
 
-<button class="btn" id="loc">
+<button
+  class="btn"
+  id="loc">
 내 위치
 </button>
 
-<button class="btn" id="routeView">
+<button
+  class="btn"
+  id="routeView">
 여행 동선 보기
 </button>
 
-<button class="btn" id="full">
+<button
+  class="btn"
+  id="full">
 지도 크게 보기
 </button>
 
@@ -682,28 +1009,44 @@ BRAND PARTNER
 </div>
 
 
-<div class="route collapsed" id="journeyBar">
+
+<!-- =====================================================
+     JOURNEY
+===================================================== -->
+
+<div
+  class="route collapsed"
+  id="journeyBar">
 
 <div class="route-top">
 
 <div class="route-title">
 
-<h2>Jeju Yoga Journey</h2>
+<h2>
+Jeju Yoga Journey
+</h2>
 
-<span class="route-count" id="routeCount">
+<span
+  class="route-count"
+  id="routeCount">
 0
 </span>
 
 </div>
 
-<button class="btn route-toggle" id="journeyToggle">
+<button
+  class="btn route-toggle"
+  id="journeyToggle">
 펼치기
 </button>
 
 </div>
 
 
-<div class="stops" id="stops"></div>
+<div
+  class="stops"
+  id="stops">
+</div>
 
 
 <div class="route-details">
@@ -711,24 +1054,32 @@ BRAND PARTNER
 <p>
 가고 싶은 요가원을 방문 순서대로 담아보세요.
 2곳 이상 선택하면 지도에 동선이 연결됩니다.
-완성한 여행은 링크로 공유할 수 있습니다.
+완성한 Journey는 링크로 공유할 수 있습니다.
 </p>
 
 <div class="actions">
 
-<button class="btn primary" id="showRoute">
+<button
+  class="btn primary"
+  id="showRoute">
 지도에 동선 표시
 </button>
 
-<button class="btn" id="naverRoute">
+<button
+  class="btn"
+  id="naverRoute">
 네이버지도 길찾기
 </button>
 
-<button class="btn" id="shareRoute">
+<button
+  class="btn"
+  id="shareRoute">
 나의 Journey 공유
 </button>
 
-<button class="btn" id="clearRoute">
+<button
+  class="btn"
+  id="clearRoute">
 동선 비우기
 </button>
 
@@ -739,64 +1090,96 @@ BRAND PARTNER
 </div>
 
 
+
+<!-- =====================================================
+     CARDS
+===================================================== -->
+
 <div class="section">
 
 <div class="head">
 
-<h2>Yoga Places</h2>
+<h2>
+Yoga Places
+</h2>
 
 <span id="count"></span>
 
 </div>
 
-<div class="cards" id="cards"></div>
-
+<div
+  class="cards"
+  id="cards">
 </div>
 
 </div>
 
+</div>
 
-<div class="back" id="back">
+
+
+<!-- =====================================================
+     BOTTOM SHEET
+===================================================== -->
+
+<div
+  class="back"
+  id="back">
 
 <div class="sheet">
 
-<div class="type" id="sType"></div>
+<div
+  class="type"
+  id="sType">
+</div>
 
 <h2 id="sName"></h2>
 
-<div class="addr" id="sAddr"></div>
+<div
+  class="addr"
+  id="sAddr">
+</div>
 
-<div class="desc" id="sDesc"></div>
+<div
+  class="desc"
+  id="sDesc">
+</div>
 
-<div class="actions" id="sActions"></div>
-
+<div
+  class="actions"
+  id="sActions">
 </div>
 
 </div>
+
+</div>
+
 
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+
 <script>
 
 /* =====================================================
-   PLACE DATA
+   DATA
 ===================================================== */
 
 const P=[
 
-/* ===================================
+
+/* =====================================================
    YOGIBARA PARTNERS
-=================================== */
+===================================================== */
 
 {
 id:'anand',
 name:'아난드요가',
 cat:'partner',
+special:1,
 region:'제주시',
 bottari:1,
-badge:'Y',
-type:'YOGIBARA PARTNER',
+type:'YOGIBARA PARTNER · SPECIAL',
 addr:'제주특별자치도 제주시 한라대학로 107 202호',
 c:[33.476477052022,126.48176932399],
 ig:'https://www.instagram.com/anande_yoga/',
@@ -860,9 +1243,10 @@ desc:'기부 하타요가를 통해 수련의 마음을 나눔으로 이어간 �
 },
 
 
-/* ===================================
+
+/* =====================================================
    BRAND PARTNER
-=================================== */
+===================================================== */
 
 {
 id:'comfort',
@@ -879,9 +1263,28 @@ desc:'요기바라와 기부 프로젝트를 함께하는 제주 로컬 브랜�
 },
 
 
-/* ===================================
-   GENERAL JEJU YOGA STUDIOS
-=================================== */
+
+/* =====================================================
+   SPECIAL
+===================================================== */
+
+{
+id:'hanjoohun',
+name:'한주훈요가원',
+cat:'normal',
+special:1,
+region:'제주시',
+type:'JEJU YOGA · SPECIAL',
+addr:'제주특별자치도 제주시 동문로9길 16 2층',
+c:[33.5151,126.5348],
+desc:'제주에서 깊이 있는 수련으로 알려진 요가원.'
+},
+
+
+
+/* =====================================================
+   GENERAL JEJU YOGA
+===================================================== */
 
 {
 id:'sashi',
@@ -891,33 +1294,157 @@ region:'제주시',
 type:'JEJU YOGA',
 addr:'제주특별자치도 제주시 남광로 44 1층',
 c:[33.494112,126.5402179],
-desc:'제주 시내에서 빈야사 요가와 명상 프로그램을 운영하는 요가 공간.'
+web:'https://sashiyoga.com/',
+desc:'빈야사 요가와 명상을 중심으로 운영하는 제주 시내 요가원.'
 },
 
 {
 id:'yogaverde',
-name:'요가 베르데',
+name:'요가베르데',
 cat:'normal',
 region:'구좌',
 type:'JEJU YOGA',
 addr:'제주특별자치도 제주시 구좌읍 비자림로 1999-6',
 c:[33.4844346,126.7870743],
 web:'https://yogaverde.co.kr/',
-desc:'제주 자연 속에서 요가와 명상, 원데이 프로그램을 운영하는 공간.'
+desc:'송당에서 원데이 요가와 야외 요가 등을 운영하는 요가 스튜디오.'
 },
 
 {
-id:'jjyoga',
-name:'제이제이 필라테스요가',
+id:'suyoga',
+name:'수요가 제주',
 cat:'normal',
-region:'한림',
+region:'애월',
 type:'JEJU YOGA',
-addr:'제주특별자치도 제주시 한림읍 일주서로 5043',
-c:[33.386650561403,126.2471867689],
-desc:'협재 인근에서 실내 요가와 야외 바다요가 프로그램을 운영하는 공간.'
+addr:'제주특별자치도 제주시 애월읍 납읍로2길 35-1',
+c:[33.4373,126.3318],
+desc:'애월 납읍에 위치한 요가 스튜디오.'
+},
+
+{
+id:'darayoga',
+name:'다라요가스튜디오',
+cat:'normal',
+region:'조천',
+type:'JEJU YOGA',
+addr:'제주특별자치도 제주시 조천읍 함대로 37-24 2층',
+c:[33.5397,126.6724],
+desc:'조천·함덕 지역의 요가 스튜디오.'
+},
+
+{
+id:'dadayoga',
+name:'다다요가',
+cat:'normal',
+region:'서귀포',
+type:'JEJU YOGA',
+addr:'제주특별자치도 서귀포시 소암로 14',
+c:[33.2455,126.5680],
+desc:'서귀포 시내에 위치한 요가 스튜디오.'
+},
+
+{
+id:'radayoga',
+name:'라다요가',
+cat:'normal',
+region:'성산',
+type:'JEJU YOGA',
+addr:'제주특별자치도 서귀포시 성산읍 서성일로 1252',
+c:[33.4389,126.8790],
+desc:'성산 지역에 위치한 요가 스튜디오.'
+},
+
+{
+id:'allkind',
+name:'제주 올카인드 요가',
+cat:'normal',
+region:'표선',
+type:'JEJU YOGA',
+addr:'제주특별자치도 서귀포시 표선면 표선리 2394-3',
+c:[33.3248,126.8315],
+desc:'표선 지역에서 운영되는 제주 요가 공간.'
+},
+
+{
+id:'hamdeokhatha',
+name:'함덕하타요가',
+cat:'normal',
+region:'조천',
+type:'JEJU YOGA',
+addr:'제주특별자치도 제주시 조천읍 신북로 185 1층',
+c:[33.5370,126.6424],
+desc:'조천·함덕 지역에서 하타요가 수련을 운영하는 요가원.'
+},
+
+{
+id:'jinyoga',
+name:'진요가',
+cat:'normal',
+region:'제주시',
+type:'JEJU YOGA',
+addr:'제주특별자치도 제주시 아란5길 22',
+c:[33.4720,126.5455],
+desc:'제주시 아라동에 위치한 요가원.'
+},
+
+{
+id:'hyunjiyun',
+name:'현지연요가',
+cat:'normal',
+region:'제주시',
+type:'JEJU YOGA',
+addr:'제주특별자치도 제주시 우정로 55',
+c:[33.4925,126.4315],
+desc:'제주시 지역에 위치한 요가원.'
+},
+
+{
+id:'pranayoga',
+name:'아쉬탕가프라나요가',
+cat:'normal',
+region:'제주시',
+type:'JEJU YOGA',
+addr:'제주특별자치도 제주시 도평길 80',
+c:[33.4783,126.4485],
+desc:'아쉬탕가 수련을 중심으로 하는 제주 요가 공간.'
+},
+
+{
+id:'aranya',
+name:'아란야요가',
+cat:'normal',
+region:'제주시',
+type:'JEJU YOGA',
+addr:'제주특별자치도 제주시 월랑로8길 1 아란야프라자 7층',
+c:[33.4860,126.4775],
+desc:'제주 아쉬탕가 요가 수련 공간.'
+},
+
+{
+id:'jungmunyoga',
+name:'중문요가원',
+cat:'normal',
+region:'서귀포',
+type:'JEJU YOGA',
+addr:'제주특별자치도 서귀포시 천제연로 200',
+c:[33.2515,126.4240],
+desc:'서귀포 중문 지역의 요가원.'
+},
+
+{
+id:'nrimwon',
+name:'느림원 제주',
+cat:'normal',
+region:'제주시',
+type:'JEJU YOGA',
+addr:'제주특별자치도 제주시',
+c:[33.4996,126.5312],
+ig:'https://www.instagram.com/yoga_nrimwon/',
+desc:'하타·빈야사·인요가 등 다양한 수련을 이어가는 제주 요가 공간.'
 }
 
 ];
+
 
 
 /* =====================================================
@@ -925,58 +1452,85 @@ desc:'협재 인근에서 실내 요가와 야외 바다요가 프로그램을 �
 ===================================================== */
 
 let filter='all';
+
 let region='all';
+
 let search='';
+
 let ids=[];
+
 let line=null;
+
 let markers={};
 
 
+
 /* =====================================================
-   JOURNEY LOAD
+   LOAD JOURNEY
 ===================================================== */
 
 try{
 
-const params=new URLSearchParams(location.search);
-const shared=params.get('journey');
-
-if(shared){
-
-  ids=shared
-    .split(',')
-    .filter(id=>P.some(p=>p.id===id));
-
-}else{
-
-  ids=JSON.parse(
-    localStorage.getItem('yr') || '[]'
+  const params=
+  new URLSearchParams(
+    location.search
   );
 
-}
+  const shared=
+  params.get('journey');
+
+
+  if(shared){
+
+    ids=
+    shared
+    .split(',')
+    .filter(
+      id=>P.some(
+        p=>p.id===id
+      )
+    );
+
+  }else{
+
+    ids=
+    JSON.parse(
+      localStorage.getItem('yr')
+      ||
+      '[]'
+    );
+
+  }
 
 }catch(e){
 
-ids=[];
+  ids=[];
 
 }
 
-ids=ids.filter(
-  id=>P.some(p=>p.id===id)
+
+ids=
+ids.filter(
+  id=>P.some(
+    p=>p.id===id
+  )
 );
+
 
 
 /* =====================================================
    MAP
 ===================================================== */
 
-const map=L.map(
+const map=
+L.map(
   'map',
   {
     minZoom:9,
     maxZoom:19
   }
-).setView(
+)
+.setView(
   [33.385,126.545],
   10
 );
@@ -988,18 +1542,23 @@ L.tileLayer(
     maxZoom:19,
     attribution:'© OpenStreetMap contributors'
   }
-).addTo(map);
+)
+.addTo(map);
 
 
-const group=L.layerGroup().addTo(map);
+const group=
+L.layerGroup()
+.addTo(map);
 
 
-const bounds=L.latLngBounds(
+const bounds=
+L.latLngBounds(
   [
     [33.105,126.12],
     [33.565,126.96]
   ]
 );
+
 
 
 /* =====================================================
@@ -1008,140 +1567,195 @@ const bounds=L.latLngBounds(
 
 function icon(p){
 
-let cls=p.cat;
+  let cls=p.cat;
 
-let inn='';
+  let inn='';
 
-if(p.cat==='partner'){
-  inn=p.badge || 'Y';
+
+  if(p.special){
+
+    cls='special';
+
+    inn='<span>◆</span>';
+
+  }else if(p.cat==='partner'){
+
+    inn=p.badge || 'Y';
+
+  }else if(p.cat==='brand'){
+
+    inn=p.badge || 'B';
+
+  }
+
+
+  return L.divIcon({
+
+    className:'ym',
+
+    html:`
+    <div class="mw">
+
+      <div class="dot ${cls}">
+        ${inn}
+      </div>
+
+      <div class="mname">
+        ${p.name}
+      </div>
+
+      ${
+        p.bottari
+        ?
+        '<div class="bottari-map">요가보따리 HERE</div>'
+        :
+        ''
+      }
+
+    </div>
+    `,
+
+    iconSize:[120,52],
+
+    iconAnchor:[60,27]
+
+  });
+
 }
 
-if(p.cat==='brand'){
-  inn=p.badge || 'B';
-}
-
-return L.divIcon({
-
-className:'ym',
-
-html:`
-<div class="mw">
-
-<div class="dot ${cls}">
-${inn}
-</div>
-
-<div class="mname">
-${p.name}
-</div>
-
-${p.bottari
-?'<div class="bottari-map">요가보따리 HERE</div>'
-:''
-}
-
-</div>
-`,
-
-iconSize:[120,52],
-iconAnchor:[60,27]
-
-});
-
-}
 
 
 P.forEach(p=>{
 
-const m=L.marker(
-  p.c,
-  {
-    icon:icon(p)
-  }
-);
+  const m=
+  L.marker(
+    p.c,
+    {
+      icon:icon(p)
+    }
+  );
 
-m.on(
-  'click',
-  ()=>openP(p)
-);
 
-markers[p.id]=m;
+  m.on(
+    'click',
+    ()=>openP(p)
+  );
+
+
+  markers[p.id]=m;
 
 });
 
 
+
 /* =====================================================
-   FILTER
+   VISIBLE PLACES
 ===================================================== */
 
 function visiblePlaces(){
 
-const q=search
+  const q=
+  search
   .trim()
   .toLowerCase();
 
-return P.filter(p=>{
 
-const typeOK=
-filter==='all' ||
+  return P.filter(p=>{
 
-(
-  filter==='bottari'
-    ? p.bottari
-    : p.cat===filter
-);
 
-const regionOK=
-region==='all' ||
-p.region===region;
+    const typeOK=
 
-const text=[
-p.name,
-p.addr,
-p.region,
-p.type,
-p.desc
-]
-.join(' ')
-.toLowerCase();
+    filter==='all'
 
-const searchOK=
-!q ||
-text.includes(q);
+    ||
 
-return typeOK &&
-regionOK &&
-searchOK;
+    (
+      filter==='bottari'
+      ?
+      p.bottari
+      :
+      p.cat===filter
+    );
 
-});
+
+    const regionOK=
+
+    region==='all'
+
+    ||
+
+    p.region===region;
+
+
+    const text=
+    [
+      p.name,
+      p.addr,
+      p.region,
+      p.type,
+      p.desc
+    ]
+    .join(' ')
+    .toLowerCase();
+
+
+    const searchOK=
+
+    !q
+
+    ||
+
+    text.includes(q);
+
+
+    return (
+      typeOK
+      &&
+      regionOK
+      &&
+      searchOK
+    );
+
+  });
 
 }
 
-
-function apply(){
-
-group.clearLayers();
-
-visiblePlaces()
-.forEach(
-  p=>group.addLayer(markers[p.id])
-);
-
-}
 
 
 /* =====================================================
-   SAVE
+   APPLY MARKERS
+===================================================== */
+
+function apply(){
+
+  group.clearLayers();
+
+
+  visiblePlaces()
+  .forEach(
+    p=>
+    group.addLayer(
+      markers[p.id]
+    )
+  );
+
+}
+
+
+
+/* =====================================================
+   SAVE JOURNEY
 ===================================================== */
 
 function save(){
 
-localStorage.setItem(
-  'yr',
-  JSON.stringify(ids)
-);
+  localStorage.setItem(
+    'yr',
+    JSON.stringify(ids)
+  );
 
 }
+
 
 
 /* =====================================================
@@ -1150,160 +1764,239 @@ localStorage.setItem(
 
 function cards(){
 
-const a=visiblePlaces();
-
-const b=document.getElementById('cards');
-
-document.getElementById('count')
-.textContent=
-a.length+' places';
+  const a=
+  visiblePlaces();
 
 
-if(!a.length){
+  const b=
+  document.getElementById(
+    'cards'
+  );
 
-b.innerHTML=`
-<div class="card">
-검색 결과가 없습니다.
-</div>
-`;
 
-apply();
+  document
+  .getElementById(
+    'count'
+  )
+  .textContent=
+  a.length+' places';
 
-return;
+
+  if(!a.length){
+
+    b.innerHTML=`
+
+    <div class="card no-result">
+      검색 결과가 없습니다.
+    </div>
+
+    `;
+
+    apply();
+
+    return;
+
+  }
+
+
+  b.innerHTML=
+
+  a.map(p=>{
+
+
+    const cardClass=
+    p.special
+    ?
+    'special'
+    :
+    p.cat;
+
+
+    const typeClass=
+    p.special
+    ?
+    'special'
+    :
+    p.cat;
+
+
+    return `
+
+    <div class="card ${cardClass}">
+
+      <div class="type ${typeClass}">
+        ${p.type}
+      </div>
+
+      <h3>
+        ${p.name}
+      </h3>
+
+      <div class="addr">
+        ${p.addr}
+      </div>
+
+      <span class="region-tag">
+        ${p.region}
+      </span>
+
+      <div class="desc">
+        ${p.desc || ''}
+      </div>
+
+
+      ${
+        p.bottari
+        ?
+        '<div class="bottari-card">요가보따리 HERE</div>'
+        :
+        ''
+      }
+
+
+      <div class="actions">
+
+        <button
+          class="action dark"
+          data-open="${p.id}">
+          지도에서 보기
+        </button>
+
+
+        <a
+          class="action"
+          target="_blank"
+          rel="noopener"
+          href="https://map.naver.com/p/search/${encodeURIComponent(
+            p.name+' '+p.addr
+          )}">
+          네이버지도
+        </a>
+
+
+        ${
+          p.ig
+          ?
+          `
+          <a
+            class="action"
+            href="${p.ig}"
+            target="_blank"
+            rel="noopener">
+            Instagram
+          </a>
+          `
+          :
+          ''
+        }
+
+
+        ${
+          p.web
+          ?
+          `
+          <a
+            class="action"
+            href="${p.web}"
+            target="_blank"
+            rel="noopener">
+            홈페이지
+          </a>
+          `
+          :
+          ''
+        }
+
+
+        ${
+          p.yt
+          ?
+          `
+          <a
+            class="action"
+            href="${p.yt}"
+            target="_blank"
+            rel="noopener">
+            ▶ 파트너 영상 보기
+          </a>
+          `
+          :
+          ''
+        }
+
+
+        <button
+          class="action ${
+            ids.includes(p.id)
+            ?
+            'added'
+            :
+            ''
+          }"
+          data-add="${p.id}">
+
+          ${
+            ids.includes(p.id)
+            ?
+            '✓ Journey에 담김'
+            :
+            '＋ Journey에 담기'
+          }
+
+        </button>
+
+      </div>
+
+    </div>
+
+    `;
+
+  })
+  .join('');
+
+
+  b
+  .querySelectorAll(
+    '[data-open]'
+  )
+  .forEach(x=>{
+
+    x.onclick=()=>{
+
+      const p=
+      P.find(
+        p=>
+        p.id===x.dataset.open
+      );
+
+      focus(p);
+
+    };
+
+  });
+
+
+  b
+  .querySelectorAll(
+    '[data-add]'
+  )
+  .forEach(x=>{
+
+    x.onclick=()=>{
+
+      toggle(
+        x.dataset.add
+      );
+
+    };
+
+  });
+
+
+  apply();
 
 }
 
-
-b.innerHTML=
-a.map(p=>`
-
-<div class="card ${p.cat}">
-
-<div class="type ${p.cat}">
-${p.type}
-</div>
-
-<h3>
-${p.name}
-</h3>
-
-<div class="addr">
-${p.addr}
-</div>
-
-<span class="region-tag">
-${p.region}
-</span>
-
-<div class="desc">
-${p.desc || ''}
-</div>
-
-${p.bottari
-?'<div class="bottari-card">요가보따리 HERE</div>'
-:''
-}
-
-<div class="actions">
-
-<button
-class="action dark"
-data-open="${p.id}">
-지도에서 보기
-</button>
-
-<a
-class="action"
-target="_blank"
-rel="noopener"
-href="https://map.naver.com/p/search/${encodeURIComponent(p.name+' '+p.addr)}">
-네이버지도
-</a>
-
-${p.ig
-?`
-<a
-class="action"
-href="${p.ig}"
-target="_blank"
-rel="noopener">
-Instagram
-</a>
-`
-:''
-}
-
-${p.web
-?`
-<a
-class="action"
-href="${p.web}"
-target="_blank"
-rel="noopener">
-홈페이지
-</a>
-`
-:''
-}
-
-${p.yt
-?`
-<a
-class="action"
-href="${p.yt}"
-target="_blank"
-rel="noopener">
-▶ 파트너 영상 보기
-</a>
-`
-:''
-}
-
-<button
-class="action ${ids.includes(p.id)?'added':''}"
-data-add="${p.id}">
-${ids.includes(p.id)
-?'✓ Journey에 담김'
-:'＋ Journey에 담기'
-}
-</button>
-
-</div>
-
-</div>
-
-`).join('');
-
-
-b.querySelectorAll('[data-open]')
-.forEach(x=>
-
-x.onclick=()=>{
-
-const p=P.find(
-  p=>p.id===x.dataset.open
-);
-
-focus(p);
-
-}
-
-);
-
-
-b.querySelectorAll('[data-add]')
-.forEach(x=>
-
-x.onclick=()=>toggle(
-  x.dataset.add
-)
-
-);
-
-
-apply();
-
-}
 
 
 /* =====================================================
@@ -1312,59 +2005,82 @@ apply();
 
 function stops(){
 
-const e=document.getElementById('stops');
+  const e=
+  document.getElementById(
+    'stops'
+  );
 
-document.getElementById('routeCount')
-.textContent=ids.length;
+
+  document
+  .getElementById(
+    'routeCount'
+  )
+  .textContent=
+  ids.length;
 
 
-if(!ids.length){
+  if(!ids.length){
 
-e.innerHTML=`
-<div class="empty">
-요가원 카드에서 ‘Journey에 담기’를 눌러주세요.
-</div>
-`;
+    e.innerHTML=`
 
-return;
+    <div class="empty">
+      요가원 카드에서 ‘Journey에 담기’를 눌러주세요.
+    </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  e.innerHTML=
+
+  ids.map((id,i)=>{
+
+    const p=
+    P.find(
+      x=>x.id===id
+    );
+
+    return `
+
+    <button
+      class="stop"
+      data-rm="${id}">
+
+      <b>
+        ${i+1}
+      </b>
+
+      ${p.name} ×
+
+    </button>
+
+    `;
+
+  })
+  .join('');
+
+
+  e
+  .querySelectorAll(
+    '[data-rm]'
+  )
+  .forEach(x=>{
+
+    x.onclick=()=>{
+
+      toggle(
+        x.dataset.rm
+      );
+
+    };
+
+  });
 
 }
 
-
-e.innerHTML=
-ids.map((id,i)=>{
-
-const p=P.find(
-  x=>x.id===id
-);
-
-return `
-
-<button
-class="stop"
-data-rm="${id}">
-
-<b>${i+1}</b>
-
-${p.name} ×
-
-</button>
-
-`;
-
-}).join('');
-
-
-e.querySelectorAll('[data-rm]')
-.forEach(x=>
-
-x.onclick=()=>toggle(
-  x.dataset.rm
-)
-
-);
-
-}
 
 
 /* =====================================================
@@ -1373,49 +2089,60 @@ x.onclick=()=>toggle(
 
 function draw(fit=1){
 
-if(line){
+  if(line){
 
-map.removeLayer(line);
+    map.removeLayer(line);
 
-line=null;
+    line=null;
 
-}
-
-
-if(ids.length<2){
-  return;
-}
-
-
-line=L.polyline(
-
-ids.map(
-  id=>P.find(p=>p.id===id).c
-),
-
-{
-  color:'#253830',
-  weight:5,
-  opacity:.82,
-  dashArray:'9 7'
-}
-
-).addTo(map);
-
-
-if(fit){
-
-map.fitBounds(
-  line.getBounds(),
-  {
-    padding:[55,55],
-    maxZoom:13
   }
-);
+
+
+  if(ids.length<2){
+
+    return;
+
+  }
+
+
+  line=
+  L.polyline(
+
+    ids.map(
+      id=>
+      P.find(
+        p=>p.id===id
+      ).c
+    ),
+
+    {
+      color:'#253830',
+      weight:5,
+      opacity:.82,
+      dashArray:'9 7'
+    }
+
+  )
+  .addTo(map);
+
+
+  if(fit){
+
+    map.fitBounds(
+
+      line.getBounds(),
+
+      {
+        padding:[55,55],
+        maxZoom:13
+      }
+
+    );
+
+  }
 
 }
 
-}
 
 
 /* =====================================================
@@ -1424,27 +2151,34 @@ map.fitBounds(
 
 function toggle(id){
 
-const i=ids.indexOf(id);
+  const i=
+  ids.indexOf(id);
 
-if(i>=0){
 
-ids.splice(i,1);
+  if(i>=0){
 
-}else{
+    ids.splice(
+      i,
+      1
+    );
 
-ids.push(id);
+  }else{
+
+    ids.push(id);
+
+  }
+
+
+  save();
+
+  stops();
+
+  cards();
+
+  draw(1);
 
 }
 
-save();
-
-stops();
-
-cards();
-
-draw(1);
-
-}
 
 
 /* =====================================================
@@ -1453,114 +2187,174 @@ draw(1);
 
 function focus(p){
 
-map.flyTo(
-  p.c,
-  16
-);
+  map.flyTo(
+    p.c,
+    16
+  );
 
-setTimeout(
-  ()=>openP(p),
-  300
-);
+
+  setTimeout(
+    ()=>openP(p),
+    300
+  );
 
 }
 
 
+
 /* =====================================================
-   PLACE SHEET
+   SHEET
 ===================================================== */
 
 function openP(p){
 
-document.getElementById('sType')
-.textContent=p.type;
-
-document.getElementById('sName')
-.textContent=p.name;
-
-document.getElementById('sAddr')
-.textContent=p.addr;
-
-document.getElementById('sDesc')
-.textContent=p.desc || '';
+  document
+  .getElementById(
+    'sType'
+  )
+  .textContent=
+  p.type;
 
 
-document.getElementById('sActions')
-.innerHTML=`
+  document
+  .getElementById(
+    'sName'
+  )
+  .textContent=
+  p.name;
 
-<a
-class="action dark"
-target="_blank"
-rel="noopener"
-href="https://map.naver.com/p/search/${encodeURIComponent(p.name+' '+p.addr)}">
-네이버지도
-</a>
 
-${p.ig
-?`
-<a
-class="action"
-target="_blank"
-rel="noopener"
-href="${p.ig}">
-Instagram
-</a>
-`
-:''
+  document
+  .getElementById(
+    'sAddr'
+  )
+  .textContent=
+  p.addr;
+
+
+  document
+  .getElementById(
+    'sDesc'
+  )
+  .textContent=
+  p.desc || '';
+
+
+  document
+  .getElementById(
+    'sActions'
+  )
+  .innerHTML=`
+
+  <a
+    class="action dark"
+    target="_blank"
+    rel="noopener"
+    href="https://map.naver.com/p/search/${encodeURIComponent(
+      p.name+' '+p.addr
+    )}">
+    네이버지도
+  </a>
+
+
+  ${
+    p.ig
+    ?
+    `
+    <a
+      class="action"
+      target="_blank"
+      rel="noopener"
+      href="${p.ig}">
+      Instagram
+    </a>
+    `
+    :
+    ''
+  }
+
+
+  ${
+    p.web
+    ?
+    `
+    <a
+      class="action"
+      target="_blank"
+      rel="noopener"
+      href="${p.web}">
+      홈페이지
+    </a>
+    `
+    :
+    ''
+  }
+
+
+  ${
+    p.yt
+    ?
+    `
+    <a
+      class="action"
+      target="_blank"
+      rel="noopener"
+      href="${p.yt}">
+      ▶ 파트너 영상 보기
+    </a>
+    `
+    :
+    ''
+  }
+
+
+  <button
+    class="action ${
+      ids.includes(p.id)
+      ?
+      'added'
+      :
+      ''
+    }"
+    id="sheetAdd">
+
+    ${
+      ids.includes(p.id)
+      ?
+      '✓ Journey에 담김'
+      :
+      '＋ Journey에 담기'
+    }
+
+  </button>
+
+  `;
+
+
+  document
+  .getElementById(
+    'sheetAdd'
+  )
+  .onclick=()=>{
+
+    toggle(p.id);
+
+    openP(p);
+
+  };
+
+
+  document
+  .getElementById(
+    'back'
+  )
+  .classList
+  .add(
+    'show'
+  );
+
 }
 
-${p.web
-?`
-<a
-class="action"
-target="_blank"
-rel="noopener"
-href="${p.web}">
-홈페이지
-</a>
-`
-:''
-}
-
-${p.yt
-?`
-<a
-class="action"
-target="_blank"
-rel="noopener"
-href="${p.yt}">
-▶ 파트너 영상 보기
-</a>
-`
-:''
-}
-
-<button
-class="action ${ids.includes(p.id)?'added':''}"
-id="sheetAdd">
-${ids.includes(p.id)
-?'✓ Journey에 담김'
-:'＋ Journey에 담기'
-}
-</button>
-
-`;
-
-
-document.getElementById('sheetAdd')
-.onclick=()=>{
-
-toggle(p.id);
-
-openP(p);
-
-};
-
-
-document.getElementById('back')
-.classList.add('show');
-
-}
 
 
 /* =====================================================
@@ -1568,28 +2362,42 @@ document.getElementById('back')
 ===================================================== */
 
 document
-.querySelectorAll('#typeFilters .pill')
-.forEach(x=>
+.querySelectorAll(
+  '#typeFilters .pill'
+)
+.forEach(x=>{
 
-x.onclick=()=>{
+  x.onclick=()=>{
 
-document
-.querySelectorAll('#typeFilters .pill')
-.forEach(
-  y=>y.classList.remove('active')
-);
+    document
+    .querySelectorAll(
+      '#typeFilters .pill'
+    )
+    .forEach(
+      y=>
+      y.classList.remove(
+        'active'
+      )
+    );
 
-x.classList.add('active');
 
-filter=x.dataset.f;
+    x.classList.add(
+      'active'
+    );
 
-cards();
 
-fitVisible();
+    filter=
+    x.dataset.f;
 
-}
 
-);
+    cards();
+
+    fitVisible();
+
+  };
+
+});
+
 
 
 /* =====================================================
@@ -1597,28 +2405,42 @@ fitVisible();
 ===================================================== */
 
 document
-.querySelectorAll('#regionFilters .pill')
-.forEach(x=>
+.querySelectorAll(
+  '#regionFilters .pill'
+)
+.forEach(x=>{
 
-x.onclick=()=>{
+  x.onclick=()=>{
 
-document
-.querySelectorAll('#regionFilters .pill')
-.forEach(
-  y=>y.classList.remove('active')
-);
+    document
+    .querySelectorAll(
+      '#regionFilters .pill'
+    )
+    .forEach(
+      y=>
+      y.classList.remove(
+        'active'
+      )
+    );
 
-x.classList.add('active');
 
-region=x.dataset.r;
+    x.classList.add(
+      'active'
+    );
 
-cards();
 
-fitVisible();
+    region=
+    x.dataset.r;
 
-}
 
-);
+    cards();
+
+    fitVisible();
+
+  };
+
+});
+
 
 
 /* =====================================================
@@ -1626,209 +2448,267 @@ fitVisible();
 ===================================================== */
 
 document
-.getElementById('search')
+.getElementById(
+  'search'
+)
 .addEventListener(
   'input',
   e=>{
 
-search=e.target.value;
+    search=
+    e.target.value;
 
-cards();
+    cards();
 
-}
+  }
 );
 
 
+
 /* =====================================================
-   FIT FILTER RESULTS
+   FIT VISIBLE
 ===================================================== */
 
 function fitVisible(){
 
-const a=visiblePlaces();
-
-if(!a.length){
-  return;
-}
-
-if(a.length===1){
-
-map.flyTo(
-  a[0].c,
-  14
-);
-
-return;
-
-}
-
-map.fitBounds(
-
-a.map(p=>p.c),
-
-{
-  padding:[40,40],
-  maxZoom:12
-}
-
-);
-
-}
+  const a=
+  visiblePlaces();
 
 
-/* =====================================================
-   JEJU ALL
-===================================================== */
+  if(!a.length){
 
-document
-.getElementById('fit')
-.onclick=()=>{
+    return;
 
-filter='all';
-region='all';
-search='';
-
-document.getElementById('search')
-.value='';
-
-
-document
-.querySelectorAll('#typeFilters .pill')
-.forEach(
-  x=>x.classList.toggle(
-    'active',
-    x.dataset.f==='all'
-  )
-);
-
-
-document
-.querySelectorAll('#regionFilters .pill')
-.forEach(
-  x=>x.classList.toggle(
-    'active',
-    x.dataset.r==='all'
-  )
-);
-
-
-cards();
-
-map.fitBounds(
-  bounds,
-  {
-    padding:[10,10]
   }
-);
+
+
+  if(a.length===1){
+
+    map.flyTo(
+      a[0].c,
+      14
+    );
+
+    return;
+
+  }
+
+
+  map.fitBounds(
+
+    a.map(
+      p=>p.c
+    ),
+
+    {
+      padding:[40,40],
+      maxZoom:12
+    }
+
+  );
+
+}
+
+
+
+/* =====================================================
+   ALL JEJU
+===================================================== */
+
+document
+.getElementById(
+  'fit'
+)
+.onclick=()=>{
+
+  filter='all';
+
+  region='all';
+
+  search='';
+
+
+  document
+  .getElementById(
+    'search'
+  )
+  .value='';
+
+
+  document
+  .querySelectorAll(
+    '#typeFilters .pill'
+  )
+  .forEach(x=>{
+
+    x.classList.toggle(
+      'active',
+      x.dataset.f==='all'
+    );
+
+  });
+
+
+  document
+  .querySelectorAll(
+    '#regionFilters .pill'
+  )
+  .forEach(x=>{
+
+    x.classList.toggle(
+      'active',
+      x.dataset.r==='all'
+    );
+
+  });
+
+
+  cards();
+
+
+  map.fitBounds(
+
+    bounds,
+
+    {
+      padding:[10,10]
+    }
+
+  );
 
 };
 
 
+
 /* =====================================================
-   MY LOCATION
+   LOCATION
 ===================================================== */
 
 document
-.getElementById('loc')
+.getElementById(
+  'loc'
+)
 .onclick=()=>{
 
-if(!navigator.geolocation){
+  if(!navigator.geolocation){
 
-alert(
-  '위치 기능을 사용할 수 없습니다.'
-);
+    alert(
+      '위치 기능을 사용할 수 없습니다.'
+    );
 
-return;
+    return;
 
-}
-
-
-navigator.geolocation
-.getCurrentPosition(
-
-q=>{
-
-const me=[
-q.coords.latitude,
-q.coords.longitude
-];
-
-map.flyTo(
-  me,
-  14
-);
+  }
 
 
-/* 가까운 요가원 계산 */
+  navigator
+  .geolocation
+  .getCurrentPosition(
 
-const nearest=
-[...P]
-.map(p=>({
+    q=>{
 
-...p,
-
-distance:
-map.distance(
-  me,
-  p.c
-)
-
-}))
-.sort(
-  (a,b)=>a.distance-b.distance
-)[0];
+      const me=[
+        q.coords.latitude,
+        q.coords.longitude
+      ];
 
 
-if(nearest){
+      map.flyTo(
+        me,
+        14
+      );
 
-setTimeout(
-  ()=>openP(nearest),
-  500
-);
 
-}
+      const nearest=
 
-},
+      [...P]
 
-()=>alert(
-  '위치 권한을 허용해주세요.'
-)
+      .map(p=>({
 
-);
+        ...p,
+
+        distance:
+        map.distance(
+          me,
+          p.c
+        )
+
+      }))
+
+      .sort(
+        (a,b)=>
+        a.distance-b.distance
+      )[0];
+
+
+      if(nearest){
+
+        setTimeout(
+          ()=>openP(nearest),
+          500
+        );
+
+      }
+
+    },
+
+    ()=>{
+
+      alert(
+        '위치 권한을 허용해주세요.'
+      );
+
+    }
+
+  );
 
 };
 
 
+
 /* =====================================================
-   JOURNEY COLLAPSE
+   COLLAPSE
 ===================================================== */
 
 document
-.getElementById('journeyToggle')
-.onclick=()=>{
-
-const bar=
-document.getElementById(
-  'journeyBar'
-);
-
-const btn=
-document.getElementById(
+.getElementById(
   'journeyToggle'
-);
-
-bar.classList.toggle(
-  'collapsed'
-);
-
-btn.textContent=
-bar.classList.contains(
-  'collapsed'
 )
-?'펼치기'
-:'접기';
+.onclick=()=>{
+
+  const bar=
+  document.getElementById(
+    'journeyBar'
+  );
+
+
+  const btn=
+  document.getElementById(
+    'journeyToggle'
+  );
+
+
+  bar.classList.toggle(
+    'collapsed'
+  );
+
+
+  btn.textContent=
+
+  bar.classList.contains(
+    'collapsed'
+  )
+
+  ?
+
+  '펼치기'
+
+  :
+
+  '접기';
 
 };
+
 
 
 /* =====================================================
@@ -1836,69 +2716,80 @@ bar.classList.contains(
 ===================================================== */
 
 document
-.getElementById('showRoute')
+.getElementById(
+  'showRoute'
+)
 .onclick=()=>{
 
-if(ids.length<2){
+  if(ids.length<2){
 
-alert(
-  '최소 2곳을 Journey에 담아주세요.'
-);
+    alert(
+      '최소 2곳을 Journey에 담아주세요.'
+    );
 
-return;
+    return;
 
-}
+  }
 
-draw(1);
+
+  draw(1);
 
 };
 
 
 document
-.getElementById('routeView')
+.getElementById(
+  'routeView'
+)
 .onclick=()=>{
 
-if(ids.length<2){
+  if(ids.length<2){
 
-alert(
-  '최소 2곳을 Journey에 담아주세요.'
-);
+    alert(
+      '최소 2곳을 Journey에 담아주세요.'
+    );
 
-return;
+    return;
 
-}
+  }
 
-draw(1);
+
+  draw(1);
 
 };
+
 
 
 /* =====================================================
-   CLEAR
+   CLEAR JOURNEY
 ===================================================== */
 
 document
-.getElementById('clearRoute')
+.getElementById(
+  'clearRoute'
+)
 .onclick=()=>{
 
-ids=[];
-
-save();
-
-stops();
-
-cards();
+  ids=[];
 
 
-if(line){
+  save();
 
-map.removeLayer(line);
+  stops();
 
-line=null;
+  cards();
 
-}
+
+  if(line){
+
+    map.removeLayer(line);
+
+    line=null;
+
+  }
 
 };
+
 
 
 /* =====================================================
@@ -1906,156 +2797,177 @@ line=null;
 ===================================================== */
 
 document
-.getElementById('naverRoute')
+.getElementById(
+  'naverRoute'
+)
 .onclick=()=>{
 
-if(ids.length<2){
+  if(ids.length<2){
 
-alert(
-  '최소 2곳을 Journey에 담아주세요.'
-);
+    alert(
+      '최소 2곳을 Journey에 담아주세요.'
+    );
 
-return;
+    return;
 
-}
-
-
-if(ids.length>7){
-
-alert(
-  '길찾기는 출발지와 도착지를 포함해 최대 7곳까지만 선택해주세요.'
-);
-
-return;
-
-}
-
-
-const a=
-ids.map(
-  id=>P.find(p=>p.id===id)
-);
-
-
-const start=a[0];
-
-const dest=a[a.length-1];
-
-
-const q=
-new URLSearchParams();
-
-
-q.set(
-  'slat',
-  start.c[0]
-);
-
-q.set(
-  'slng',
-  start.c[1]
-);
-
-q.set(
-  'sname',
-  start.name
-);
-
-
-q.set(
-  'dlat',
-  dest.c[0]
-);
-
-q.set(
-  'dlng',
-  dest.c[1]
-);
-
-q.set(
-  'dname',
-  dest.name
-);
-
-
-a.slice(1,-1)
-.forEach((p,i)=>{
-
-const n=i+1;
-
-q.set(
-  `v${n}lat`,
-  p.c[0]
-);
-
-q.set(
-  `v${n}lng`,
-  p.c[1]
-);
-
-q.set(
-  `v${n}name`,
-  p.name
-);
-
-});
-
-
-q.set(
-  'appname',
-  'com.yogibara.map'
-);
-
-
-const appUrl=
-'nmap://route/car?'
-+q.toString();
-
-
-const fallback=
-'https://map.naver.com/p/directions';
-
-
-let hidden=false;
-
-
-const onVis=()=>{
-
-if(document.hidden){
-  hidden=true;
-}
-
-};
-
-
-document.addEventListener(
-  'visibilitychange',
-  onVis,
-  {
-    once:true
   }
-);
 
 
-window.location.href=
-appUrl;
+  if(ids.length>7){
+
+    alert(
+      '길찾기는 출발지와 도착지를 포함해 최대 7곳까지만 선택해주세요.'
+    );
+
+    return;
+
+  }
 
 
-setTimeout(()=>{
+  const a=
+  ids.map(
+    id=>
+    P.find(
+      p=>p.id===id
+    )
+  );
 
-if(
-  !hidden &&
-  document.visibilityState==='visible'
-){
 
-window.location.href=
-fallback;
+  const start=
+  a[0];
 
-}
 
-},1400);
+  const dest=
+  a[a.length-1];
+
+
+  const q=
+  new URLSearchParams();
+
+
+  q.set(
+    'slat',
+    start.c[0]
+  );
+
+  q.set(
+    'slng',
+    start.c[1]
+  );
+
+  q.set(
+    'sname',
+    start.name
+  );
+
+
+  q.set(
+    'dlat',
+    dest.c[0]
+  );
+
+  q.set(
+    'dlng',
+    dest.c[1]
+  );
+
+  q.set(
+    'dname',
+    dest.name
+  );
+
+
+  a
+  .slice(1,-1)
+  .forEach((p,i)=>{
+
+    const n=
+    i+1;
+
+
+    q.set(
+      `v${n}lat`,
+      p.c[0]
+    );
+
+    q.set(
+      `v${n}lng`,
+      p.c[1]
+    );
+
+    q.set(
+      `v${n}name`,
+      p.name
+    );
+
+  });
+
+
+  q.set(
+    'appname',
+    'com.yogibara.map'
+  );
+
+
+  const appUrl=
+
+  'nmap://route/car?'
+
+  +
+
+  q.toString();
+
+
+  const fallback=
+
+  'https://map.naver.com/p/directions';
+
+
+  let hidden=false;
+
+
+  const onVis=()=>{
+
+    if(document.hidden){
+
+      hidden=true;
+
+    }
+
+  };
+
+
+  document
+  .addEventListener(
+    'visibilitychange',
+    onVis,
+    {
+      once:true
+    }
+  );
+
+
+  window.location.href=
+  appUrl;
+
+
+  setTimeout(()=>{
+
+    if(
+      !hidden
+      &&
+      document.visibilityState==='visible'
+    ){
+
+      window.location.href=
+      fallback;
+
+    }
+
+  },1400);
 
 };
+
 
 
 /* =====================================================
@@ -2063,117 +2975,153 @@ fallback;
 ===================================================== */
 
 document
-.getElementById('shareRoute')
+.getElementById(
+  'shareRoute'
+)
 .onclick=async()=>{
 
-if(!ids.length){
+  if(!ids.length){
 
-alert(
-  '먼저 Journey에 장소를 담아주세요.'
-);
+    alert(
+      '먼저 Journey에 장소를 담아주세요.'
+    );
 
-return;
+    return;
 
-}
-
-
-const url=
-new URL(
-  location.href
-);
+  }
 
 
-url.searchParams.set(
-  'journey',
-  ids.join(',')
-);
+  const url=
+  new URL(
+    location.href
+  );
 
 
-const places=
-ids
-.map(
-  id=>P.find(p=>p.id===id).name
-)
-.join(' → ');
+  url.searchParams.set(
+    'journey',
+    ids.join(',')
+  );
 
 
-const shareData={
+  const places=
 
-title:
-'YOGIBARA · JEJU YOGA JOURNEY',
+  ids
 
-text:
-`나의 제주 요가여행\n${places}`,
+  .map(
+    id=>
+    P.find(
+      p=>p.id===id
+    ).name
+  )
 
-url:
-url.toString()
+  .join(' → ');
+
+
+  const shareData={
+
+    title:
+    'YOGIBARA · JEJU YOGA JOURNEY',
+
+    text:
+    `나의 제주 요가여행\n${places}`,
+
+    url:
+    url.toString()
+
+  };
+
+
+  try{
+
+
+    if(navigator.share){
+
+      await navigator.share(
+        shareData
+      );
+
+    }else if(
+      navigator.clipboard
+    ){
+
+      await navigator
+      .clipboard
+      .writeText(
+        url.toString()
+      );
+
+
+      alert(
+        'Journey 링크를 복사했습니다.'
+      );
+
+    }else{
+
+      prompt(
+        '아래 링크를 복사해주세요.',
+        url.toString()
+      );
+
+    }
+
+
+  }catch(e){
+
+    /* 공유 취소 */
+
+  }
 
 };
 
-
-try{
-
-if(navigator.share){
-
-await navigator.share(
-  shareData
-);
-
-}else{
-
-await navigator.clipboard.writeText(
-  url.toString()
-);
-
-alert(
-  'Journey 링크를 복사했습니다.'
-);
-
-}
-
-}catch(e){
-
-/* 공유 취소는 별도 처리하지 않음 */
-
-}
-
-};
 
 
 /* =====================================================
-   FULL SCREEN
+   FULL MAP
 ===================================================== */
 
 document
-.getElementById('full')
+.getElementById(
+  'full'
+)
 .onclick=()=>{
 
-const s=
-document.querySelector(
-  '.map-shell'
-);
-
-s.classList.toggle(
-  'map-full'
-);
+  const s=
+  document.querySelector(
+    '.map-shell'
+  );
 
 
-document
-.getElementById('full')
-.textContent=
-s.classList.contains(
-  'map-full'
-)
-?'작게 보기'
-:'지도 크게 보기';
+  s.classList.toggle(
+    'map-full'
+  );
 
 
-setTimeout(
-  ()=>map.invalidateSize(),
-  100
-);
+  document
+  .getElementById(
+    'full'
+  )
+  .textContent=
+
+  s.classList.contains(
+    'map-full'
+  )
+
+  ?
+
+  '작게 보기'
+
+  :
+
+  '지도 크게 보기';
+
+
+  setTimeout(
+    ()=>map.invalidateSize(),
+    100
+  );
 
 };
+
 
 
 /* =====================================================
@@ -2181,21 +3129,25 @@ setTimeout(
 ===================================================== */
 
 document
-.getElementById('back')
+.getElementById(
+  'back'
+)
 .onclick=e=>{
 
-if(
-  e.target.id==='back'
-){
+  if(
+    e.target.id==='back'
+  ){
 
-e.currentTarget
-.classList.remove(
-  'show'
-);
+    e.currentTarget
+    .classList
+    .remove(
+      'show'
+    );
 
-}
+  }
 
 };
+
 
 
 /* =====================================================
@@ -2208,12 +3160,17 @@ stops();
 
 draw(0);
 
+
 map.fitBounds(
+
   bounds,
+
   {
     padding:[10,10]
   }
+
 );
+
 
 setTimeout(
   ()=>map.invalidateSize(),

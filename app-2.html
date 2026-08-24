@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f3efe5">
+<title>YOGIBARA</title>
+<style>
+:root{
+  --bg:#f3efe5;
+  --paper:#fffdf8;
+  --ink:#26362f;
+  --muted:#7d847f;
+  --line:#ded8ca;
+  --olive:#7b7a45;
+  --olive2:#a3a16c;
+  --emerald:#2f887a;
+  --purple:#665b74;
+  --sand:#c9b79c;
+  --soft:#f1ece1;
+  --white:#fff;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.app{
+  max-width:760px;
+  margin:auto;
+  min-height:100vh;
+  background:var(--paper);
+  padding-bottom:88px;
+}
+.top{
+  padding:22px 18px 14px;
+  border-bottom:1px solid var(--line);
+  background:rgba(255,253,248,.97);
+}
+.kicker{
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.2em;
+  color:var(--muted);
+}
+h1{
+  margin:6px 0 4px;
+  font:500 34px Georgia,serif;
+}
+.sub{font-size:12px;line-height:1.55;color:var(--muted)}
+.main{padding:14px}
+.card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:16px;
+  margin-bottom:12px;
+}
+.hero{
+  background:linear-gradient(180deg,#fffdf8,#f4eee2);
+  border-color:#d8cfbd;
+}
+.hero h2,.section-title{
+  margin:0 0 7px;
+  font:500 24px Georgia,serif;
+}
+.small{font-size:11px;color:var(--muted);line-height:1.55}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{
+  border:1px solid var(--line);
+  background:#fff;
+  color:var(--ink);
+  border-radius:999px;
+  padding:10px 14px;
+  min-height:44px;
+}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.olive{background:var(--olive);border-color:var(--olive);color:#fff}
+.btn.ghost{background:transparent}
+.btn.active{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn[disabled]{opacity:.55;cursor:default}
+.input,.textarea,.select{
+  width:100%;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:14px;
+  padding:12px 13px;
+  color:var(--ink);
+  outline:none;
+  font-size:16px;
+}
+.textarea{min-height:92px;resize:vertical}
+.label{display:block;font-size:11px;font-weight:800;margin:12px 0 6px}
+.choice-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+.choice{
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:13px 10px;
+  background:#fff;
+  text-align:center;
+  min-height:72px;
+}
+.choice.active{border:2px solid var(--olive);background:#f3f1e2}
+.choice .swatch{
+  display:block;width:24px;height:6px;border-radius:999px;margin:6px auto 0
+}
+
+/* AVATAR STAGE */
+.avatar-stage{
+  position:relative;
+  overflow:hidden;
+  border-radius:26px;
+  min-height:360px;
+  border:1px solid #d7d0c3;
+  background:#ede5d7;
+  margin-bottom:12px;
+}
+.avatar-stage.compact{min-height:320px}
+.scene-bg{
+  position:absolute; inset:0;
+  transition:.2s ease;
+}
+.bg-paper{background:linear-gradient(180deg,#f1eadf 0%,#e8e0d2 100%)}
+.bg-jeju{
+  background:
+    radial-gradient(circle at 72% 25%,#fff6 0 15%,transparent 16%),
+    linear-gradient(180deg,#cddbd6 0 45%,#8ea5a0 46% 54%,#c8b99c 55% 100%);
+}
+.bg-stone{
+  background:
+    linear-gradient(180deg,#dcd7cc 0 67%,#c8bea9 68% 100%);
+}
+.bg-night{
+  background:
+    radial-gradient(circle at 78% 18%,#fff8 0 5%,transparent 6%),
+    linear-gradient(180deg,#4d5668,#343d49 65%,#565044 66%);
+}
+.bg-tea{
+  background:linear-gradient(180deg,#e7e4d6 0 67%,#c9b69a 68% 100%);
+}
+.bg-stone:after,.bg-tea:after{
+  content:"";
+  position:absolute;left:8%;right:8%;bottom:27%;
+  height:3px;background:#948a7b55;border-radius:999px;
+}
+.scene-label{
+  position:absolute;left:14px;top:13px;
+  padding:7px 10px;border-radius:999px;
+  background:#fffdf8dd;border:1px solid #ffffff80;
+  font-size:9px;font-weight:800;letter-spacing:.08em;
+}
+.scene-floor{
+  position:absolute;left:0;right:0;bottom:0;height:26%;
+  background:#cbbfae55;
+}
+.mat{
+  position:absolute;
+  width:180px;height:54px;
+  left:50%;bottom:48px;transform:translateX(-50%);
+  border-radius:50%;
+  box-shadow:0 12px 18px #00000010;
+  transition:.2s ease;
+}
+.mat-sand{background:#b9a58a}
+.mat-forest{background:#6f806d}
+.mat-ocean{background:#678b91}
+.mat-night{background:#5f5f73}
+.mat-clay{background:#ad7e67}
+
+/* stylized yogi SVG */
+.avatar-wrap{
+  position:absolute;
+  left:50%;
+  bottom:64px;
+  width:190px;
+  height:250px;
+  transform:translateX(-50%);
+  transition:.2s ease;
+}
+.avatar-svg{width:100%;height:100%;overflow:visible}
+.avatar-shadow{fill:#000;opacity:.08}
+.skin{fill:#d7ad8d}
+.skin2{fill:#c98f6f}
+.hair{fill:#353734}
+.hair2{fill:#4e3f37}
+.top-fill{fill:#f4f1e8}
+.bottom-fill{fill:#6d756e}
+.bracelet{fill:none;stroke:#7b7a45;stroke-width:5;opacity:0}
+.patch{fill:#7b7a45;opacity:0}
+.aura{fill:none;stroke:#a6ad86;stroke-width:3;opacity:0}
+.avatar-wrap.wearing-bracelet .bracelet{opacity:1}
+.avatar-wrap.wearing-patch .patch{opacity:1}
+.avatar-wrap.wearing-aura .aura{opacity:.65}
+.avatar-wrap.outfit-cream .top-fill{fill:#f2eee2}
+.avatar-wrap.outfit-olive .top-fill{fill:#7b7a45}
+.avatar-wrap.outfit-emerald .top-fill{fill:#2f887a}
+.avatar-wrap.outfit-night .top-fill{fill:#4e5360}
+.avatar-wrap.bottom-sand .bottom-fill{fill:#a6927b}
+.avatar-wrap.bottom-olive .bottom-fill{fill:#68725f}
+.avatar-wrap.bottom-charcoal .bottom-fill{fill:#4c514e}
+.avatar-wrap.bottom-plum .bottom-fill{fill:#655867}
+.avatar-wrap.gender-yogi .yogini-only{display:none}
+.avatar-wrap.gender-yogini .yogi-only{display:none}
+
+.avatar-caption{
+  position:absolute;left:50%;bottom:12px;transform:translateX(-50%);
+  background:#fffdf8e8;border:1px solid #ffffff90;
+  border-radius:999px;padding:7px 11px;
+  font-size:10px;font-weight:800;white-space:nowrap
+}
+
+/* ITEM PANELS */
+.tabs{
+  display:flex;gap:7px;overflow-x:auto;padding-bottom:3px;
+  scrollbar-width:none
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex:0 0 auto;border:1px solid var(--line);background:#fff;
+  border-radius:999px;padding:9px 11px;font-size:10px
+}
+.tab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.item-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;margin-top:10px
+}
+.item{
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:11px;
+  background:#fff;
+  text-align:left;
+  min-height:88px;
+}
+.item.locked{opacity:.43}
+.item.equipped{border:2px solid var(--olive);background:#f4f2e5}
+.item .item-icon{font-size:24px;margin-bottom:6px}
+.item b{display:block;font-size:11px}
+.item span{font-size:9px;color:var(--muted)}
+.item .tag{
+  display:inline-block;margin-top:7px;padding:3px 6px;border-radius:999px;
+  background:#eee9dd;font-size:8px;font-weight:800;color:#656b66
+}
+
+.profile-head{text-align:center}
+.yogi-name{font:500 28px Georgia,serif;margin:4px 0}
+.handle{font-size:11px;color:var(--muted)}
+.stats{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:6px;margin-top:14px
+}
+.stat{border:1px solid var(--line);border-radius:14px;padding:10px 6px;text-align:center}
+.stat b{display:block;font-size:18px}
+.stat span{font-size:9px;color:var(--muted)}
+.gyeol{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px}
+.gyeol .chip{
+  flex:0 0 auto;border:1px solid var(--line);border-radius:999px;
+  padding:8px 10px;font-size:10px;background:#fff
+}
+.timeline{display:grid;gap:8px}
+.note{
+  border-left:3px solid var(--olive);
+  padding:10px 12px;background:#faf7ef;border-radius:0 12px 12px 0
+}
+.note b{font-size:12px}
+.note p{margin:4px 0 0;font-size:11px;color:#52605a;line-height:1.5}
+.unlock{border:1px dashed var(--olive);background:#f3f1e2}
+.friend{
+  display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)
+}
+.friend:last-child{border-bottom:0}
+.friend-avatar{
+  width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
+  background:#efe7d8;font-size:23px;flex:0 0 auto
+}
+.friend .meta{min-width:0;flex:1}
+.friend b{font-size:12px}
+.friend p{margin:2px 0 0;font-size:10px;color:var(--muted)}
+.moods{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px}
+.mood{
+  flex:0 0 auto;border:1px solid var(--line);border-radius:999px;
+  padding:9px 11px;background:#fff
+}
+.mood.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.bottom{
+  position:fixed;left:50%;bottom:0;transform:translateX(-50%);
+  width:min(760px,100%);display:grid;grid-template-columns:repeat(5,1fr);
+  background:rgba(255,253,248,.97);border-top:1px solid var(--line);
+  padding:7px 4px max(7px,env(safe-area-inset-bottom));z-index:100
+}
+.nav{
+  border:0;background:transparent;color:var(--muted);
+  padding:7px 2px;font-size:9px;min-height:50px
+}
+.nav b{display:block;font-size:17px;line-height:1.1;margin-bottom:3px}
+.nav.active{color:var(--ink);font-weight:800}
+.view{display:none}
+.view.active{display:block}
+.toast{
+  position:fixed;left:50%;bottom:90px;transform:translateX(-50%);
+  max-width:calc(100% - 32px);background:var(--ink);color:#fff;
+  padding:11px 14px;border-radius:999px;font-size:11px;opacity:0;
+  pointer-events:none;transition:.2s;z-index:200;text-align:center
+}
+.toast.show{opacity:1}
+.hidden{display:none!important}
+.empty-state{text-align:center;padding:28px 10px;color:var(--muted);font-size:12px}
+.visit{background:#f7f2e7;border:1px solid var(--line);border-radius:18px;padding:13px}
+.visit-scene{
+  height:150px;border-radius:14px;display:flex;justify-content:center;align-items:flex-end;
+  gap:18px;background:linear-gradient(#e7efe9,#f5eadc);overflow:hidden;margin-bottom:10px
+}
+.visit-yogi{font-size:54px;transform:translateY(6px)}
+.inline-hint{
+  padding:10px 12px;border-radius:14px;background:#f7f2e7;
+  border:1px solid var(--line);font-size:10px;color:#626c66;line-height:1.5
+}
+.progress{
+  height:10px;background:#eee8dc;border-radius:999px;margin:14px 0 8px;overflow:hidden
+}
+.progress > div{height:100%;background:var(--olive)}
+@media(min-width:650px){
+  .main{padding:18px}
+  .item-grid{grid-template-columns:repeat(3,1fr)}
+  .avatar-stage{min-height:400px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="kicker">PRACTICE · SHARE · PEACE</div>
+    <h1>YOGIBARA</h1>
+    <div class="sub">수련은, 나에게서 끝나지 않는다.<br>나의 수련을 기록하고, 연을 맺고, 나눔으로 이어보세요.</div>
+  </header>
+
+  <main class="main">
+
+    <section id="onboarding" class="view active">
+      <div class="card hero">
+        <div class="kicker">MY YOGI</div>
+        <h2>당신의 요기를 만나볼까요?</h2>
+        <div class="small">처음 고른 모습과 매트는 나중에 언제든 다시 바꿀 수 있어요.</div>
+      </div>
+
+      <div id="onboardingPreview"></div>
+
+      <div class="card">
+        <div class="section-title">1. 나의 모습</div>
+        <div class="choice-grid">
+          <button class="choice active" data-gender="yogini" type="button">
+            <div style="font-size:34px">◡</div>
+            <b>요기니 YOGINI</b>
+          </button>
+          <button class="choice" data-gender="yogi" type="button">
+            <div style="font-size:34px">◠</div>
+            <b>요기 YOGI</b>
+          </button>
+        </div>
+
+        <label class="label" for="yogiName">2. 나의 요기 이름</label>
+        <input id="yogiName" class="input" maxlength="16" placeholder="예: 바람요기, 숨, 하루">
+
+        <label class="label" for="yogiWord">3. 지금의 나를 한 문장으로</label>
+        <input id="yogiWord" class="input" maxlength="50" placeholder="예: 천천히, 그러나 계속">
+
+        <label class="label">4. 첫 요가 매트</label>
+        <div class="small" style="margin-bottom:8px">누르면 위 미리보기에 바로 반영됩니다.</div>
+        <div class="choice-grid" id="matChoices">
+          <button class="choice active" data-mat="sand" type="button">SAND<span class="swatch" style="background:#b9a58a"></span></button>
+          <button class="choice" data-mat="forest" type="button">FOREST<span class="swatch" style="background:#6f806d"></span></button>
+          <button class="choice" data-mat="ocean" type="button">OCEAN<span class="swatch" style="background:#678b91"></span></button>
+          <button class="choice" data-mat="night" type="button">NIGHT<span class="swatch" style="background:#5f5f73"></span></button>
+        </div>
+
+        <div style="margin-top:14px">
+          <button id="createYogi" class="btn primary" type="button" style="width:100%">나의 YOGI 시작하기</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="today" class="view">
+      <div class="card hero">
+        <div class="kicker">TODAY</div>
+        <h2>오늘, 어떤 마음으로 수련했나요?</h2>
+        <div class="small">수련은 횟수보다 그날의 마음과 함께 기록됩니다.</div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">오늘의 마음</div>
+        <div class="moods" id="moods">
+          <button class="mood active" data-mood="🌿 평온">🌿 평온</button>
+          <button class="mood" data-mood="🌊 복잡">🌊 복잡</button>
+          <button class="mood" data-mood="🔥 활력">🔥 활력</button>
+          <button class="mood" data-mood="🌙 휴식">🌙 휴식</button>
+          <button class="mood" data-mood="❤️ 감사">❤️ 감사</button>
+          <button class="mood" data-mood="☁️ 무거움">☁️ 무거움</button>
+        </div>
+
+        <label class="label" for="practiceType">오늘의 수련</label>
+        <select id="practiceType" class="select">
+          <option>요가</option>
+          <option>명상</option>
+          <option>호흡</option>
+          <option>걷기</option>
+          <option>마음공부</option>
+          <option>나눔</option>
+        </select>
+
+        <label class="label" for="practiceWhere">어디서 했나요?</label>
+        <input id="practiceWhere" class="input" placeholder="예: 집, 아난드요가, 함덕 바다">
+
+        <label class="label" for="practiceNote">오늘의 한 문장</label>
+        <textarea id="practiceNote" class="textarea" placeholder="오늘 수련 후 내 마음에 남은 것을 적어보세요."></textarea>
+
+        <label class="label" for="practiceMinutes">수련 시간</label>
+        <input id="practiceMinutes" class="input" type="number" min="1" max="600" value="30">
+
+        <div style="margin-top:14px">
+          <button id="savePractice" class="btn olive" type="button" style="width:100%">오늘의 수련 남기기</button>
+        </div>
+      </div>
+
+      <div id="latestUnlock" class="card unlock hidden"></div>
+    </section>
+
+    <section id="myplace" class="view">
+      <div class="card profile-head">
+        <div class="kicker">MY PLACE</div>
+        <div class="yogi-name" id="profileName">나의 요기</div>
+        <div class="handle" id="profileHandle">@myyogi</div>
+        <div class="small" id="profileWord"></div>
+      </div>
+
+      <div id="myAvatarStage"></div>
+
+      <div class="card">
+        <div class="section-title">꾸미기</div>
+        <div class="small">보유한 아이템을 누르면 바로 입거나 벗고, 매트와 배경도 바꿀 수 있어요.</div>
+        <div class="tabs" id="dressTabs">
+          <button class="tab active" data-tab="outfit">요가복</button>
+          <button class="tab" data-tab="accessory">소품</button>
+          <button class="tab" data-tab="mat">매트</button>
+          <button class="tab" data-tab="background">배경</button>
+          <button class="tab" data-tab="trace">결의 흔적</button>
+        </div>
+        <div id="dressItems" class="item-grid"></div>
+      </div>
+
+      <div class="card">
+        <div class="stats">
+          <div class="stat"><b id="statPractice">0</b><span>PRACTICE</span></div>
+          <div class="stat"><b id="statPlaces">0</b><span>PLACES</span></div>
+          <div class="stat"><b id="statShare">0</b><span>SHARE</span></div>
+          <div class="stat"><b id="statYeon">0</b><span>연</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">나의 결</div>
+        <div class="gyeol">
+          <div class="chip">숨결 <b id="gBreath">0</b></div>
+          <div class="chip">마음결 <b id="gMind">0</b></div>
+          <div class="chip">길결 <b id="gPath">0</b></div>
+          <div class="chip">인연결 <b id="gBond">0</b></div>
+          <div class="chip">나눔결 <b id="gShare">0</b></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">나의 수련 기록</div>
+        <div id="timeline" class="timeline"></div>
+      </div>
+    </section>
+
+    <section id="connect" class="view">
+      <div class="card hero">
+        <div class="kicker">CONNECT</div>
+        <h2>연을 맺고, 서로의 자리에 머물러요.</h2>
+        <div class="small">팔로워가 아니라 서로의 수련을 바라봐주는 ‘연’입니다.</div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">나의 주소</div>
+        <div class="visit">
+          <b id="myAddress">yogibara/@myyogi</b>
+          <p class="small">이 주소를 친구에게 알려주면 나의 자리에 찾아올 수 있어요.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">연 맺기 미리보기</div>
+        <div class="friend">
+          <div class="friend-avatar">🌿</div>
+          <div class="meta"><b>바람요기</b><p>“오늘도 천천히.”</p></div>
+          <button class="btn" data-friend="바람요기" type="button">연 맺기</button>
+        </div>
+        <div class="friend">
+          <div class="friend-avatar">☀️</div>
+          <div class="meta"><b>숨요기</b><p>“깊게 호흡하는 중.”</p></div>
+          <button class="btn" data-friend="숨요기" type="button">연 맺기</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">친구의 자리에 놀러가기</div>
+        <div class="visit">
+          <div class="visit-scene">
+            <div class="visit-yogi">◡</div>
+            <div class="visit-yogi">◠</div>
+          </div>
+          <div class="small">내 아바타가 친구의 공간에 잠시 머무는 장면입니다.</div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn" data-gift="차 한 잔" type="button">☕ 차 두고가기</button>
+            <button class="btn" data-gift="꽃 한 송이" type="button">🌿 꽃 두고가기</button>
+            <button class="btn" data-gift="응원" type="button">☀️ 응원 보내기</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="share" class="view">
+      <div class="card hero">
+        <div class="kicker">SHARE</div>
+        <h2>내 수련을 나눔으로 이어보세요.</h2>
+        <div class="small">릴레이에 참여한 기록은 나의 자리에 오래 남습니다.</div>
+      </div>
+
+      <div class="card">
+        <div class="kicker">RELAY 001</div>
+        <div class="section-title" style="margin-top:5px">108 HEART RELAY</div>
+        <div class="small">108개의 수련이 하나의 나눔이 되는 릴레이</div>
+        <div class="progress"><div id="relayBar" style="width:34%"></div></div>
+        <div class="small"><b id="relayCount">37</b> / 108개의 수련이 이어졌습니다.</div>
+
+        <label class="label" for="relayNote">나의 수련 한마디</label>
+        <input id="relayNote" class="input" maxlength="60" placeholder="예: 오늘의 한 번을 이어봅니다.">
+
+        <div style="margin-top:12px">
+          <button id="joinRelay" class="btn olive" style="width:100%" type="button">이 릴레이에 내 수련 잇기</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">나의 SHARE 기록</div>
+        <div id="shareHistory" class="timeline"></div>
+      </div>
+    </section>
+
+    <section id="journey" class="view">
+      <div class="card hero">
+        <div class="kicker">JOURNEY</div>
+        <h2>현실의 장소에서 새로운 결을 만나요.</h2>
+        <div class="small">제주 요가원과 로컬 파트너를 찾아가며 나만의 Journey를 이어갑니다.</div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">YOGIBARA MAP</div>
+        <div class="small">기존 제주 지도를 그대로 연결합니다.</div>
+        <div style="margin-top:12px">
+          <a href="./index.html" class="btn primary" style="display:inline-block;text-decoration:none">제주 지도 열기</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">장소에서 얻는 흔적</div>
+        <div class="timeline">
+          <div class="note"><b>🧘 요가원</b><p>수련의 기록 · 숨결 / 길결</p></div>
+          <div class="note"><b>☕ 카페</b><p>차의 온기 · 작은 소품</p></div>
+          <div class="note"><b>🍚 식당</b><p>함께한 한 끼 · 식탁의 흔적</p></div>
+          <div class="note"><b>🏡 숙소</b><p>머문 밤 · 나의 자리 배경</p></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="bottom" aria-label="YOGIBARA navigation">
+    <button class="nav" data-view="today" type="button"><b>◯</b>TODAY</button>
+    <button class="nav" data-view="myplace" type="button"><b>⌂</b>MY PLACE</button>
+    <button class="nav" data-view="connect" type="button"><b>∞</b>CONNECT</button>
+    <button class="nav" data-view="share" type="button"><b>♡</b>SHARE</button>
+    <button class="nav" data-view="journey" type="button"><b>⌖</b>JOURNEY</button>
+  </nav>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+const KEY='yogibara_v2_demo';
+const oldKey='yogibara_v1_demo';
+
+const catalog=[
+  {id:'top_cream',cat:'outfit',name:'크림 요가탑',icon:'◻',type:'top',value:'cream',free:true},
+  {id:'top_olive',cat:'outfit',name:'올리브 요가탑',icon:'▰',type:'top',value:'olive',unlock:2},
+  {id:'top_emerald',cat:'outfit',name:'에메랄드 탑',icon:'▰',type:'top',value:'emerald',lockedText:'COLLECTION'},
+  {id:'bottom_sand',cat:'outfit',name:'샌드 팬츠',icon:'▥',type:'bottom',value:'sand',free:true},
+  {id:'bottom_olive',cat:'outfit',name:'올리브 팬츠',icon:'▥',type:'bottom',value:'olive',unlock:5},
+  {id:'bottom_charcoal',cat:'outfit',name:'차콜 팬츠',icon:'▥',type:'bottom',value:'charcoal',lockedText:'SHOP'},
+
+  {id:'bracelet_breath',cat:'accessory',name:'숨결 팔찌',icon:'◌',type:'bracelet',value:true,unlock:1},
+  {id:'patch_heart',cat:'accessory',name:'HEART 패치',icon:'♥',type:'patch',value:true,relay:true},
+
+  {id:'mat_sand',cat:'mat',name:'SAND MAT',icon:'━',type:'mat',value:'sand',free:true},
+  {id:'mat_forest',cat:'mat',name:'FOREST MAT',icon:'━',type:'mat',value:'forest',free:true},
+  {id:'mat_ocean',cat:'mat',name:'OCEAN MAT',icon:'━',type:'mat',value:'ocean',free:true},
+  {id:'mat_night',cat:'mat',name:'NIGHT MAT',icon:'━',type:'mat',value:'night',free:true},
+  {id:'mat_clay',cat:'mat',name:'CLAY MAT',icon:'━',type:'mat',value:'clay',lockedText:'JOURNEY'},
+
+  {id:'bg_paper',cat:'background',name:'나의 자리',icon:'□',type:'background',value:'paper',free:true},
+  {id:'bg_jeju',cat:'background',name:'제주의 바람',icon:'≈',type:'background',value:'jeju',unlock:3},
+  {id:'bg_stone',cat:'background',name:'돌담의 오후',icon:'▧',type:'background',value:'stone',lockedText:'JEJU'},
+  {id:'bg_tea',cat:'background',name:'차의 온기',icon:'⌁',type:'background',value:'tea',lockedText:'LOCAL'},
+  {id:'bg_night',cat:'background',name:'조용한 밤',icon:'☾',type:'background',value:'night',unlock:10},
+
+  {id:'trace_aura',cat:'trace',name:'숨결의 빛',icon:'○',type:'aura',value:true,unlock:3},
+  {id:'trace_heart',cat:'trace',name:'릴레이의 흔적',icon:'♥',type:'patch',value:true,relay:true}
+];
+
+const defaultState={
+  created:false,
+  gender:'yogini',
+  name:'',
+  word:'',
+  mood:'🌿 평온',
+  practices:[],
+  friends:[],
+  shares:[],
+  relayCount:37,
+  equipped:{
+    top:'cream',
+    bottom:'sand',
+    bracelet:false,
+    patch:false,
+    aura:false,
+    mat:'sand',
+    background:'paper'
+  },
+  gyeol:{breath:0,mind:0,path:0,bond:0,share:0}
+};
+
+let state=load();
+
+function load(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(KEY)||'null');
+    if(saved) return {...defaultState,...saved,equipped:{...defaultState.equipped,...(saved.equipped||{})},gyeol:{...defaultState.gyeol,...(saved.gyeol||{})}};
+    const old=JSON.parse(localStorage.getItem(oldKey)||'null');
+    if(old && old.created){
+      return {
+        ...defaultState,
+        created:true,
+        gender:old.gender||'yogini',
+        name:old.name||'',
+        word:old.word||'',
+        mood:old.mood||'🌿 평온',
+        practices:old.practices||[],
+        friends:old.friends||[],
+        shares:old.shares||[],
+        relayCount:old.relayCount||37,
+        gyeol:{...defaultState.gyeol,...(old.gyeol||{})},
+        equipped:{...defaultState.equipped,mat:old.mat||'sand'}
+      };
+    }
+  }catch(e){}
+  return structuredClone(defaultState);
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(window.__toast);
+  window.__toast=setTimeout(()=>el.classList.remove('show'),2200);
+}
+function slug(s){
+  return (s||'myyogi').trim().toLowerCase().replace(/\s+/g,'').replace(/[^a-z0-9가-힣_-]/g,'').slice(0,20)||'myyogi';
+}
+function esc(v){
+  return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+}
+function owned(item){
+  if(item.free) return true;
+  if(item.unlock && state.practices.length>=item.unlock) return true;
+  if(item.relay && state.shares.length>0) return true;
+  return false;
+}
+function isEquipped(item){
+  const e=state.equipped;
+  if(item.type==='top') return e.top===item.value;
+  if(item.type==='bottom') return e.bottom===item.value;
+  if(item.type==='bracelet') return !!e.bracelet;
+  if(item.type==='patch') return !!e.patch;
+  if(item.type==='aura') return !!e.aura;
+  if(item.type==='mat') return e.mat===item.value;
+  if(item.type==='background') return e.background===item.value;
+  return false;
+}
+function avatarHTML(compact=false,previewState=null){
+  const s=previewState||state;
+  const e=s.equipped||state.equipped;
+  const gender=s.gender||'yogini';
+  const wrapClass=[
+    'avatar-wrap',
+    'gender-'+gender,
+    'outfit-'+(e.top||'cream'),
+    'bottom-'+(e.bottom||'sand'),
+    e.bracelet?'wearing-bracelet':'',
+    e.patch?'wearing-patch':'',
+    e.aura?'wearing-aura':''
+  ].join(' ');
+  const bg=e.background||'paper';
+  const mat=e.mat||'sand';
+
+  return `
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="avatar-stage ${compact?'compact':''}">
+      <div class="scene-bg bg-${bg}"></div>
+      <div class="scene-label">${bgName(bg)}</div>
+      <div class="scene-floor"></div>
+      <div class="mat mat-${mat}"></div>
+      <div class="${wrapClass}">
+        <svg class="avatar-svg" viewBox="0 0 190 250" aria-label="${gender==='yogi'?'요기':'요기니'} 아바타">
+          <ellipse class="avatar-shadow" cx="95" cy="232" rx="54" ry="10"/>
+          <circle class="aura" cx="95" cy="113" r="77"/>
+
+          <!-- legs -->
+          <path class="bottom-fill" d="M70 157 C62 178 58 201 66 228 L84 228 C86 207 88 186 95 168 C102 186 104 207 106 228 L124 228 C132 200 126 176 120 157 Z"/>
+
+          <!-- feet -->
+          <ellipse class="skin" cx="73" cy="229" rx="16" ry="7"/>
+          <ellipse class="skin" cx="117" cy="229" rx="16" ry="7"/>
+
+          <!-- torso -->
+          <path class="top-fill yogini-only" d="M68 92 C71 78 82 70 95 70 C108 70 119 78 122 92 L120 158 C106 165 84 165 70 158 Z"/>
+          <path class="top-fill yogi-only" d="M65 91 C71 77 82 70 95 70 C108 70 121 77 126 91 L120 158 C105 164 84 164 70 158 Z"/>
+
+          <!-- neck -->
+          <rect class="skin" x="88" y="60" width="14" height="18" rx="6"/>
+
+          <!-- arms -->
+          <path class="skin" d="M71 95 C58 112 51 129 50 151 C50 158 59 160 62 153 C66 135 73 119 82 107 Z"/>
+          <path class="skin" d="M119 95 C132 112 139 129 140 151 C140 158 131 160 128 153 C124 135 117 119 108 107 Z"/>
+          <path class="bracelet" d="M48 147 Q55 151 63 148"/>
+
+          <!-- head -->
+          <ellipse class="skin" cx="95" cy="45" rx="28" ry="31"/>
+          <path class="hair yogini-only" d="M68 47 C64 17 79 7 96 7 C117 7 129 23 122 51 C119 33 111 24 96 23 C83 22 74 31 68 47 Z"/>
+          <path class="hair yogini-only" d="M70 43 C64 71 73 80 79 85 L82 60 Z"/>
+          <path class="hair yogini-only" d="M120 43 C126 71 117 80 111 85 L108 60 Z"/>
+          <path class="hair yogi-only" d="M68 43 C68 19 79 8 96 8 C114 8 124 20 123 43 C114 32 105 28 94 28 C83 28 75 33 68 43 Z"/>
+
+          <!-- face -->
+          <circle cx="85" cy="46" r="2.1" fill="#554b45"/>
+          <circle cx="105" cy="46" r="2.1" fill="#554b45"/>
+          <path d="M89 58 Q95 62 101 58" fill="none" stroke="#8b6557" stroke-width="1.8" stroke-linecap="round"/>
+
+          <!-- patch -->
+          <circle class="patch" cx="111" cy="106" r="6"/>
+        </svg>
+      </div>
+      <div class="avatar-caption">${esc(s.name||'나의 YOGI')} · ${mat.toUpperCase()} MAT</div>
+    </div>
+  </div>`;
+}
+function bgName(v){
+  return ({paper:'나의 자리',jeju:'제주의 바람',stone:'돌담의 오후',tea:'차의 온기',night:'조용한 밤'})[v]||'나의 자리';
+}
+function renderOnboardingPreview(){
+  const temp={
+    gender:state.gender,
+    name:document.getElementById('yogiName')?.value||state.name||'나의 YOGI',
+    equipped:{...state.equipped,mat:state.equipped.mat||'sand',background:'paper',top:'cream',bottom:'sand',bracelet:false,patch:false,aura:false}
+  };
+  document.getElementById('onboardingPreview').innerHTML=avatarHTML(true,temp);
+}
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const target=document.getElementById(id);
+  if(target) target.classList.add('active');
+  document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.view===id));
+  if(id==='myplace') renderProfile();
+  if(id==='connect') renderProfile();
+  if(id==='share') renderShare();
+}
+
+document.querySelectorAll('[data-gender]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    state.gender=btn.dataset.gender;
+    document.querySelectorAll('[data-gender]').forEach(x=>x.classList.toggle('active',x===btn));
+    renderOnboardingPreview();
+  });
+});
+document.querySelectorAll('[data-mat]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    state.equipped.mat=btn.dataset.mat;
+    document.querySelectorAll('[data-mat]').forEach(x=>x.classList.toggle('active',x===btn));
+    renderOnboardingPreview();
+  });
+});
+document.getElementById('yogiName').addEventListener('input',renderOnboardingPreview);
+
+document.getElementById('createYogi').addEventListener('click',()=>{
+  const name=document.getElementById('yogiName').value.trim();
+  if(name.length<2){toast('요기 이름을 2글자 이상 적어주세요.');return}
+  state.name=name;
+  state.word=document.getElementById('yogiWord').value.trim();
+  state.created=true;
+  save();
+  toast(name+'의 Journey가 시작되었습니다.');
+  showView('today');
+});
+
+document.querySelectorAll('.mood').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    state.mood=btn.dataset.mood;
+    document.querySelectorAll('.mood').forEach(x=>x.classList.toggle('active',x===btn));
+  });
+});
+
+document.getElementById('savePractice').addEventListener('click',()=>{
+  const type=document.getElementById('practiceType').value;
+  const where=document.getElementById('practiceWhere').value.trim()||'나의 자리';
+  const note=document.getElementById('practiceNote').value.trim();
+  let minutes=parseInt(document.getElementById('practiceMinutes').value,10);
+  if(!Number.isFinite(minutes) || minutes<1) minutes=1;
+  if(minutes>600) minutes=600;
+
+  state.practices.unshift({date:new Date().toISOString(),type,where,note,minutes,mood:state.mood});
+  state.gyeol.breath+=1;
+  state.gyeol.mind+=1;
+  if(where!=='나의 자리' && where!=='집') state.gyeol.path+=1;
+
+  const n=state.practices.length;
+  let unlock='';
+  if(n===1) unlock='첫 수련으로 ‘숨결 팔찌’가 열렸습니다.';
+  else if(n===2) unlock='두 번째 수련으로 ‘올리브 요가탑’이 열렸습니다.';
+  else if(n===3) unlock='세 번째 수련으로 ‘제주의 바람’ 배경과 ‘숨결의 빛’이 열렸습니다.';
+  else if(n===5) unlock='다섯 번째 수련으로 ‘올리브 팬츠’가 열렸습니다.';
+  else if(n===10) unlock='열 번째 수련으로 ‘조용한 밤’ 배경이 열렸습니다.';
+
+  save();
+  document.getElementById('practiceWhere').value='';
+  document.getElementById('practiceNote').value='';
+  const box=document.getElementById('latestUnlock');
+  if(unlock){
+    box.innerHTML='<b>새로운 흔적이 생겼어요 🌿</b><p class="small">'+unlock+'</p>';
+    box.classList.remove('hidden');
+  }else box.classList.add('hidden');
+  toast('오늘의 수련이 기록되었습니다.');
+});
+
+document.querySelectorAll('.nav').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    if(!state.created){showView('onboarding');toast('먼저 나의 YOGI를 만들어주세요.');return}
+    showView(btn.dataset.view);
+  });
+});
+
+let currentDressTab='outfit';
+document.querySelectorAll('#dressTabs .tab').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    currentDressTab=btn.dataset.tab;
+    document.querySelectorAll('#dressTabs .tab').forEach(x=>x.classList.toggle('active',x===btn));
+    renderDressItems();
+  });
+});
+
+function renderDressItems(){
+  const box=document.getElementById('dressItems');
+  if(!box) return;
+  const items=catalog.filter(i=>i.cat===currentDressTab);
+  box.innerHTML=items.map(i=>{
+    const own=owned(i), eq=isEquipped(i);
+    const label=eq?'착용중':(own?'눌러서 적용':(i.unlock?i.unlock+'회 수련':(i.relay?'릴레이 참여':(i.lockedText||'LOCKED'))));
+    return `<button class="item ${own?'':'locked'} ${eq?'equipped':''}" type="button" data-item="${i.id}" ${own?'':'disabled'}>
+      <div class="item-icon">${i.icon}</div>
+      <b>${i.name}</b>
+      <span>${label}</span>
+      ${eq?'<div class="tag">EQUIPPED</div>':''}
+    </button>`;
+  }).join('');
+  box.querySelectorAll('[data-item]').forEach(btn=>{
+    btn.addEventListener('click',()=>equipItem(btn.dataset.item));
+  });
+}
+function equipItem(id){
+  const i=catalog.find(x=>x.id===id);
+  if(!i || !owned(i)) return;
+  const e=state.equipped;
+  if(i.type==='top') e.top=i.value;
+  else if(i.type==='bottom') e.bottom=i.value;
+  else if(i.type==='mat') e.mat=i.value;
+  else if(i.type==='background') e.background=i.value;
+  else if(i.type==='bracelet') e.bracelet=!e.bracelet;
+  else if(i.type==='patch') e.patch=!e.patch;
+  else if(i.type==='aura') e.aura=!e.aura;
+  save();
+  renderProfile();
+  renderDressItems();
+  toast(isEquipped(i)?i.name+'을 적용했습니다.':i.name+'을 해제했습니다.');
+}
+
+document.querySelectorAll('[data-friend]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const name=btn.dataset.friend;
+    if(!state.friends.includes(name)){
+      state.friends.push(name);
+      state.gyeol.bond+=1;
+      save();
+      btn.textContent='연 맺음';
+      btn.disabled=true;
+      toast(name+'님과 연이 이어졌습니다.');
+      renderProfile();
+    }
+  });
+});
+document.querySelectorAll('[data-gift]').forEach(btn=>{
+  btn.addEventListener('click',()=>toast(btn.dataset.gift+'을 친구의 자리에 남겼습니다.'));
+});
+
+document.getElementById('joinRelay').addEventListener('click',()=>{
+  const note=document.getElementById('relayNote').value.trim()||'오늘의 수련을 이어봅니다.';
+  state.relayCount=Math.min(108,(state.relayCount||37)+1);
+  state.shares.unshift({date:new Date().toISOString(),relay:'108 HEART RELAY',note,order:state.relayCount});
+  state.gyeol.share+=1;
+  save();
+  document.getElementById('relayNote').value='';
+  renderShare();
+  toast('당신의 수련이 릴레이에 이어졌습니다.');
+});
+
+function uniqPlaces(){
+  return new Set(state.practices.map(p=>p.where).filter(Boolean)).size;
+}
+function renderProfile(){
+  if(!state.created) return;
+  document.getElementById('profileName').textContent=state.name;
+  document.getElementById('profileHandle').textContent='@'+slug(state.name);
+  document.getElementById('profileWord').textContent=state.word?('“'+state.word+'”'):'';
+  document.getElementById('myAvatarStage').innerHTML=avatarHTML(false);
+
+  document.getElementById('statPractice').textContent=state.practices.length;
+  document.getElementById('statPlaces').textContent=uniqPlaces();
+  document.getElementById('statShare').textContent=state.shares.length;
+  document.getElementById('statYeon').textContent=state.friends.length;
+  document.getElementById('gBreath').textContent=state.gyeol.breath;
+  document.getElementById('gMind').textContent=state.gyeol.mind;
+  document.getElementById('gPath').textContent=state.gyeol.path;
+  document.getElementById('gBond').textContent=state.gyeol.bond;
+  document.getElementById('gShare').textContent=state.gyeol.share;
+  document.getElementById('myAddress').textContent='yogibara/@'+slug(state.name);
+
+  const timeline=document.getElementById('timeline');
+  if(!state.practices.length){
+    timeline.innerHTML='<div class="empty-state">아직 기록된 수련이 없습니다.</div>';
+  }else{
+    timeline.innerHTML=state.practices.slice(0,20).map(p=>{
+      const d=new Date(p.date);
+      const ds=(d.getMonth()+1)+'.'+d.getDate();
+      return '<div class="note"><b>'+ds+' · '+esc(p.type)+' · '+esc(p.where)+'</b><p>'+esc(p.mood)+' · '+p.minutes+'분'+(p.note?'<br>'+esc(p.note):'')+'</p></div>';
+    }).join('');
+  }
+  document.querySelectorAll('[data-friend]').forEach(btn=>{
+    if(state.friends.includes(btn.dataset.friend)){btn.textContent='연 맺음';btn.disabled=true}
+  });
+  renderDressItems();
+}
+
+function renderShare(){
+  const count=state.relayCount||37;
+  document.getElementById('relayCount').textContent=count;
+  document.getElementById('relayBar').style.width=Math.round(count/108*100)+'%';
+  const box=document.getElementById('shareHistory');
+  if(!state.shares.length){
+    box.innerHTML='<div class="empty-state">아직 이어진 릴레이가 없습니다.</div>';
+  }else{
+    box.innerHTML=state.shares.map(s=>{
+      const d=new Date(s.date);
+      return '<div class="note"><b>'+esc(s.relay)+' · '+s.order+'번째 연결</b><p>'+(d.getMonth()+1)+'.'+d.getDate()+' · '+esc(s.note)+'</p></div>';
+    }).join('');
+  }
+}
+
+(function init(){
+  renderOnboardingPreview();
+  if(state.created){
+    document.getElementById('onboarding').classList.remove('active');
+    showView('today');
+  }else showView('onboarding');
+  renderProfile();
+  renderShare();
+})();
+</script>
+</body>
+</html>

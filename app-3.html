@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f4f1e9">
+<meta name="color-scheme" content="light only">
+<title>YOGIBARA V3</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f4f1e9;
+  --paper:#fffdf8;
+  --ink:#26362f;
+  --muted:#7b837d;
+  --line:#ddd6c9;
+  --olive:#7b7a45;
+  --olive-soft:#efefdf;
+  --emerald:#2f887a;
+  --special:#665b74;
+  --sand:#b8a58a;
+  --soft:#f3eee4;
+  --heart:#9d5f62;
+}
+*{box-sizing:border-box}
+html{background:var(--bg);color-scheme:light}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+a{color:inherit}
+.app{
+  max-width:760px;margin:auto;min-height:100vh;background:var(--paper);padding-bottom:88px;
+}
+.top{
+  padding:22px 18px 14px;border-bottom:1px solid var(--line);background:#fffdf8;
+}
+.kicker{font-size:10px;font-weight:800;letter-spacing:.2em;color:var(--muted)}
+h1{margin:6px 0 4px;font:500 34px Georgia,serif}
+.sub{font-size:12px;line-height:1.55;color:var(--muted)}
+.main{padding:14px}
+.card{
+  background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;margin-bottom:12px;
+}
+.hero{background:linear-gradient(180deg,#fffdf8,#f4eee2);border-color:#d8cfbd}
+.hero h2,.section-title{margin:0 0 7px;font:500 24px Georgia,serif}
+.small{font-size:11px;color:var(--muted);line-height:1.55}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{
+  border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;
+  padding:10px 14px;min-height:44px
+}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.olive{background:var(--olive);border-color:var(--olive);color:#fff}
+.btn.heart{background:var(--heart);border-color:var(--heart);color:#fff}
+.btn[disabled]{opacity:.45;cursor:default}
+.input,.textarea,.select{
+  width:100%;border:1px solid var(--line);background:#fff;color:var(--ink);
+  border-radius:14px;padding:12px 13px;outline:none;font-size:16px
+}
+.textarea{min-height:92px;resize:vertical}
+.label{display:block;font-size:11px;font-weight:800;margin:12px 0 6px}
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.choice{
+  border:1px solid var(--line);border-radius:18px;padding:13px 10px;background:#fff;color:var(--ink);
+  text-align:center;min-height:72px
+}
+.choice.active{border:2px solid var(--olive);background:var(--olive-soft)}
+.swatch{display:block;width:34px;height:7px;border-radius:999px;margin:7px auto 0}
+
+/* views */
+.view{display:none}.view.active{display:block}
+.bottom{
+  position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(760px,100%);
+  display:grid;grid-template-columns:repeat(5,1fr);background:#fffdf8f5;border-top:1px solid var(--line);
+  padding:7px 4px max(7px,env(safe-area-inset-bottom));z-index:100
+}
+.nav{border:0;background:transparent;color:var(--muted);padding:7px 2px;font-size:9px;min-height:50px}
+.nav b{display:block;font-size:17px;line-height:1.1;margin-bottom:3px}
+.nav.active{color:var(--ink);font-weight:800}
+
+/* avatar scene */
+.avatar-card{padding:0;overflow:hidden}
+.stage{
+  position:relative;min-height:350px;overflow:hidden;background:#ebe5d9;
+}
+.stage.compact{min-height:320px}
+.bg-paper{background:linear-gradient(180deg,#eee8dd,#e4dccd)}
+.bg-jeju{background:linear-gradient(180deg,#d6e3df 0 50%,#9bb1ad 51% 58%,#d7c8ad 59% 100%)}
+.bg-night{background:linear-gradient(180deg,#596172 0 60%,#4c4b43 61% 100%)}
+.bg-tea{background:linear-gradient(180deg,#e9e5d7 0 68%,#cbb89e 69%)}
+.scene-label{
+  position:absolute;top:13px;left:14px;padding:7px 10px;border-radius:999px;
+  background:#fffdf8e8;border:1px solid #ffffffaa;font-size:9px;font-weight:800
+}
+.mat{
+  position:absolute;left:50%;bottom:42px;transform:translateX(-50%);
+  width:220px;height:62px;border-radius:50%;box-shadow:0 14px 20px #00000010
+}
+.mat-sand{background:#b9a58a}.mat-forest{background:#73806e}.mat-ocean{background:#6f9198}.mat-night{background:#626375}
+.avatar{
+  position:absolute;width:220px;height:250px;left:50%;bottom:60px;transform:translateX(-50%)
+}
+.avatar svg{width:100%;height:100%;overflow:visible}
+.skin{fill:#d3a383}.hair{fill:#3e3a36}.topfill{fill:#eee9dc}.bottomfill{fill:#6a726d}
+.avatar.top-cream .topfill{fill:#eee9dc}.avatar.top-olive .topfill{fill:#7b7a45}.avatar.top-emerald .topfill{fill:#2f887a}
+.avatar.bottom-sand .bottomfill{fill:#aa977f}.avatar.bottom-olive .bottomfill{fill:#6c765f}.avatar.bottom-charcoal .bottomfill{fill:#525754}
+.bracelet{fill:none;stroke:#7b7a45;stroke-width:5;opacity:0}
+.avatar.has-bracelet .bracelet{opacity:1}
+.heartmark{fill:#9d5f62;opacity:0}
+.avatar.has-heart .heartmark{opacity:1}
+.aura{fill:none;stroke:#a7ad86;stroke-width:3;opacity:0}
+.avatar.has-aura .aura{opacity:.7}
+.avatar.gender-yogi .yogini-only{display:none}
+.avatar.gender-yogini .yogi-only{display:none}
+.avatar-caption{
+  position:absolute;left:50%;bottom:10px;transform:translateX(-50%);white-space:nowrap;
+  padding:7px 11px;border-radius:999px;background:#fffdf8e8;border:1px solid #fff;font-size:10px;font-weight:800
+}
+
+/* profile / collection */
+.profile-head{text-align:center}
+.yogi-name{font:500 28px Georgia,serif;margin:4px 0}
+.handle{font-size:11px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:14px}
+.stat{border:1px solid var(--line);border-radius:14px;padding:10px 6px;text-align:center}
+.stat b{display:block;font-size:18px}.stat span{font-size:9px;color:var(--muted)}
+.tabs{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex:0 0 auto;border:1px solid var(--line);background:#fff;color:var(--ink);
+  border-radius:999px;padding:9px 11px;font-size:10px
+}
+.tab.active{background:var(--ink);border-color:var(--ink);color:#fff}
+.item-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.item{
+  border:1px solid var(--line);border-radius:16px;padding:11px;background:#fff;text-align:left;min-height:84px;color:var(--ink)
+}
+.item.locked{opacity:.42}.item.equipped{border:2px solid var(--olive);background:var(--olive-soft)}
+.item b{display:block;font-size:11px}.item span{font-size:9px;color:var(--muted)}
+.item-icon{font-size:22px;margin-bottom:5px}
+.gyeol{display:flex;gap:7px;overflow-x:auto}
+.chip{flex:0 0 auto;border:1px solid var(--line);border-radius:999px;padding:8px 10px;font-size:10px}
+.timeline{display:grid;gap:8px}
+.note{border-left:3px solid var(--olive);padding:10px 12px;background:#faf7ef;border-radius:0 12px 12px 0}
+.note b{font-size:12px}.note p{margin:4px 0 0;font-size:11px;color:#52605a;line-height:1.5}
+.empty{text-align:center;padding:26px 10px;color:var(--muted);font-size:12px}
+
+/* friend scene */
+.friend{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.friend:last-child{border-bottom:0}
+.friend-icon{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#efe8dc}
+.friend .meta{flex:1;min-width:0}.friend b{font-size:12px}.friend p{margin:2px 0;font-size:10px;color:var(--muted)}
+.visit-scene{
+  min-height:230px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,#e4ebe5,#d9cbb6);
+  position:relative;overflow:hidden
+}
+.visit-scene .mini{position:absolute;width:145px;height:180px;bottom:25px}
+.visit-scene .mini.me{left:8%}.visit-scene .mini.friendy{right:8%}
+.visit-scene .mini svg{width:100%;height:100%}
+
+/* RELAY */
+.relay-hero{
+  background:
+    radial-gradient(circle at 80% 15%,#ffffff90 0 8%,transparent 9%),
+    linear-gradient(155deg,#f4eadf,#ecebd8);
+}
+.relay-head{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:12px
+}
+.relay-count-big{font:500 42px Georgia,serif;line-height:1}
+.relay-count-big span{font-size:16px;color:var(--muted)}
+.progress{height:10px;background:#ebe5d8;border-radius:999px;overflow:hidden;margin:14px 0 6px}
+.progress>div{height:100%;background:linear-gradient(90deg,var(--olive),#aaa86c);transition:.35s}
+.relay-grid{
+  display:grid;grid-template-columns:repeat(9,1fr);gap:5px;margin-top:12px
+}
+.relay-dot{
+  aspect-ratio:1;border:1px solid var(--line);border-radius:50%;background:#f6f2e9;color:#aaa49a;
+  display:grid;place-items:center;font-size:8px;padding:0;position:relative
+}
+.relay-dot.done{background:var(--olive-soft);border-color:#aaa979;color:#4b4b35;font-weight:800}
+.relay-dot.you{background:var(--olive);color:#fff;border:3px solid #d9d7a2;box-shadow:0 0 0 3px #7b7a4522}
+.relay-dot.frienddone:after{
+  content:"";position:absolute;right:-1px;top:-1px;width:7px;height:7px;border-radius:50%;background:var(--emerald);border:1px solid #fff
+}
+.legend-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:9px;color:var(--muted)}
+.legend-sym{display:inline-block;width:9px;height:9px;border-radius:50%;vertical-align:-1px;margin-right:4px}
+.verification-box{border:1px solid var(--line);border-radius:18px;padding:13px;background:#fbf8f1;margin-top:10px}
+.verify-methods{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+.verify-method{
+  border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px;color:var(--ink);text-align:left;font-size:10px
+}
+.verify-method.active{border:2px solid var(--olive);background:var(--olive-soft)}
+.verify-panel{margin-top:10px}
+.timerbox{
+  padding:14px;border-radius:16px;background:#fff;border:1px solid var(--line);text-align:center
+}
+.timer{font:500 34px Georgia,serif;margin:5px 0}
+.cert-chip{
+  display:inline-block;padding:4px 7px;border-radius:999px;background:#edf2ee;color:#426057;
+  font-size:8px;font-weight:800;letter-spacing:.06em
+}
+.cert-chip.photo{background:#f0e9f2;color:#68586c}
+.cert-chip.partner{background:#eef0df;color:#626039}
+.cert-chip.timer{background:#e7eef1;color:#45626b}
+.relay-success{
+  display:none;border:1px solid #c9c78e;background:#f3f1dd;border-radius:20px;padding:18px;text-align:center;margin-bottom:12px
+}
+.relay-success.show{display:block;animation:pop .35s ease}
+@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
+.relay-success .num{font:500 52px Georgia,serif;color:var(--olive)}
+.relay-success b{display:block;font-size:15px;margin-bottom:4px}
+
+/* bottom sheet */
+.sheet-back{
+  display:none;position:fixed;inset:0;background:#1e2c2555;z-index:5000
+}
+.sheet-back.show{display:block}
+.sheet{
+  position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:min(760px,100%);
+  background:#fffdf8;border-radius:26px 26px 0 0;padding:18px 18px max(22px,env(safe-area-inset-bottom));
+  max-height:82%;overflow:auto
+}
+.sheet-handle{width:42px;height:4px;border-radius:999px;background:#d6d0c5;margin:0 auto 14px}
+.cert-card{
+  border:1px solid var(--line);border-radius:18px;padding:14px;background:#fff;margin-top:12px
+}
+.cert-card h3{margin:5px 0;font:500 24px Georgia,serif}
+.cert-row{display:grid;grid-template-columns:88px 1fr;gap:8px;padding:6px 0;border-bottom:1px solid #eee8dd;font-size:11px}
+.cert-row:last-child{border-bottom:0}.cert-row span:first-child{color:var(--muted)}
+.close-sheet{width:100%;margin-top:12px}
+
+/* toast */
+.toast{
+  position:fixed;left:50%;bottom:90px;transform:translateX(-50%);max-width:calc(100% - 32px);
+  background:var(--ink);color:#fff;padding:11px 14px;border-radius:999px;font-size:11px;opacity:0;
+  pointer-events:none;transition:.2s;z-index:7000;text-align:center
+}
+.toast.show{opacity:1}
+.hidden{display:none!important}
+.moods{display:flex;gap:7px;overflow-x:auto}
+.mood{flex:0 0 auto;border:1px solid var(--line);border-radius:999px;padding:9px 11px;background:#fff;color:var(--ink)}
+.mood.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+@media(min-width:650px){
+  .main{padding:18px}.item-grid{grid-template-columns:repeat(3,1fr)}
+  .relay-grid{grid-template-columns:repeat(12,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="kicker">PRACTICE · SHARE · PEACE</div>
+  <h1>YOGIBARA</h1>
+  <div class="sub">수련은, 나에게서 끝나지 않는다.<br>기록하고, 연을 맺고, 나눔으로 이어보세요.</div>
+</header>
+
+<main class="main">
+<section id="onboarding" class="view active">
+  <div class="card hero">
+    <div class="kicker">MY YOGI</div>
+    <h2>나의 요기를 시작해볼까요?</h2>
+    <div class="small">처음 고른 모습과 매트는 나중에 MY PLACE에서 언제든 바꿀 수 있어요.</div>
+  </div>
+  <div id="onboardingPreview"></div>
+  <div class="card">
+    <div class="section-title">1. 나의 모습</div>
+    <div class="choice-grid">
+      <button class="choice active" data-gender="yogini" type="button"><b>YOGINI</b><div class="small">요기니</div></button>
+      <button class="choice" data-gender="yogi" type="button"><b>YOGI</b><div class="small">요기</div></button>
+    </div>
+    <label class="label" for="yogiName">2. 나의 요기 이름</label>
+    <input id="yogiName" class="input" maxlength="16" placeholder="예: 바람요기, 숨, 하루">
+    <label class="label" for="yogiWord">3. 지금의 나를 한 문장으로</label>
+    <input id="yogiWord" class="input" maxlength="50" placeholder="예: 천천히, 그러나 계속">
+    <label class="label">4. 첫 요가 매트</label>
+    <div class="small" style="margin-bottom:8px">매트를 누르면 위 미리보기가 바로 바뀝니다.</div>
+    <div class="choice-grid">
+      <button class="choice active" data-mat="sand" type="button">SAND<span class="swatch" style="background:#b9a58a"></span></button>
+      <button class="choice" data-mat="forest" type="button">FOREST<span class="swatch" style="background:#73806e"></span></button>
+      <button class="choice" data-mat="ocean" type="button">OCEAN<span class="swatch" style="background:#6f9198"></span></button>
+      <button class="choice" data-mat="night" type="button">NIGHT<span class="swatch" style="background:#626375"></span></button>
+    </div>
+    <button id="createYogi" class="btn primary" type="button" style="width:100%;margin-top:14px">나의 YOGI 시작하기</button>
+  </div>
+</section>
+
+<section id="today" class="view">
+  <div class="card hero">
+    <div class="kicker">TODAY</div>
+    <h2>오늘의 수련을 남겨보세요.</h2>
+    <div class="small">기록한 수련은 MY PLACE에 쌓이고, 릴레이 인증에도 사용할 수 있어요.</div>
+  </div>
+  <div class="card">
+    <div class="section-title">오늘의 마음</div>
+    <div class="moods">
+      <button class="mood active" data-mood="🌿 평온">🌿 평온</button>
+      <button class="mood" data-mood="🌊 복잡">🌊 복잡</button>
+      <button class="mood" data-mood="🔥 활력">🔥 활력</button>
+      <button class="mood" data-mood="🌙 휴식">🌙 휴식</button>
+      <button class="mood" data-mood="❤️ 감사">❤️ 감사</button>
+    </div>
+    <label class="label" for="practiceType">수련</label>
+    <select id="practiceType" class="select">
+      <option>요가</option><option>명상</option><option>호흡</option><option>걷기</option><option>마음공부</option>
+    </select>
+    <label class="label" for="practiceWhere">장소</label>
+    <input id="practiceWhere" class="input" placeholder="예: 집, 아난드요가, 바라보다요가">
+    <label class="label" for="practiceMinutes">수련 시간</label>
+    <input id="practiceMinutes" class="input" type="number" min="1" max="600" value="30">
+    <label class="label" for="practiceNote">오늘의 한 문장</label>
+    <textarea id="practiceNote" class="textarea" placeholder="오늘 수련에서 남은 마음을 적어보세요."></textarea>
+    <button id="savePractice" class="btn olive" type="button" style="width:100%;margin-top:12px">수련 기록하기</button>
+  </div>
+</section>
+
+<section id="myplace" class="view">
+  <div class="card profile-head">
+    <div class="kicker">MY PLACE</div>
+    <div class="yogi-name" id="profileName">나의 요기</div>
+    <div class="handle" id="profileHandle">@myyogi</div>
+    <div class="small" id="profileWord"></div>
+  </div>
+  <div id="myAvatarStage"></div>
+  <div class="card">
+    <div class="section-title">꾸미기</div>
+    <div class="tabs" id="dressTabs">
+      <button class="tab active" data-tab="outfit">요가복</button>
+      <button class="tab" data-tab="accessory">소품</button>
+      <button class="tab" data-tab="mat">매트</button>
+      <button class="tab" data-tab="background">배경</button>
+      <button class="tab" data-tab="trace">결의 흔적</button>
+    </div>
+    <div id="dressItems" class="item-grid"></div>
+  </div>
+  <div class="card">
+    <div class="stats">
+      <div class="stat"><b id="statPractice">0</b><span>PRACTICE</span></div>
+      <div class="stat"><b id="statPlaces">0</b><span>PLACES</span></div>
+      <div class="stat"><b id="statShare">0</b><span>SHARE</span></div>
+      <div class="stat"><b id="statYeon">0</b><span>연</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-title">나의 결</div>
+    <div class="gyeol">
+      <div class="chip">숨결 <b id="gBreath">0</b></div>
+      <div class="chip">마음결 <b id="gMind">0</b></div>
+      <div class="chip">길결 <b id="gPath">0</b></div>
+      <div class="chip">인연결 <b id="gBond">0</b></div>
+      <div class="chip">나눔결 <b id="gShare">0</b></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-title">나의 수련 기록</div>
+    <div id="timeline" class="timeline"></div>
+  </div>
+</section>
+
+<section id="connect" class="view">
+  <div class="card hero">
+    <div class="kicker">CONNECT</div>
+    <h2>연을 맺고 서로의 자리를 오가요.</h2>
+    <div class="small">친구의 공간에는 실제 두 아바타가 함께 나타납니다.</div>
+  </div>
+  <div class="card">
+    <div class="section-title">나의 주소</div>
+    <div style="padding:12px;border:1px solid var(--line);border-radius:16px;background:#faf7ef">
+      <b id="myAddress">yogibara/@myyogi</b>
+      <div class="small">친구가 이 주소로 나의 자리에 찾아올 수 있어요.</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-title">연 맺기</div>
+    <div class="friend">
+      <div class="friend-icon">🌿</div><div class="meta"><b>바람요기</b><p>“오늘도 천천히.”</p></div>
+      <button class="btn" data-friend="바람요기" type="button">연 맺기</button>
+    </div>
+    <div class="friend">
+      <div class="friend-icon">☀️</div><div class="meta"><b>숨요기</b><p>“깊게 호흡하는 중.”</p></div>
+      <button class="btn" data-friend="숨요기" type="button">연 맺기</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-title">친구의 자리에 놀러가기</div>
+    <div id="friendScene" class="visit-scene"></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" data-gift="차 한 잔" type="button">☕ 차 두고가기</button>
+      <button class="btn" data-gift="꽃 한 송이" type="button">🌿 꽃 두고가기</button>
+      <button class="btn" data-gift="응원" type="button">☀️ 응원 보내기</button>
+    </div>
+  </div>
+</section>
+
+<section id="share" class="view">
+  <div id="relaySuccess" class="relay-success"></div>
+
+  <div class="card relay-hero">
+    <div class="kicker">RELAY 001</div>
+    <div class="relay-head">
+      <div>
+        <div class="section-title" style="margin-top:5px">108 HEART RELAY</div>
+        <div class="small">한 사람의 실제 수련이 다음 사람의 수련으로 이어집니다.</div>
+      </div>
+      <div class="relay-count-big"><b id="relayCount">38</b><span> /108</span></div>
+    </div>
+    <div class="progress"><div id="relayBar"></div></div>
+    <div class="small">채워진 번호를 눌러 누가 어떤 수련으로 참여했는지 확인하세요.</div>
+
+    <div id="relayGrid" class="relay-grid"></div>
+    <div class="legend-row">
+      <span><i class="legend-sym" style="background:#efefdf;border:1px solid #aaa979"></i>인증 완료</span>
+      <span><i class="legend-sym" style="background:#7b7a45"></i>나</span>
+      <span><i class="legend-sym" style="background:#2f887a"></i>내가 맺은 연</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">내 수련을 릴레이에 잇기</div>
+    <div class="small"><b>버튼만 눌러서는 참여되지 않습니다.</b> 아래 수련정보와 인증을 완료해야 번호가 채워집니다.</div>
+
+    <label class="label" for="relayPractice">수련 종류</label>
+    <select id="relayPractice" class="select">
+      <option>요가</option><option>명상</option><option>호흡</option>
+    </select>
+
+    <label class="label" for="relayPlace">수련 장소</label>
+    <input id="relayPlace" class="input" placeholder="예: 아난드요가, 집, 함덕 바다">
+
+    <label class="label" for="relayMinutes">수련 시간</label>
+    <input id="relayMinutes" class="input" type="number" min="10" max="600" value="30">
+
+    <label class="label" for="relayNote">수련 한마디</label>
+    <textarea id="relayNote" class="textarea" placeholder="오늘 이 수련을 어떤 마음으로 이어보내나요?"></textarea>
+
+    <div class="verification-box">
+      <b style="font-size:12px">수련 인증</b>
+      <div class="small">현재는 프로토타입입니다. 실제 서비스에서는 파트너별 인증코드·타이머·사진 인증을 서버에서 확인합니다.</div>
+      <div class="verify-methods">
+        <button class="verify-method active" data-method="partner" type="button"><b>PARTNER</b><br>요가원 인증번호</button>
+        <button class="verify-method" data-method="photo" type="button"><b>PHOTO</b><br>수련 사진</button>
+        <button class="verify-method" data-method="timer" type="button"><b>TIMER</b><br>수련 타이머</button>
+      </div>
+
+      <div id="verifyPartner" class="verify-panel">
+        <label class="label" for="partnerCode">오늘의 파트너 인증번호</label>
+        <input id="partnerCode" class="input" inputmode="numeric" maxlength="4" placeholder="테스트용 번호: 1080">
+      </div>
+
+      <div id="verifyPhoto" class="verify-panel hidden">
+        <label class="label" for="proofPhoto">수련 사진 1장</label>
+        <input id="proofPhoto" class="input" type="file" accept="image/*">
+        <div class="small">프로토타입에서는 사진의 파일 선택 여부만 확인합니다.</div>
+      </div>
+
+      <div id="verifyTimer" class="verify-panel hidden">
+        <div class="timerbox">
+          <div class="small">테스트 타이머 · 실제 서비스는 최소 수련시간을 적용</div>
+          <div id="timerDisplay" class="timer">00:00</div>
+          <button id="timerStart" class="btn" type="button">타이머 시작</button>
+          <button id="timerDone" class="btn hidden" type="button">인증용 기록 완료</button>
+        </div>
+      </div>
+    </div>
+
+    <button id="joinRelay" class="btn heart" type="button" style="width:100%;margin-top:12px">수련 인증하고 릴레이 잇기</button>
+  </div>
+
+  <div class="card">
+    <div class="section-title">나의 SHARE 기록</div>
+    <div id="shareHistory" class="timeline"></div>
+  </div>
+</section>
+
+<section id="journey" class="view">
+  <div class="card hero">
+    <div class="kicker">JOURNEY</div>
+    <h2>현실의 장소에서 새로운 결을 만나요.</h2>
+    <div class="small">제주 요가원과 로컬 파트너를 찾아가며 나의 Journey를 이어갑니다.</div>
+  </div>
+  <div class="card">
+    <div class="section-title">YOGIBARA MAP</div>
+    <div class="small">기존 제주 지도를 그대로 연결합니다.</div>
+    <a href="./index.html" class="btn primary" style="display:inline-block;text-decoration:none;margin-top:12px">제주 지도 열기</a>
+  </div>
+</section>
+</main>
+
+<nav class="bottom">
+  <button class="nav" data-view="today" type="button"><b>◯</b>TODAY</button>
+  <button class="nav" data-view="myplace" type="button"><b>⌂</b>MY PLACE</button>
+  <button class="nav" data-view="connect" type="button"><b>∞</b>CONNECT</button>
+  <button class="nav" data-view="share" type="button"><b>♡</b>SHARE</button>
+  <button class="nav" data-view="journey" type="button"><b>⌖</b>JOURNEY</button>
+</nav>
+</div>
+
+<div id="sheetBack" class="sheet-back" aria-hidden="true">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div id="sheetContent"></div>
+    <button id="closeSheet" class="btn close-sheet" type="button">닫기</button>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+const KEY='yogibara_v3_demo';
+const OLD='yogibara_v2_demo';
+
+const catalog=[
+ {id:'top_cream',cat:'outfit',name:'크림 요가탑',icon:'◻',type:'top',value:'cream',free:true},
+ {id:'top_olive',cat:'outfit',name:'올리브 요가탑',icon:'▰',type:'top',value:'olive',unlock:2},
+ {id:'bottom_sand',cat:'outfit',name:'샌드 팬츠',icon:'▥',type:'bottom',value:'sand',free:true},
+ {id:'bottom_olive',cat:'outfit',name:'올리브 팬츠',icon:'▥',type:'bottom',value:'olive',unlock:5},
+ {id:'bracelet',cat:'accessory',name:'숨결 팔찌',icon:'◌',type:'bracelet',value:true,unlock:1},
+ {id:'heart',cat:'accessory',name:'HEART RELAY 흔적',icon:'♥',type:'heart',value:true,relay:true},
+ {id:'mat_sand',cat:'mat',name:'SAND MAT',icon:'━',type:'mat',value:'sand',free:true},
+ {id:'mat_forest',cat:'mat',name:'FOREST MAT',icon:'━',type:'mat',value:'forest',free:true},
+ {id:'mat_ocean',cat:'mat',name:'OCEAN MAT',icon:'━',type:'mat',value:'ocean',free:true},
+ {id:'mat_night',cat:'mat',name:'NIGHT MAT',icon:'━',type:'mat',value:'night',free:true},
+ {id:'bg_paper',cat:'background',name:'나의 자리',icon:'□',type:'background',value:'paper',free:true},
+ {id:'bg_jeju',cat:'background',name:'제주의 바람',icon:'≈',type:'background',value:'jeju',unlock:3},
+ {id:'bg_night',cat:'background',name:'조용한 밤',icon:'☾',type:'background',value:'night',unlock:10},
+ {id:'aura',cat:'trace',name:'숨결의 빛',icon:'○',type:'aura',value:true,unlock:3}
+];
+
+const demoNames=['바람요기','숨요기','하루요기','달요기','소담요기','모아요기','산요기','해온요기','나무요기','푸른요기','고요요기','온기요기'];
+const demoPlaces=['아난드요가','요가로움','쁘라즈나요가','바라보다요가','집','함덕 바다'];
+const demoTypes=['하타요가','빈야사','명상','호흡','아쉬탕가'];
+const verifyCycle=['partner','timer','photo'];
+
+function makeDemoRelay(){
+  const arr=[];
+  for(let i=1;i<=38;i++){
+    const method=verifyCycle[(i-1)%verifyCycle.length];
+    arr.push({
+      number:i,
+      yogi:demoNames[(i-1)%demoNames.length],
+      date:'2026-08-'+String(10+((i-1)%14)).padStart(2,'0'),
+      practice:demoTypes[(i-1)%demoTypes.length],
+      duration:[30,45,60,20][(i-1)%4],
+      place:demoPlaces[(i-1)%demoPlaces.length],
+      mood:['🌿 평온','❤️ 감사','🔥 활력','🌙 휴식'][(i-1)%4],
+      note:['오늘의 한 번을 이어봅니다.','조용히 마음을 보냅니다.','나의 수련이 누군가에게 닿기를.','함께 이어져서 기쁩니다.'][(i-1)%4],
+      verify:method,
+      relation:(i===5||i===17)?'friend':''
+    });
+  }
+  return arr;
+}
+
+const defaultState={
+ created:false,gender:'yogini',name:'',word:'',mood:'🌿 평온',
+ practices:[],friends:[],shares:[],relayParticipants:makeDemoRelay(),
+ equipped:{top:'cream',bottom:'sand',bracelet:false,heart:false,aura:false,mat:'sand',background:'paper'},
+ gyeol:{breath:0,mind:0,path:0,bond:0,share:0}
+};
+let state=load();
+let currentDressTab='outfit';
+let verifyMethod='partner';
+let timerSec=0,timerInt=null,timerVerified=false;
+
+function load(){
+ try{
+  const s=JSON.parse(localStorage.getItem(KEY)||'null');
+  if(s) return {...defaultState,...s,equipped:{...defaultState.equipped,...(s.equipped||{})},gyeol:{...defaultState.gyeol,...(s.gyeol||{})},relayParticipants:s.relayParticipants||makeDemoRelay()};
+  const o=JSON.parse(localStorage.getItem(OLD)||'null');
+  if(o&&o.created){
+   return {...defaultState,created:true,gender:o.gender||'yogini',name:o.name||'',word:o.word||'',mood:o.mood||'🌿 평온',
+    practices:o.practices||[],friends:o.friends||[],shares:[],equipped:{...defaultState.equipped,...(o.equipped||{})},
+    gyeol:{...defaultState.gyeol,...(o.gyeol||{})},relayParticipants:makeDemoRelay()};
+  }
+ }catch(e){}
+ return structuredClone(defaultState);
+}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function slug(s){return (s||'myyogi').trim().toLowerCase().replace(/\s+/g,'').replace(/[^a-z0-9가-힣_-]/g,'').slice(0,20)||'myyogi'}
+function toast(msg){
+ const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
+ clearTimeout(window.__t);window.__t=setTimeout(()=>el.classList.remove('show'),2200);
+}
+function bgName(v){return ({paper:'나의 자리',jeju:'제주의 바람',night:'조용한 밤',tea:'차의 온기'})[v]||'나의 자리'}
+function avatarSVG(gender='yogini',mini=false){
+ return `<svg viewBox="0 0 220 250" aria-label="${gender==='yogi'?'요기':'요기니'}">
+ <ellipse cx="110" cy="226" rx="70" ry="12" fill="#000" opacity=".07"/>
+ <circle class="aura" cx="110" cy="118" r="90"/>
+ <path class="bottomfill" d="M76 161 C54 171 39 188 45 203 C51 218 78 213 103 194 C91 211 91 225 98 234 L122 234 C129 225 129 211 117 194 C142 213 169 218 175 203 C181 188 166 171 144 161 C129 151 91 151 76 161Z"/>
+ <ellipse class="skin" cx="62" cy="205" rx="20" ry="9"/><ellipse class="skin" cx="158" cy="205" rx="20" ry="9"/>
+ <path class="topfill" d="M79 93 C86 79 97 72 110 72 C123 72 134 79 141 93 L142 164 C127 173 93 173 78 164Z"/>
+ <rect class="skin" x="102" y="61" width="16" height="18" rx="6"/>
+ <path class="skin" d="M83 98 C63 116 55 133 57 151 C58 160 68 161 72 152 C76 137 83 121 94 110Z"/>
+ <path class="skin" d="M137 98 C157 116 165 133 163 151 C162 160 152 161 148 152 C144 137 137 121 126 110Z"/>
+ <path class="bracelet" d="M55 147 Q63 151 73 148"/>
+ <ellipse class="skin" cx="110" cy="46" rx="30" ry="32"/>
+ <path class="hair yogini-only" d="M80 48 C74 20 89 7 110 7 C132 7 146 23 140 53 C134 34 125 25 109 24 C95 23 86 31 80 48Z"/>
+ <path class="hair yogini-only" d="M82 43 C74 72 83 87 91 91 L93 62Z"/>
+ <path class="hair yogini-only" d="M138 43 C146 72 137 87 129 91 L127 62Z"/>
+ <path class="hair yogi-only" d="M80 44 C80 19 92 7 111 7 C131 7 142 20 141 44 C131 32 122 27 109 27 C96 27 87 33 80 44Z"/>
+ <circle cx="99" cy="47" r="2.2" fill="#514a45"/><circle cx="121" cy="47" r="2.2" fill="#514a45"/>
+ <path d="M103 58 Q110 63 117 58" fill="none" stroke="#8b6557" stroke-width="1.7" stroke-linecap="round"/>
+ <path class="heartmark" d="M129 105 C125 98 115 102 118 110 C121 117 129 121 129 121 C129 121 137 117 140 110 C143 102 133 98 129 105Z"/>
+ </svg>`;
+}
+function avatarHTML(compact=false){
+ const e=state.equipped;
+ return `<div class="card avatar-card"><div class="stage ${compact?'compact':''} bg-${e.background}">
+  <div class="scene-label">${bgName(e.background)}</div>
+  <div class="mat mat-${e.mat}"></div>
+  <div class="avatar gender-${state.gender} top-${e.top} bottom-${e.bottom} ${e.bracelet?'has-bracelet':''} ${e.heart?'has-heart':''} ${e.aura?'has-aura':''}">
+   ${avatarSVG(state.gender)}
+  </div>
+  <div class="avatar-caption">${esc(state.name||'나의 YOGI')} · ${e.mat.toUpperCase()} MAT</div>
+ </div></div>`;
+}
+function renderOnboardingPreview(){
+ const saved={...state.equipped};
+ state.equipped={...state.equipped,top:'cream',bottom:'sand',bracelet:false,heart:false,aura:false,background:'paper'};
+ document.getElementById('onboardingPreview').innerHTML=avatarHTML(true);
+ state.equipped=saved;
+}
+function showView(id){
+ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+ document.getElementById(id)?.classList.add('active');
+ document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.view===id));
+ if(id==='myplace')renderProfile();
+ if(id==='connect')renderConnect();
+ if(id==='share')renderRelay();
+}
+document.querySelectorAll('[data-gender]').forEach(b=>b.addEventListener('click',()=>{
+ state.gender=b.dataset.gender;document.querySelectorAll('[data-gender]').forEach(x=>x.classList.toggle('active',x===b));renderOnboardingPreview();
+}));
+document.querySelectorAll('[data-mat]').forEach(b=>b.addEventListener('click',()=>{
+ state.equipped.mat=b.dataset.mat;document.querySelectorAll('[data-mat]').forEach(x=>x.classList.toggle('active',x===b));renderOnboardingPreview();
+}));
+document.getElementById('createYogi').addEventListener('click',()=>{
+ const n=document.getElementById('yogiName').value.trim();if(n.length<2){toast('요기 이름을 2글자 이상 적어주세요.');return}
+ state.name=n;state.word=document.getElementById('yogiWord').value.trim();state.created=true;save();showView('today');toast(n+'의 기록이 시작되었습니다.');
+});
+document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>{
+ if(!state.created){showView('onboarding');toast('먼저 나의 YOGI를 만들어주세요.');return}
+ showView(b.dataset.view);
+}));
+document.querySelectorAll('.mood').forEach(b=>b.addEventListener('click',()=>{
+ state.mood=b.dataset.mood;document.querySelectorAll('.mood').forEach(x=>x.classList.toggle('active',x===b));
+}));
+document.getElementById('savePractice').addEventListener('click',()=>{
+ let m=parseInt(document.getElementById('practiceMinutes').value,10);if(!Number.isFinite(m)||m<1)m=1;
+ const where=document.getElementById('practiceWhere').value.trim()||'나의 자리';
+ state.practices.unshift({date:new Date().toISOString(),type:document.getElementById('practiceType').value,where,minutes:m,note:document.getElementById('practiceNote').value.trim(),mood:state.mood});
+ state.gyeol.breath++;state.gyeol.mind++;if(where!=='나의 자리'&&where!=='집')state.gyeol.path++;
+ save();toast('오늘의 수련이 기록되었습니다.');document.getElementById('practiceWhere').value='';document.getElementById('practiceNote').value='';
+});
+
+function owned(i){return i.free||(i.unlock&&state.practices.length>=i.unlock)||(i.relay&&state.shares.length>0)}
+function equipped(i){
+ const e=state.equipped;
+ return i.type==='top'?e.top===i.value:i.type==='bottom'?e.bottom===i.value:i.type==='mat'?e.mat===i.value:i.type==='background'?e.background===i.value:i.type==='bracelet'?e.bracelet:i.type==='heart'?e.heart:i.type==='aura'?e.aura:false;
+}
+document.querySelectorAll('#dressTabs .tab').forEach(b=>b.addEventListener('click',()=>{
+ currentDressTab=b.dataset.tab;document.querySelectorAll('#dressTabs .tab').forEach(x=>x.classList.toggle('active',x===b));renderDress();
+}));
+function renderDress(){
+ const box=document.getElementById('dressItems');if(!box)return;
+ box.innerHTML=catalog.filter(i=>i.cat===currentDressTab).map(i=>{
+  const o=owned(i),e=equipped(i);return `<button class="item ${o?'':'locked'} ${e?'equipped':''}" data-item="${i.id}" ${o?'':'disabled'}>
+   <div class="item-icon">${i.icon}</div><b>${i.name}</b><span>${e?'착용중':o?'눌러서 적용':i.unlock?i.unlock+'회 수련':'릴레이 참여'}</span></button>`;
+ }).join('');
+ box.querySelectorAll('[data-item]').forEach(b=>b.addEventListener('click',()=>equipItem(b.dataset.item)));
+}
+function equipItem(id){
+ const i=catalog.find(x=>x.id===id);if(!i||!owned(i))return;const e=state.equipped;
+ if(i.type==='top')e.top=i.value;else if(i.type==='bottom')e.bottom=i.value;else if(i.type==='mat')e.mat=i.value;else if(i.type==='background')e.background=i.value;
+ else if(i.type==='bracelet')e.bracelet=!e.bracelet;else if(i.type==='heart')e.heart=!e.heart;else if(i.type==='aura')e.aura=!e.aura;
+ save();renderProfile();toast(i.name+' 적용');
+}
+function renderProfile(){
+ if(!state.created)return;
+ document.getElementById('profileName').textContent=state.name;
+ document.getElementById('profileHandle').textContent='@'+slug(state.name);
+ document.getElementById('profileWord').textContent=state.word?'“'+state.word+'”':'';
+ document.getElementById('myAvatarStage').innerHTML=avatarHTML();
+ document.getElementById('statPractice').textContent=state.practices.length;
+ document.getElementById('statPlaces').textContent=new Set(state.practices.map(p=>p.where)).size;
+ document.getElementById('statShare').textContent=state.shares.length;
+ document.getElementById('statYeon').textContent=state.friends.length;
+ document.getElementById('gBreath').textContent=state.gyeol.breath;
+ document.getElementById('gMind').textContent=state.gyeol.mind;
+ document.getElementById('gPath').textContent=state.gyeol.path;
+ document.getElementById('gBond').textContent=state.gyeol.bond;
+ document.getElementById('gShare').textContent=state.gyeol.share;
+ const t=document.getElementById('timeline');
+ t.innerHTML=state.practices.length?state.practices.slice(0,20).map(p=>{
+  const d=new Date(p.date);return `<div class="note"><b>${d.getMonth()+1}.${d.getDate()} · ${esc(p.type)} · ${esc(p.where)}</b><p>${esc(p.mood)} · ${p.minutes}분${p.note?'<br>'+esc(p.note):''}</p></div>`;
+ }).join(''):'<div class="empty">아직 기록된 수련이 없습니다.</div>';
+ renderDress();
+}
+document.querySelectorAll('[data-friend]').forEach(b=>b.addEventListener('click',()=>{
+ const n=b.dataset.friend;if(!state.friends.includes(n)){state.friends.push(n);state.gyeol.bond++;save();toast(n+'님과 연이 이어졌습니다.');renderConnect();}
+}));
+document.querySelectorAll('[data-gift]').forEach(b=>b.addEventListener('click',()=>toast(b.dataset.gift+'을 친구의 자리에 남겼습니다.')));
+function renderConnect(){
+ document.getElementById('myAddress').textContent='yogibara/@'+slug(state.name);
+ document.querySelectorAll('[data-friend]').forEach(b=>{if(state.friends.includes(b.dataset.friend)){b.textContent='연 맺음';b.disabled=true}});
+ const scene=document.getElementById('friendScene');
+ scene.innerHTML=`<div class="mini me"><svg viewBox="0 0 220 250">${avatarSVG(state.gender).replace(/^<svg[^>]*>|<\/svg>$/g,'')}</svg></div>
+ <div class="mini friendy"><svg viewBox="0 0 220 250">${avatarSVG(state.gender==='yogi'?'yogini':'yogi').replace(/^<svg[^>]*>|<\/svg>$/g,'')}</svg></div>`;
+}
+
+/* verification methods */
+document.querySelectorAll('.verify-method').forEach(b=>b.addEventListener('click',()=>{
+ verifyMethod=b.dataset.method;document.querySelectorAll('.verify-method').forEach(x=>x.classList.toggle('active',x===b));
+ ['Partner','Photo','Timer'].forEach(n=>document.getElementById('verify'+n).classList.toggle('hidden',n.toLowerCase()!==verifyMethod));
+}));
+document.getElementById('timerStart').addEventListener('click',()=>{
+ if(timerInt)return;timerSec=0;timerVerified=false;document.getElementById('timerDone').classList.add('hidden');
+ timerInt=setInterval(()=>{timerSec++;document.getElementById('timerDisplay').textContent=String(Math.floor(timerSec/60)).padStart(2,'0')+':'+String(timerSec%60).padStart(2,'0');if(timerSec>=5)document.getElementById('timerDone').classList.remove('hidden')},1000);
+ toast('테스트 타이머를 시작했습니다.');
+});
+document.getElementById('timerDone').addEventListener('click',()=>{
+ if(timerSec<5){toast('테스트에서는 5초 이상 기록해주세요.');return}
+ timerVerified=true;clearInterval(timerInt);timerInt=null;toast('타이머 인증 준비 완료');
+});
+
+function certLabel(v){return v==='partner'?'PARTNER VERIFIED':v==='photo'?'PHOTO VERIFIED':'TIMER VERIFIED'}
+function verifyOK(){
+ if(verifyMethod==='partner')return document.getElementById('partnerCode').value.trim()==='1080';
+ if(verifyMethod==='photo')return document.getElementById('proofPhoto').files.length>0;
+ return timerVerified;
+}
+document.getElementById('joinRelay').addEventListener('click',()=>{
+ if(!state.created){toast('먼저 나의 YOGI를 만들어주세요.');return}
+ const place=document.getElementById('relayPlace').value.trim();
+ const mins=parseInt(document.getElementById('relayMinutes').value,10);
+ if(!place){toast('수련 장소를 적어주세요.');return}
+ if(!Number.isFinite(mins)||mins<10){toast('수련시간을 10분 이상 기록해주세요.');return}
+ if(!verifyOK()){
+  toast(verifyMethod==='partner'?'테스트 인증번호 1080을 입력해주세요.':verifyMethod==='photo'?'수련 사진을 선택해주세요.':'타이머 인증을 완료해주세요.');
+  return;
+ }
+ const nums=state.relayParticipants.map(x=>x.number);
+ const next=Math.max(0,...nums)+1;
+ if(next>108){toast('이 릴레이는 이미 완성되었습니다.');return}
+ const p={
+  number:next,yogi:state.name,date:new Date().toISOString().slice(0,10),
+  practice:document.getElementById('relayPractice').value,duration:mins,place,
+  mood:state.mood,note:document.getElementById('relayNote').value.trim()||'오늘의 수련을 이어봅니다.',
+  verify:verifyMethod,relation:'you'
+ };
+ state.relayParticipants.push(p);
+ state.shares.unshift(p);
+ state.gyeol.share++;
+ state.equipped.heart=true;
+ save();
+ renderRelay();
+ const success=document.getElementById('relaySuccess');
+ success.innerHTML=`<div class="num">${String(next).padStart(3,'0')}</div><b>${esc(state.name)}님의 수련이 이어졌습니다.</b><div class="small">${certLabel(verifyMethod)} · HEART RELAY 흔적이 아바타에 남았습니다.</div>`;
+ success.classList.add('show');
+ success.scrollIntoView({behavior:'smooth',block:'center'});
+ toast(next+'번째 연결 완료');
+});
+
+function renderRelay(){
+ const list=state.relayParticipants||[];
+ const count=list.length;
+ document.getElementById('relayCount').textContent=count;
+ document.getElementById('relayBar').style.width=Math.min(100,count/108*100)+'%';
+ const map=new Map(list.map(p=>[p.number,p]));
+ document.getElementById('relayGrid').innerHTML=Array.from({length:108},(_,idx)=>{
+  const n=idx+1,p=map.get(n);let cls='relay-dot';
+  if(p)cls+=' done';if(p?.relation==='you')cls+=' you';if(p?.relation==='friend')cls+=' frienddone';
+  return `<button class="${cls}" type="button" data-num="${n}" ${p?'':'disabled'}>${String(n).padStart(3,'0')}</button>`;
+ }).join('');
+ document.querySelectorAll('.relay-dot.done').forEach(b=>b.addEventListener('click',()=>openCert(parseInt(b.dataset.num,10))));
+ const h=document.getElementById('shareHistory');
+ h.innerHTML=state.shares.length?state.shares.map(s=>`<div class="note"><b>108 HEART RELAY · ${String(s.number).padStart(3,'0')}번째 연결</b><p>${esc(s.practice)} ${s.duration}분 · ${esc(s.place)}<br>${certLabel(s.verify)}</p></div>`).join(''):'<div class="empty">아직 나의 릴레이 기록이 없습니다.</div>';
+}
+function openCert(num){
+ const p=state.relayParticipants.find(x=>x.number===num);if(!p)return;
+ const chip=p.verify==='photo'?'photo':p.verify==='timer'?'timer':'partner';
+ document.getElementById('sheetContent').innerHTML=`
+  <div class="kicker">108 HEART RELAY · ${String(p.number).padStart(3,'0')}</div>
+  <div class="cert-card">
+   <span class="cert-chip ${chip}">${certLabel(p.verify)}</span>
+   <h3>${esc(p.yogi)}</h3>
+   <div class="small">${p.relation==='you'?'나의 수련 기록':p.relation==='friend'?'내가 맺은 연의 수련':'릴레이 참여자의 공개 수련 기록'}</div>
+   <div style="margin-top:10px">
+    <div class="cert-row"><span>수련</span><b>${esc(p.practice)}</b></div>
+    <div class="cert-row"><span>시간</span><b>${p.duration}분</b></div>
+    <div class="cert-row"><span>장소</span><b>${esc(p.place)}</b></div>
+    <div class="cert-row"><span>날짜</span><b>${esc(p.date)}</b></div>
+    <div class="cert-row"><span>오늘의 마음</span><b>${esc(p.mood)}</b></div>
+    <div class="cert-row"><span>인증</span><b>${certLabel(p.verify)}</b></div>
+    <div class="cert-row"><span>한마디</span><b>${esc(p.note)}</b></div>
+   </div>
+  </div>
+  <button class="btn primary" type="button" style="width:100%;margin-top:10px" id="visitFromCert">${esc(p.yogi)}의 자리 보기</button>`;
+ document.getElementById('sheetBack').classList.add('show');
+ document.getElementById('sheetBack').setAttribute('aria-hidden','false');
+ document.getElementById('visitFromCert').addEventListener('click',()=>toast('실제 회원 주소가 연결되면 이곳에서 MY PLACE로 이동합니다.'));
+}
+function closeSheet(){document.getElementById('sheetBack').classList.remove('show');document.getElementById('sheetBack').setAttribute('aria-hidden','true')}
+document.getElementById('closeSheet').addEventListener('click',closeSheet);
+document.getElementById('sheetBack').addEventListener('click',e=>{if(e.target===document.getElementById('sheetBack'))closeSheet()});
+
+(function init(){
+ renderOnboardingPreview();
+ if(state.created){showView('today')}else showView('onboarding');
+ renderProfile();renderConnect();renderRelay();
+})();
+</script>
+</body>
+</html>

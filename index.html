@@ -1,453 +1,2226 @@
-<!doctype html><html lang="ko"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>YOGIBARA MAP</title>
+
+<meta name="description" content="제주의 요가 공간과 나눔을 잇는 YOGIBARA MAP. 요가원을 찾고 나만의 Jeju Yoga Journey를 만들어보세요.">
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
 <style>
-:root{--bg:#f5f0e6;--paper:#fffdf8;--ink:#253830;--muted:#778079;--line:#ddd6c7;--partner:#3f7467;--brand:#bd7957;--anand:#776b91}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
-.app{max-width:900px;margin:auto;background:var(--paper);min-height:100vh}header{padding:24px 18px 14px;border-bottom:1px solid var(--line);position:relative;z-index:10;background:rgba(255,253,248,.96)}
-.kicker{font-size:10px;font-weight:800;letter-spacing:.22em;color:var(--muted)}h1{font:500 34px Georgia,serif;margin:7px 0 4px}.sub{font-size:12px;color:var(--muted);line-height:1.5}
-.filters{display:flex;gap:7px;overflow:auto;margin-top:14px}.pill,.btn,.action,.stop{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:9px 12px;font-size:11px;cursor:pointer}
-.pill.active,.btn.primary,.action.dark{background:var(--ink);color:#fff;border-color:var(--ink)}.map-shell{padding:14px}#map{height:46vh;min-height:360px;max-height:540px;border-radius:24px;overflow:hidden;border:1px solid #cbc7bb}
-.toolbar{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.ym{background:transparent;border:0}.mw{display:flex;flex-direction:column;align-items:center}
-.dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:white;font-size:10px;font-weight:800;border:2px solid white;box-shadow:0 3px 10px #0003}.dot.partner{background:var(--partner)}.dot.brand{background:var(--brand)}.dot.anand{background:var(--anand);border-radius:8px;transform:rotate(45deg)}.dot.anand span{transform:rotate(-45deg);font-size:12px}.mname{margin-top:3px;background:#fffdf8ee;padding:3px 6px;border-radius:7px;font-size:10px;font-weight:700;white-space:nowrap}.bottari-map{margin-top:2px;background:#253830;color:#fff;padding:3px 7px;border-radius:999px;font-size:8px;font-weight:800;white-space:nowrap;letter-spacing:.02em}.bottari-card{display:inline-block;margin-top:8px;background:#f0e5ce;border:1px solid #d8c6a3;color:#544a38;border-radius:999px;padding:5px 8px;font-size:9px;font-weight:800}
-.section{padding:4px 14px}.head{display:flex;justify-content:space-between;align-items:end;margin:7px 4px 10px}.head h2,.route h2{font:500 23px Georgia,serif;margin:0}.head span{font-size:10px;color:var(--muted)}
-.cards{display:grid;gap:10px}.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px}.type{font-size:9px;letter-spacing:.14em;font-weight:800;color:var(--muted)}.card h3{font-size:16px;margin:5px 0}.addr,.desc{font-size:10px;color:var(--muted);line-height:1.45}.desc{font-size:11px;color:#52605a;margin-top:6px}.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}.action{border-radius:10px;padding:8px 10px;text-decoration:none}.action.added{background:#e5efe9;border-color:#8aa99a}
-.route{position:sticky;top:0;z-index:1200;margin:0 14px 14px;border:1px solid var(--line);border-radius:0 0 20px 20px;background:rgba(251,247,238,.97);padding:10px 12px;box-shadow:0 8px 22px #25383014;backdrop-filter:blur(12px)}
-.route-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.route-title{display:flex;align-items:center;gap:8px;min-width:0}
-.route h2{font:500 19px Georgia,serif;margin:0;white-space:nowrap}
-.route-count{display:inline-grid;place-items:center;min-width:24px;height:24px;border-radius:999px;background:var(--ink);color:#fff;font-size:10px;font-weight:800}
-.route-toggle{padding:7px 10px;flex:0 0 auto}
-.route p{font-size:10px;color:#657069;line-height:1.5;margin:8px 0}
-.stops{display:flex;gap:6px;overflow-x:auto;min-height:34px;padding:4px 0 2px;scrollbar-width:none}.stops::-webkit-scrollbar{display:none}
-.stop{padding:7px 9px;white-space:nowrap}.stop b{display:inline-grid;place-items:center;width:17px;height:17px;border-radius:50%;background:var(--ink);color:#fff;margin-right:5px;font-size:9px}
-.empty{font-size:10px;color:var(--muted);padding:7px 2px;white-space:nowrap}
-.route-details{overflow:hidden;max-height:180px;opacity:1;transition:max-height .2s ease,opacity .2s ease}
-.route.collapsed .route-details{max-height:0;opacity:0}
-.route.collapsed{padding-bottom:8px}
-.route .actions{margin-top:8px}
-.back{position:fixed;inset:0;background:#18261f55;display:none;z-index:2000}.back.show{display:block}.sheet{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:min(900px,100%);background:#fff;border-radius:25px 25px 0 0;padding:20px}.sheet h2{font:500 27px Georgia,serif;margin:6px 0}
-.map-full{position:fixed!important;inset:0!important;z-index:3000!important;background:#fff!important;padding:0!important}.map-full #map{height:100vh!important;max-height:none!important;border-radius:0}.map-full .toolbar{position:absolute;z-index:3100;left:10px;bottom:18px;background:#ffffffe6;padding:7px;border-radius:14px}
-@media(min-width:700px){.cards{grid-template-columns:1fr 1fr}#map{height:570px}}
-</style></head><body>
+:root{
+  --bg:#f5f0e6;
+  --paper:#fffdf8;
+  --ink:#253830;
+  --muted:#778079;
+  --line:#ddd6c7;
+
+  /* 요청하신 컬러 */
+  --partner:#7b7a45;   /* OLIVE */
+  --brand:#2f887a;     /* EMERALD */
+  --normal:#8b918c;    /* 일반 요가원 */
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif
+}
+
+.app{
+  max-width:900px;
+  margin:auto;
+  background:var(--paper);
+  min-height:100vh
+}
+
+header{
+  padding:24px 18px 14px;
+  border-bottom:1px solid var(--line);
+  position:relative;
+  z-index:10;
+  background:rgba(255,253,248,.96)
+}
+
+.kicker{
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.22em;
+  color:var(--muted)
+}
+
+h1{
+  font:500 34px Georgia,serif;
+  margin:7px 0 4px
+}
+
+.sub{
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.55
+}
+
+/* SEARCH */
+
+.search-wrap{
+  display:flex;
+  gap:7px;
+  margin-top:14px
+}
+
+.search-wrap input{
+  flex:1;
+  min-width:0;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:999px;
+  padding:11px 14px;
+  font-size:12px;
+  color:var(--ink);
+  outline:none
+}
+
+.search-wrap input:focus{
+  border-color:#9d9a86
+}
+
+.filters{
+  display:flex;
+  gap:7px;
+  overflow-x:auto;
+  padding-bottom:3px;
+  margin-top:9px;
+  scrollbar-width:none
+}
+
+.filters::-webkit-scrollbar{
+  display:none
+}
+
+.pill,
+.btn,
+.action,
+.stop{
+  border:1px solid var(--line);
+  background:#fff;
+  color:var(--ink);
+  border-radius:999px;
+  padding:9px 12px;
+  font-size:11px;
+  cursor:pointer
+}
+
+.pill{
+  flex:0 0 auto
+}
+
+.pill.active,
+.btn.primary,
+.action.dark{
+  background:var(--ink);
+  color:#fff;
+  border-color:var(--ink)
+}
+
+/* LEGEND */
+
+.legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:11px;
+  margin-top:12px;
+  font-size:9px;
+  color:var(--muted)
+}
+
+.legend-item{
+  display:flex;
+  align-items:center;
+  gap:5px
+}
+
+.legend-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%
+}
+
+.legend-dot.normal{background:var(--normal)}
+.legend-dot.partner{background:var(--partner)}
+.legend-dot.brand{background:var(--brand)}
+
+/* MAP */
+
+.map-shell{
+  padding:14px
+}
+
+#map{
+  height:46vh;
+  min-height:360px;
+  max-height:540px;
+  border-radius:24px;
+  overflow:hidden;
+  border:1px solid #cbc7bb
+}
+
+.toolbar{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+  margin-top:9px
+}
+
+.ym{
+  background:transparent;
+  border:0
+}
+
+.mw{
+  display:flex;
+  flex-direction:column;
+  align-items:center
+}
+
+.dot{
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  color:#fff;
+  font-size:9px;
+  font-weight:800;
+  border:2px solid #fff;
+  box-shadow:0 3px 10px #0003
+}
+
+.dot.normal{
+  width:22px;
+  height:22px;
+  background:var(--normal);
+  font-size:0
+}
+
+.dot.normal::after{
+  content:"";
+  width:7px;
+  height:7px;
+  background:white;
+  border-radius:50%
+}
+
+.dot.partner{
+  background:var(--partner)
+}
+
+.dot.brand{
+  background:var(--brand);
+  border-radius:8px
+}
+
+.mname{
+  margin-top:3px;
+  background:#fffdf8ee;
+  padding:3px 6px;
+  border-radius:7px;
+  font-size:9px;
+  font-weight:700;
+  white-space:nowrap;
+  box-shadow:0 1px 5px #00000012
+}
+
+.bottari-map{
+  margin-top:2px;
+  background:#253830;
+  color:#fff;
+  padding:3px 7px;
+  border-radius:999px;
+  font-size:8px;
+  font-weight:800;
+  white-space:nowrap
+}
+
+/* JOURNEY */
+
+.route{
+  position:sticky;
+  top:0;
+  z-index:1200;
+  margin:0 14px 14px;
+  border:1px solid var(--line);
+  border-radius:0 0 20px 20px;
+  background:rgba(251,247,238,.97);
+  padding:10px 12px;
+  box-shadow:0 8px 22px #25383014;
+  backdrop-filter:blur(12px)
+}
+
+.route-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px
+}
+
+.route-title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0
+}
+
+.route h2{
+  font:500 19px Georgia,serif;
+  margin:0;
+  white-space:nowrap
+}
+
+.route-count{
+  display:inline-grid;
+  place-items:center;
+  min-width:24px;
+  height:24px;
+  border-radius:999px;
+  background:var(--ink);
+  color:#fff;
+  font-size:10px;
+  font-weight:800
+}
+
+.route-toggle{
+  padding:7px 10px;
+  flex:0 0 auto
+}
+
+.route p{
+  font-size:10px;
+  color:#657069;
+  line-height:1.5;
+  margin:8px 0
+}
+
+.stops{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  min-height:34px;
+  padding:4px 0 2px;
+  scrollbar-width:none
+}
+
+.stops::-webkit-scrollbar{
+  display:none
+}
+
+.stop{
+  padding:7px 9px;
+  white-space:nowrap
+}
+
+.stop b{
+  display:inline-grid;
+  place-items:center;
+  width:17px;
+  height:17px;
+  border-radius:50%;
+  background:var(--ink);
+  color:#fff;
+  margin-right:5px;
+  font-size:9px
+}
+
+.empty{
+  font-size:10px;
+  color:var(--muted);
+  padding:7px 2px;
+  white-space:nowrap
+}
+
+.route-details{
+  overflow:hidden;
+  max-height:230px;
+  opacity:1;
+  transition:max-height .2s ease,opacity .2s ease
+}
+
+.route.collapsed .route-details{
+  max-height:0;
+  opacity:0
+}
+
+.route.collapsed{
+  padding-bottom:8px
+}
+
+.route .actions{
+  margin-top:8px
+}
+
+/* CARDS */
+
+.section{
+  padding:4px 14px 32px
+}
+
+.head{
+  display:flex;
+  justify-content:space-between;
+  align-items:end;
+  margin:7px 4px 10px
+}
+
+.head h2{
+  font:500 23px Georgia,serif;
+  margin:0
+}
+
+.head span{
+  font-size:10px;
+  color:var(--muted)
+}
+
+.cards{
+  display:grid;
+  gap:10px
+}
+
+.card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:14px
+}
+
+.card.partner{
+  border-left:4px solid var(--partner)
+}
+
+.card.brand{
+  border-left:4px solid var(--brand)
+}
+
+.type{
+  font-size:9px;
+  letter-spacing:.12em;
+  font-weight:800;
+  color:var(--muted)
+}
+
+.type.partner{
+  color:var(--partner)
+}
+
+.type.brand{
+  color:var(--brand)
+}
+
+.card h3{
+  font-size:16px;
+  margin:5px 0
+}
+
+.addr,
+.desc{
+  font-size:10px;
+  color:var(--muted);
+  line-height:1.45
+}
+
+.desc{
+  font-size:11px;
+  color:#52605a;
+  margin-top:6px
+}
+
+.region-tag{
+  display:inline-block;
+  margin-top:8px;
+  padding:4px 7px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  font-size:9px;
+  color:var(--muted)
+}
+
+.bottari-card{
+  display:inline-block;
+  margin-top:8px;
+  background:#f0e5ce;
+  border:1px solid #d8c6a3;
+  color:#544a38;
+  border-radius:999px;
+  padding:5px 8px;
+  font-size:9px;
+  font-weight:800
+}
+
+.actions{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:11px
+}
+
+.action{
+  border-radius:10px;
+  padding:8px 10px;
+  text-decoration:none
+}
+
+.action.added{
+  background:#e8ecdf;
+  border-color:#9da474
+}
+
+/* BOTTOM SHEET */
+
+.back{
+  position:fixed;
+  inset:0;
+  background:#18261f55;
+  display:none;
+  z-index:2000
+}
+
+.back.show{
+  display:block
+}
+
+.sheet{
+  position:absolute;
+  left:50%;
+  bottom:0;
+  transform:translateX(-50%);
+  width:min(900px,100%);
+  background:#fff;
+  border-radius:25px 25px 0 0;
+  padding:20px 20px max(20px,env(safe-area-inset-bottom))
+}
+
+.sheet h2{
+  font:500 27px Georgia,serif;
+  margin:6px 0
+}
+
+/* FULL MAP */
+
+.map-full{
+  position:fixed!important;
+  inset:0!important;
+  z-index:3000!important;
+  background:#fff!important;
+  padding:0!important
+}
+
+.map-full #map{
+  height:100vh!important;
+  max-height:none!important;
+  border-radius:0
+}
+
+.map-full .toolbar{
+  position:absolute;
+  z-index:3100;
+  left:10px;
+  bottom:18px;
+  background:#ffffffe6;
+  padding:7px;
+  border-radius:14px
+}
+
+@media(min-width:700px){
+  .cards{
+    grid-template-columns:1fr 1fr
+  }
+
+  #map{
+    height:570px
+  }
+}
+</style>
+</head>
+
+<body>
 
 <div class="app">
+
 <header>
+
 <div class="kicker">PRACTICE · SHARE · PEACE</div>
+
 <h1>YOGIBARA MAP</h1>
-<div class="sub">수련은, 나에게서 끝나지 않는다.<br>제주의 수련 공간과 나눔을 잇는 지도</div>
-<div class="filters">
-<button class="pill active" data-f="all">ALL</button>
-<button class="pill" data-f="partner">YOGIBARA PARTNER</button>
-<button class="pill" data-f="brand">BRAND PARTNER</button>
-<button class="pill" data-f="bottari">요가보따리</button>
+
+<div class="sub">
+수련은, 나에게서 끝나지 않는다.<br>
+제주의 요가 공간과 나눔을 잇는 지도
 </div>
+
+<div class="search-wrap">
+<input
+  id="search"
+  type="search"
+  placeholder="요가원 이름 또는 지역 검색"
+  autocomplete="off">
+</div>
+
+<div class="filters" id="typeFilters">
+
+<button class="pill active" data-f="all">
+ALL
+</button>
+
+<button class="pill" data-f="normal">
+제주 요가원
+</button>
+
+<button class="pill" data-f="partner">
+YOGIBARA PARTNER
+</button>
+
+<button class="pill" data-f="brand">
+BRAND PARTNER
+</button>
+
+<button class="pill" data-f="bottari">
+요가보따리
+</button>
+
+</div>
+
+<div class="filters" id="regionFilters">
+
+<button class="pill active" data-r="all">
+제주 전체
+</button>
+
+<button class="pill" data-r="제주시">
+제주시
+</button>
+
+<button class="pill" data-r="애월">
+애월
+</button>
+
+<button class="pill" data-r="한림">
+한림·협재
+</button>
+
+<button class="pill" data-r="조천">
+조천·함덕
+</button>
+
+<button class="pill" data-r="구좌">
+구좌
+</button>
+
+<button class="pill" data-r="성산">
+성산
+</button>
+
+<button class="pill" data-r="표선">
+표선
+</button>
+
+<button class="pill" data-r="서귀포">
+서귀포
+</button>
+
+</div>
+
+<div class="legend">
+
+<div class="legend-item">
+<span class="legend-dot normal"></span>
+일반 제주 요가원
+</div>
+
+<div class="legend-item">
+<span class="legend-dot partner"></span>
+YOGIBARA PARTNER
+</div>
+
+<div class="legend-item">
+<span class="legend-dot brand"></span>
+BRAND PARTNER
+</div>
+
+</div>
+
 </header>
 
+
 <div class="map-shell">
+
 <div id="map"></div>
+
 <div class="toolbar">
-<button class="btn primary" id="fit">제주 전체 보기</button>
-<button class="btn" id="loc">내 위치</button>
-<button class="btn" id="routeView">여행 동선 보기</button>
-<button class="btn" id="full">지도 크게 보기</button>
-</div>
+
+<button class="btn primary" id="fit">
+제주 전체 보기
+</button>
+
+<button class="btn" id="loc">
+내 위치
+</button>
+
+<button class="btn" id="routeView">
+여행 동선 보기
+</button>
+
+<button class="btn" id="full">
+지도 크게 보기
+</button>
+
 </div>
 
+</div>
+
+
 <div class="route collapsed" id="journeyBar">
+
 <div class="route-top">
+
 <div class="route-title">
+
 <h2>Jeju Yoga Journey</h2>
-<span class="route-count" id="routeCount">0</span>
+
+<span class="route-count" id="routeCount">
+0
+</span>
+
 </div>
-<button class="btn route-toggle" id="journeyToggle">펼치기</button>
+
+<button class="btn route-toggle" id="journeyToggle">
+펼치기
+</button>
+
 </div>
+
 
 <div class="stops" id="stops"></div>
 
-<div class="route-details" id="journeyDetails">
-<p>가고 싶은 곳을 방문 순서대로 선택하세요. 2곳 이상 선택하면 지도에 동선이 연결됩니다. 네이버지도 버튼은 선택 순서 그대로 자동차 길찾기를 엽니다.</p>
+
+<div class="route-details">
+
+<p>
+가고 싶은 요가원을 방문 순서대로 담아보세요.
+2곳 이상 선택하면 지도에 동선이 연결됩니다.
+완성한 여행은 링크로 공유할 수 있습니다.
+</p>
+
 <div class="actions">
-<button class="btn primary" id="showRoute">지도에 동선 표시</button>
-<button class="btn" id="clearRoute">동선 비우기</button>
-<button class="btn" id="googleRoute">선택 동선 네이버지도</button>
+
+<button class="btn primary" id="showRoute">
+지도에 동선 표시
+</button>
+
+<button class="btn" id="naverRoute">
+네이버지도 길찾기
+</button>
+
+<button class="btn" id="shareRoute">
+나의 Journey 공유
+</button>
+
+<button class="btn" id="clearRoute">
+동선 비우기
+</button>
+
 </div>
+
 </div>
+
 </div>
+
 
 <div class="section">
+
 <div class="head">
-<h2>Partners</h2>
+
+<h2>Yoga Places</h2>
+
 <span id="count"></span>
+
 </div>
+
 <div class="cards" id="cards"></div>
+
 </div>
+
 </div>
+
 
 <div class="back" id="back">
+
 <div class="sheet">
+
 <div class="type" id="sType"></div>
+
 <h2 id="sName"></h2>
+
 <div class="addr" id="sAddr"></div>
+
 <div class="desc" id="sDesc"></div>
+
 <div class="actions" id="sActions"></div>
+
 </div>
+
 </div>
+
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
+
+/* =====================================================
+   PLACE DATA
+===================================================== */
+
 const P=[
-{id:'anand',name:'아난드요가',cat:'partner',special:1,bottari:1,badge:'',type:'YOGIBARA PARTNER',addr:'제주특별자치도 제주시 한라대학로 107 202호',c:[33.476477052022,126.48176932399],ig:'https://www.instagram.com/anande_yoga/',desc:'요기바라와 함께하는 파트너 요가원.'},
-{id:'yogaroum',name:'요가로움',cat:'partner',badge:'01',type:'YOGIBARA PARTNER · 01',addr:'제주특별자치도 제주시 우정로11길 21',c:[33.4920,126.4296],ig:'https://www.instagram.com/yogaroum.jeju/',yt:'https://youtu.be/XRHwW8Tu33E',desc:'요가로 나눔을 함께 실천하는 요기바라 파트너 01.'},
-{id:'yoga12',name:'요가열두달',cat:'partner',badge:'02',type:'YOGIBARA PARTNER · 02',addr:'제주특별자치도 제주시 중앙로 567',c:[33.4704,126.5469],ig:'https://www.instagram.com/yoga_12month/',yt:'https://youtu.be/FlbG79mJvJs',desc:'제주 아라동에서 수련과 나눔을 이어가는 요기바라 파트너 02.'},
-{id:'aewol7',name:'애월7일요가원',cat:'partner',badge:'03',type:'YOGIBARA PARTNER · 03',addr:'제주특별자치도 제주시 애월읍 납읍로4길 29',c:[33.4375,126.3302],ig:'https://www.instagram.com/aewol_7th_yoga/',yt:'https://youtu.be/fKkv19w7VVs',desc:'애월에서 수련과 나눔을 이어가는 요기바라 파트너 03.'},
-{id:'prajna',name:'쁘라즈나요가',cat:'partner',badge:'04',type:'YOGIBARA PARTNER · 04',addr:'제주특별자치도 제주시 아봉로 34 2층',c:[33.4767,126.5567],ig:'https://www.instagram.com/pprajna_yoga/',yt:'https://youtu.be/cpipZ5OkptM',desc:'기부 하타요가를 통해 수련의 마음을 나눔으로 이어간 요기바라 파트너 04.'},
-{id:'comfort',name:'컴포트플로우',cat:'brand',bottari:1,badge:'B',type:'BRAND PARTNER',addr:'제주특별자치도 제주시 전농로9길 20 1층',c:[33.50618,126.52105],ig:'https://www.instagram.com/comfortflow_jeju/',desc:'요기바라와 기부 프로젝트를 함께하는 제주 로컬 브랜드.'}
+
+/* ===================================
+   YOGIBARA PARTNERS
+=================================== */
+
+{
+id:'anand',
+name:'아난드요가',
+cat:'partner',
+region:'제주시',
+bottari:1,
+badge:'Y',
+type:'YOGIBARA PARTNER',
+addr:'제주특별자치도 제주시 한라대학로 107 202호',
+c:[33.476477052022,126.48176932399],
+ig:'https://www.instagram.com/anande_yoga/',
+desc:'요기바라와 함께하는 파트너 요가원.'
+},
+
+{
+id:'yogaroum',
+name:'요가로움',
+cat:'partner',
+region:'제주시',
+badge:'01',
+type:'YOGIBARA PARTNER · 01',
+addr:'제주특별자치도 제주시 우정로11길 21',
+c:[33.4920,126.4296],
+ig:'https://www.instagram.com/yogaroum.jeju/',
+yt:'https://youtu.be/XRHwW8Tu33E',
+desc:'요가로 나눔을 함께 실천하는 요기바라 파트너 01.'
+},
+
+{
+id:'yoga12',
+name:'요가열두달',
+cat:'partner',
+region:'제주시',
+badge:'02',
+type:'YOGIBARA PARTNER · 02',
+addr:'제주특별자치도 제주시 중앙로 567',
+c:[33.4704,126.5469],
+ig:'https://www.instagram.com/yoga_12month/',
+yt:'https://youtu.be/FlbG79mJvJs',
+desc:'제주 아라동에서 수련과 나눔을 이어가는 요기바라 파트너 02.'
+},
+
+{
+id:'aewol7',
+name:'애월7일요가원',
+cat:'partner',
+region:'애월',
+badge:'03',
+type:'YOGIBARA PARTNER · 03',
+addr:'제주특별자치도 제주시 애월읍 납읍로4길 29',
+c:[33.4375,126.3302],
+ig:'https://www.instagram.com/aewol_7th_yoga/',
+yt:'https://youtu.be/fKkv19w7VVs',
+desc:'애월에서 수련과 나눔을 이어가는 요기바라 파트너 03.'
+},
+
+{
+id:'prajna',
+name:'쁘라즈나요가',
+cat:'partner',
+region:'제주시',
+badge:'04',
+type:'YOGIBARA PARTNER · 04',
+addr:'제주특별자치도 제주시 아봉로 34 2층',
+c:[33.4767,126.5567],
+ig:'https://www.instagram.com/pprajna_yoga/',
+yt:'https://youtu.be/cpipZ5OkptM',
+desc:'기부 하타요가를 통해 수련의 마음을 나눔으로 이어간 요기바라 파트너 04.'
+},
+
+
+/* ===================================
+   BRAND PARTNER
+=================================== */
+
+{
+id:'comfort',
+name:'컴포트플로우',
+cat:'brand',
+region:'제주시',
+bottari:1,
+badge:'B',
+type:'BRAND PARTNER',
+addr:'제주특별자치도 제주시 전농로9길 20 1층',
+c:[33.50618,126.52105],
+ig:'https://www.instagram.com/comfortflow_jeju/',
+desc:'요기바라와 기부 프로젝트를 함께하는 제주 로컬 브랜드.'
+},
+
+
+/* ===================================
+   GENERAL JEJU YOGA STUDIOS
+=================================== */
+
+{
+id:'sashi',
+name:'사쉬요가',
+cat:'normal',
+region:'제주시',
+type:'JEJU YOGA',
+addr:'제주특별자치도 제주시 남광로 44 1층',
+c:[33.494112,126.5402179],
+desc:'제주 시내에서 빈야사 요가와 명상 프로그램을 운영하는 요가 공간.'
+},
+
+{
+id:'yogaverde',
+name:'요가 베르데',
+cat:'normal',
+region:'구좌',
+type:'JEJU YOGA',
+addr:'제주특별자치도 제주시 구좌읍 비자림로 1999-6',
+c:[33.4844346,126.7870743],
+web:'https://yogaverde.co.kr/',
+desc:'제주 자연 속에서 요가와 명상, 원데이 프로그램을 운영하는 공간.'
+},
+
+{
+id:'jjyoga',
+name:'제이제이 필라테스요가',
+cat:'normal',
+region:'한림',
+type:'JEJU YOGA',
+addr:'제주특별자치도 제주시 한림읍 일주서로 5043',
+c:[33.386650561403,126.2471867689],
+desc:'협재 인근에서 실내 요가와 야외 바다요가 프로그램을 운영하는 공간.'
+}
+
 ];
 
-let filter='all',ids=[],line=null,markers={};
+
+/* =====================================================
+   STATE
+===================================================== */
+
+let filter='all';
+let region='all';
+let search='';
+let ids=[];
+let line=null;
+let markers={};
+
+
+/* =====================================================
+   JOURNEY LOAD
+===================================================== */
 
 try{
-ids=JSON.parse(localStorage.getItem('yr')||'[]')
-}catch(e){}
 
-ids=ids.filter(x=>P.some(p=>p.id===x));
+const params=new URLSearchParams(location.search);
+const shared=params.get('journey');
 
-const map=L.map('map',{minZoom:9,maxZoom:19}).setView([33.385,126.545],10);
+if(shared){
 
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
-maxZoom:19,
-attribution:'© OpenStreetMap contributors'
-}).addTo(map);
+  ids=shared
+    .split(',')
+    .filter(id=>P.some(p=>p.id===id));
 
-const group=L.layerGroup().addTo(map);
-const bounds=L.latLngBounds([[33.105,126.12],[33.565,126.96]]);
+}else{
 
-function icon(p){
-let cls=p.special?'anand':p.cat;
-let inn=p.special?'<span>◆</span>':p.badge;
+  ids=JSON.parse(
+    localStorage.getItem('yr') || '[]'
+  );
 
-return L.divIcon({
-className:'ym',
-html:`<div class="mw"><div class="dot ${cls}">${inn}</div><div class="mname">${p.name}</div>${p.bottari?'<div class="bottari-map">요가보따리 HERE</div>':''}</div>`,
-iconSize:[110,50],
-iconAnchor:[55,28]
-})
 }
 
-P.forEach(p=>{
-let m=L.marker(p.c,{icon:icon(p)});
-m.on('click',()=>openP(p));
-markers[p.id]=m;
-group.addLayer(m)
-});
+}catch(e){
 
-function apply(){
-group.clearLayers();
+ids=[];
 
-P.filter(p=>
-filter==='all'||
-(filter==='bottari'?p.bottari:p.cat===filter)
-).forEach(p=>group.addLayer(markers[p.id]))
 }
 
-function save(){
-localStorage.setItem('yr',JSON.stringify(ids))
-}
-
-function cards(){
-let a=P.filter(p=>
-filter==='all'||
-(filter==='bottari'?p.bottari:p.cat===filter)
+ids=ids.filter(
+  id=>P.some(p=>p.id===id)
 );
 
-let b=document.getElementById('cards');
 
-document.getElementById('count').textContent=a.length+' places';
+/* =====================================================
+   MAP
+===================================================== */
 
-b.innerHTML=a.map(p=>`
-<div class="card">
-<div class="type">${p.type}</div>
-<h3>${p.name}</h3>
-<div class="addr">${p.addr}</div>
-<div class="desc">${p.desc}</div>
-
-${p.bottari?'<div class="bottari-card">요가보따리 HERE</div>':''}
-
-<div class="actions">
-<button class="action dark" data-open="${p.id}">지도에서 보기</button>
-
-${p.ig?`<a class="action" href="${p.ig}" target="_blank" rel="noopener">Instagram</a>`:''}
-
-${p.yt?`<a class="action" href="${p.yt}" target="_blank" rel="noopener">▶ 파트너 영상 보기</a>`:''}
-
-<button class="action ${ids.includes(p.id)?'added':''}" data-add="${p.id}">
-${ids.includes(p.id)?'✓ 동선에 추가됨':'＋ 동선에 추가'}
-</button>
-</div>
-</div>
-`).join('');
-
-b.querySelectorAll('[data-open]').forEach(x=>
-x.onclick=()=>focus(P.find(p=>p.id===x.dataset.open))
+const map=L.map(
+  'map',
+  {
+    minZoom:9,
+    maxZoom:19
+  }
+).setView(
+  [33.385,126.545],
+  10
 );
 
-b.querySelectorAll('[data-add]').forEach(x=>
-x.onclick=()=>toggle(x.dataset.add)
-);
 
-apply()
-}
-
-function stops(){
-let e=document.getElementById('stops');
-let c=document.getElementById('routeCount');
-
-if(c)c.textContent=ids.length;
-
-if(!ids.length){
-e.innerHTML='<div class="empty">파트너 카드에서 ‘동선에 추가’를 눌러주세요.</div>';
-return
-}
-
-e.innerHTML=ids.map((id,i)=>{
-let p=P.find(x=>x.id===id);
-return `<button class="stop" data-rm="${id}"><b>${i+1}</b>${p.name} ×</button>`
-}).join('');
-
-e.querySelectorAll('[data-rm]').forEach(x=>
-x.onclick=()=>toggle(x.dataset.rm)
-)
-}
-
-function draw(fit=1){
-if(line){
-map.removeLayer(line);
-line=null
-}
-
-if(ids.length<2)return;
-
-line=L.polyline(
-ids.map(id=>P.find(p=>p.id===id).c),
-{
-color:'#253830',
-weight:5,
-opacity:.82,
-dashArray:'9 7'
-}
+L.tileLayer(
+  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  {
+    maxZoom:19,
+    attribution:'© OpenStreetMap contributors'
+  }
 ).addTo(map);
 
-if(fit){
-map.fitBounds(
-line.getBounds(),
-{padding:[55,55],maxZoom:13}
-)
+
+const group=L.layerGroup().addTo(map);
+
+
+const bounds=L.latLngBounds(
+  [
+    [33.105,126.12],
+    [33.565,126.96]
+  ]
+);
+
+
+/* =====================================================
+   MARKER
+===================================================== */
+
+function icon(p){
+
+let cls=p.cat;
+
+let inn='';
+
+if(p.cat==='partner'){
+  inn=p.badge || 'Y';
 }
+
+if(p.cat==='brand'){
+  inn=p.badge || 'B';
 }
 
-function toggle(id){
-let i=ids.indexOf(id);
+return L.divIcon({
 
-i>=0?ids.splice(i,1):ids.push(id);
+className:'ym',
 
-save();
-stops();
-cards();
-draw(1)
+html:`
+<div class="mw">
+
+<div class="dot ${cls}">
+${inn}
+</div>
+
+<div class="mname">
+${p.name}
+</div>
+
+${p.bottari
+?'<div class="bottari-map">요가보따리 HERE</div>'
+:''
 }
 
-function focus(p){
-map.flyTo(p.c,16);
-setTimeout(()=>openP(p),300)
+</div>
+`,
+
+iconSize:[120,52],
+iconAnchor:[60,27]
+
+});
+
 }
 
-function openP(p){
-document.getElementById('sType').textContent=p.type;
-document.getElementById('sName').textContent=p.name;
-document.getElementById('sAddr').textContent=p.addr;
-document.getElementById('sDesc').textContent=p.desc;
 
-document.getElementById('sActions').innerHTML=`
-<a class="action dark" target="_blank" href="https://map.naver.com/p/search/${encodeURIComponent(p.name+' '+p.addr)}">네이버지도</a>
+P.forEach(p=>{
 
-${p.ig?`<a class="action" target="_blank" rel="noopener" href="${p.ig}">Instagram</a>`:''}
+const m=L.marker(
+  p.c,
+  {
+    icon:icon(p)
+  }
+);
 
-${p.yt?`<a class="action" target="_blank" rel="noopener" href="${p.yt}">▶ 파트너 영상 보기</a>`:''}
+m.on(
+  'click',
+  ()=>openP(p)
+);
 
-<button class="action ${ids.includes(p.id)?'added':''}" id="sheetAdd">
-${ids.includes(p.id)?'✓ 동선에 추가됨':'＋ 동선에 추가'}
-</button>
+markers[p.id]=m;
+
+});
+
+
+/* =====================================================
+   FILTER
+===================================================== */
+
+function visiblePlaces(){
+
+const q=search
+  .trim()
+  .toLowerCase();
+
+return P.filter(p=>{
+
+const typeOK=
+filter==='all' ||
+
+(
+  filter==='bottari'
+    ? p.bottari
+    : p.cat===filter
+);
+
+const regionOK=
+region==='all' ||
+p.region===region;
+
+const text=[
+p.name,
+p.addr,
+p.region,
+p.type,
+p.desc
+]
+.join(' ')
+.toLowerCase();
+
+const searchOK=
+!q ||
+text.includes(q);
+
+return typeOK &&
+regionOK &&
+searchOK;
+
+});
+
+}
+
+
+function apply(){
+
+group.clearLayers();
+
+visiblePlaces()
+.forEach(
+  p=>group.addLayer(markers[p.id])
+);
+
+}
+
+
+/* =====================================================
+   SAVE
+===================================================== */
+
+function save(){
+
+localStorage.setItem(
+  'yr',
+  JSON.stringify(ids)
+);
+
+}
+
+
+/* =====================================================
+   CARDS
+===================================================== */
+
+function cards(){
+
+const a=visiblePlaces();
+
+const b=document.getElementById('cards');
+
+document.getElementById('count')
+.textContent=
+a.length+' places';
+
+
+if(!a.length){
+
+b.innerHTML=`
+<div class="card">
+검색 결과가 없습니다.
+</div>
 `;
 
-document.getElementById('sheetAdd').onclick=()=>{
-toggle(p.id);
-openP(p)
-};
+apply();
 
-document.getElementById('back').classList.add('show')
+return;
+
 }
 
-document.querySelectorAll('.pill').forEach(x=>x.onclick=()=>{
-document.querySelectorAll('.pill').forEach(y=>
-y.classList.remove('active')
+
+b.innerHTML=
+a.map(p=>`
+
+<div class="card ${p.cat}">
+
+<div class="type ${p.cat}">
+${p.type}
+</div>
+
+<h3>
+${p.name}
+</h3>
+
+<div class="addr">
+${p.addr}
+</div>
+
+<span class="region-tag">
+${p.region}
+</span>
+
+<div class="desc">
+${p.desc || ''}
+</div>
+
+${p.bottari
+?'<div class="bottari-card">요가보따리 HERE</div>'
+:''
+}
+
+<div class="actions">
+
+<button
+class="action dark"
+data-open="${p.id}">
+지도에서 보기
+</button>
+
+<a
+class="action"
+target="_blank"
+rel="noopener"
+href="https://map.naver.com/p/search/${encodeURIComponent(p.name+' '+p.addr)}">
+네이버지도
+</a>
+
+${p.ig
+?`
+<a
+class="action"
+href="${p.ig}"
+target="_blank"
+rel="noopener">
+Instagram
+</a>
+`
+:''
+}
+
+${p.web
+?`
+<a
+class="action"
+href="${p.web}"
+target="_blank"
+rel="noopener">
+홈페이지
+</a>
+`
+:''
+}
+
+${p.yt
+?`
+<a
+class="action"
+href="${p.yt}"
+target="_blank"
+rel="noopener">
+▶ 파트너 영상 보기
+</a>
+`
+:''
+}
+
+<button
+class="action ${ids.includes(p.id)?'added':''}"
+data-add="${p.id}">
+${ids.includes(p.id)
+?'✓ Journey에 담김'
+:'＋ Journey에 담기'
+}
+</button>
+
+</div>
+
+</div>
+
+`).join('');
+
+
+b.querySelectorAll('[data-open]')
+.forEach(x=>
+
+x.onclick=()=>{
+
+const p=P.find(
+  p=>p.id===x.dataset.open
+);
+
+focus(p);
+
+}
+
+);
+
+
+b.querySelectorAll('[data-add]')
+.forEach(x=>
+
+x.onclick=()=>toggle(
+  x.dataset.add
+)
+
+);
+
+
+apply();
+
+}
+
+
+/* =====================================================
+   JOURNEY STOPS
+===================================================== */
+
+function stops(){
+
+const e=document.getElementById('stops');
+
+document.getElementById('routeCount')
+.textContent=ids.length;
+
+
+if(!ids.length){
+
+e.innerHTML=`
+<div class="empty">
+요가원 카드에서 ‘Journey에 담기’를 눌러주세요.
+</div>
+`;
+
+return;
+
+}
+
+
+e.innerHTML=
+ids.map((id,i)=>{
+
+const p=P.find(
+  x=>x.id===id
+);
+
+return `
+
+<button
+class="stop"
+data-rm="${id}">
+
+<b>${i+1}</b>
+
+${p.name} ×
+
+</button>
+
+`;
+
+}).join('');
+
+
+e.querySelectorAll('[data-rm]')
+.forEach(x=>
+
+x.onclick=()=>toggle(
+  x.dataset.rm
+)
+
+);
+
+}
+
+
+/* =====================================================
+   DRAW ROUTE
+===================================================== */
+
+function draw(fit=1){
+
+if(line){
+
+map.removeLayer(line);
+
+line=null;
+
+}
+
+
+if(ids.length<2){
+  return;
+}
+
+
+line=L.polyline(
+
+ids.map(
+  id=>P.find(p=>p.id===id).c
+),
+
+{
+  color:'#253830',
+  weight:5,
+  opacity:.82,
+  dashArray:'9 7'
+}
+
+).addTo(map);
+
+
+if(fit){
+
+map.fitBounds(
+  line.getBounds(),
+  {
+    padding:[55,55],
+    maxZoom:13
+  }
+);
+
+}
+
+}
+
+
+/* =====================================================
+   TOGGLE JOURNEY
+===================================================== */
+
+function toggle(id){
+
+const i=ids.indexOf(id);
+
+if(i>=0){
+
+ids.splice(i,1);
+
+}else{
+
+ids.push(id);
+
+}
+
+save();
+
+stops();
+
+cards();
+
+draw(1);
+
+}
+
+
+/* =====================================================
+   FOCUS
+===================================================== */
+
+function focus(p){
+
+map.flyTo(
+  p.c,
+  16
+);
+
+setTimeout(
+  ()=>openP(p),
+  300
+);
+
+}
+
+
+/* =====================================================
+   PLACE SHEET
+===================================================== */
+
+function openP(p){
+
+document.getElementById('sType')
+.textContent=p.type;
+
+document.getElementById('sName')
+.textContent=p.name;
+
+document.getElementById('sAddr')
+.textContent=p.addr;
+
+document.getElementById('sDesc')
+.textContent=p.desc || '';
+
+
+document.getElementById('sActions')
+.innerHTML=`
+
+<a
+class="action dark"
+target="_blank"
+rel="noopener"
+href="https://map.naver.com/p/search/${encodeURIComponent(p.name+' '+p.addr)}">
+네이버지도
+</a>
+
+${p.ig
+?`
+<a
+class="action"
+target="_blank"
+rel="noopener"
+href="${p.ig}">
+Instagram
+</a>
+`
+:''
+}
+
+${p.web
+?`
+<a
+class="action"
+target="_blank"
+rel="noopener"
+href="${p.web}">
+홈페이지
+</a>
+`
+:''
+}
+
+${p.yt
+?`
+<a
+class="action"
+target="_blank"
+rel="noopener"
+href="${p.yt}">
+▶ 파트너 영상 보기
+</a>
+`
+:''
+}
+
+<button
+class="action ${ids.includes(p.id)?'added':''}"
+id="sheetAdd">
+${ids.includes(p.id)
+?'✓ Journey에 담김'
+:'＋ Journey에 담기'
+}
+</button>
+
+`;
+
+
+document.getElementById('sheetAdd')
+.onclick=()=>{
+
+toggle(p.id);
+
+openP(p);
+
+};
+
+
+document.getElementById('back')
+.classList.add('show');
+
+}
+
+
+/* =====================================================
+   TYPE FILTER
+===================================================== */
+
+document
+.querySelectorAll('#typeFilters .pill')
+.forEach(x=>
+
+x.onclick=()=>{
+
+document
+.querySelectorAll('#typeFilters .pill')
+.forEach(
+  y=>y.classList.remove('active')
 );
 
 x.classList.add('active');
+
 filter=x.dataset.f;
 
 cards();
 
-if(filter==='all'){
-map.fitBounds(bounds,{padding:[10,10]})
-}else{
-let a=P.filter(p=>
-filter==='bottari'?p.bottari:p.cat===filter
+fitVisible();
+
+}
+
 );
+
+
+/* =====================================================
+   REGION FILTER
+===================================================== */
+
+document
+.querySelectorAll('#regionFilters .pill')
+.forEach(x=>
+
+x.onclick=()=>{
+
+document
+.querySelectorAll('#regionFilters .pill')
+.forEach(
+  y=>y.classList.remove('active')
+);
+
+x.classList.add('active');
+
+region=x.dataset.r;
+
+cards();
+
+fitVisible();
+
+}
+
+);
+
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+document
+.getElementById('search')
+.addEventListener(
+  'input',
+  e=>{
+
+search=e.target.value;
+
+cards();
+
+}
+);
+
+
+/* =====================================================
+   FIT FILTER RESULTS
+===================================================== */
+
+function fitVisible(){
+
+const a=visiblePlaces();
+
+if(!a.length){
+  return;
+}
+
+if(a.length===1){
+
+map.flyTo(
+  a[0].c,
+  14
+);
+
+return;
+
+}
 
 map.fitBounds(
+
 a.map(p=>p.c),
-{padding:[40,40],maxZoom:12}
-)
+
+{
+  padding:[40,40],
+  maxZoom:12
 }
-});
 
-document.getElementById('fit').onclick=()=>{
-filter='all';
-
-document.querySelectorAll('.pill').forEach(x=>
-x.classList.toggle('active',x.dataset.f==='all')
 );
 
+}
+
+
+/* =====================================================
+   JEJU ALL
+===================================================== */
+
+document
+.getElementById('fit')
+.onclick=()=>{
+
+filter='all';
+region='all';
+search='';
+
+document.getElementById('search')
+.value='';
+
+
+document
+.querySelectorAll('#typeFilters .pill')
+.forEach(
+  x=>x.classList.toggle(
+    'active',
+    x.dataset.f==='all'
+  )
+);
+
+
+document
+.querySelectorAll('#regionFilters .pill')
+.forEach(
+  x=>x.classList.toggle(
+    'active',
+    x.dataset.r==='all'
+  )
+);
+
+
 cards();
-map.fitBounds(bounds,{padding:[10,10]})
+
+map.fitBounds(
+  bounds,
+  {
+    padding:[10,10]
+  }
+);
+
 };
 
-document.getElementById('loc').onclick=()=>
-navigator.geolocation?
-navigator.geolocation.getCurrentPosition(
-q=>map.flyTo([q.coords.latitude,q.coords.longitude],15),
-()=>alert('위치 권한을 허용해주세요.')
-):
-alert('위치 기능을 사용할 수 없습니다.');
 
-document.getElementById('journeyToggle').onclick=()=>{
-let bar=document.getElementById('journeyBar');
-let btn=document.getElementById('journeyToggle');
+/* =====================================================
+   MY LOCATION
+===================================================== */
 
-bar.classList.toggle('collapsed');
+document
+.getElementById('loc')
+.onclick=()=>{
+
+if(!navigator.geolocation){
+
+alert(
+  '위치 기능을 사용할 수 없습니다.'
+);
+
+return;
+
+}
+
+
+navigator.geolocation
+.getCurrentPosition(
+
+q=>{
+
+const me=[
+q.coords.latitude,
+q.coords.longitude
+];
+
+map.flyTo(
+  me,
+  14
+);
+
+
+/* 가까운 요가원 계산 */
+
+const nearest=
+[...P]
+.map(p=>({
+
+...p,
+
+distance:
+map.distance(
+  me,
+  p.c
+)
+
+}))
+.sort(
+  (a,b)=>a.distance-b.distance
+)[0];
+
+
+if(nearest){
+
+setTimeout(
+  ()=>openP(nearest),
+  500
+);
+
+}
+
+},
+
+()=>alert(
+  '위치 권한을 허용해주세요.'
+)
+
+);
+
+};
+
+
+/* =====================================================
+   JOURNEY COLLAPSE
+===================================================== */
+
+document
+.getElementById('journeyToggle')
+.onclick=()=>{
+
+const bar=
+document.getElementById(
+  'journeyBar'
+);
+
+const btn=
+document.getElementById(
+  'journeyToggle'
+);
+
+bar.classList.toggle(
+  'collapsed'
+);
 
 btn.textContent=
-bar.classList.contains('collapsed')?
-'펼치기':'접기'
+bar.classList.contains(
+  'collapsed'
+)
+?'펼치기'
+:'접기';
+
 };
 
-document.getElementById('showRoute').onclick=()=>
-ids.length<2?
-alert('최소 2곳을 선택해주세요.'):
+
+/* =====================================================
+   SHOW ROUTE
+===================================================== */
+
+document
+.getElementById('showRoute')
+.onclick=()=>{
+
+if(ids.length<2){
+
+alert(
+  '최소 2곳을 Journey에 담아주세요.'
+);
+
+return;
+
+}
+
 draw(1);
 
-document.getElementById('routeView').onclick=()=>
-ids.length<2?
-alert('최소 2곳을 선택해주세요.'):
+};
+
+
+document
+.getElementById('routeView')
+.onclick=()=>{
+
+if(ids.length<2){
+
+alert(
+  '최소 2곳을 Journey에 담아주세요.'
+);
+
+return;
+
+}
+
 draw(1);
 
-document.getElementById('clearRoute').onclick=()=>{
+};
+
+
+/* =====================================================
+   CLEAR
+===================================================== */
+
+document
+.getElementById('clearRoute')
+.onclick=()=>{
+
 ids=[];
+
 save();
+
 stops();
+
 cards();
 
+
 if(line){
+
 map.removeLayer(line);
-line=null
+
+line=null;
+
 }
+
 };
 
-document.getElementById('googleRoute').onclick=()=>{
+
+/* =====================================================
+   NAVER ROUTE
+===================================================== */
+
+document
+.getElementById('naverRoute')
+.onclick=()=>{
+
 if(ids.length<2){
-alert('최소 2곳을 선택해주세요.');
+
+alert(
+  '최소 2곳을 Journey에 담아주세요.'
+);
+
 return;
+
 }
+
 
 if(ids.length>7){
-alert('네이버지도는 경유지를 최대 5곳까지 넣을 수 있어요. 출발지와 도착지를 포함해 최대 7곳만 선택해주세요.');
+
+alert(
+  '길찾기는 출발지와 도착지를 포함해 최대 7곳까지만 선택해주세요.'
+);
+
 return;
+
 }
 
-const a=ids.map(id=>P.find(p=>p.id===id));
+
+const a=
+ids.map(
+  id=>P.find(p=>p.id===id)
+);
+
+
 const start=a[0];
+
 const dest=a[a.length-1];
 
-const q=new URLSearchParams();
 
-q.set('slat',start.c[0]);
-q.set('slng',start.c[1]);
-q.set('sname',start.name);
+const q=
+new URLSearchParams();
 
-q.set('dlat',dest.c[0]);
-q.set('dlng',dest.c[1]);
-q.set('dname',dest.name);
 
-a.slice(1,-1).forEach((p,i)=>{
+q.set(
+  'slat',
+  start.c[0]
+);
+
+q.set(
+  'slng',
+  start.c[1]
+);
+
+q.set(
+  'sname',
+  start.name
+);
+
+
+q.set(
+  'dlat',
+  dest.c[0]
+);
+
+q.set(
+  'dlng',
+  dest.c[1]
+);
+
+q.set(
+  'dname',
+  dest.name
+);
+
+
+a.slice(1,-1)
+.forEach((p,i)=>{
+
 const n=i+1;
 
-q.set(`v${n}lat`,p.c[0]);
-q.set(`v${n}lng`,p.c[1]);
-q.set(`v${n}name`,p.name);
+q.set(
+  `v${n}lat`,
+  p.c[0]
+);
+
+q.set(
+  `v${n}lng`,
+  p.c[1]
+);
+
+q.set(
+  `v${n}name`,
+  p.name
+);
+
 });
 
-q.set('appname','com.yogibara.map');
 
-const appUrl='nmap://route/car?'+q.toString();
-const fallback='https://map.naver.com/p/directions';
+q.set(
+  'appname',
+  'com.yogibara.map'
+);
+
+
+const appUrl=
+'nmap://route/car?'
++q.toString();
+
+
+const fallback=
+'https://map.naver.com/p/directions';
+
 
 let hidden=false;
 
+
 const onVis=()=>{
-if(document.hidden)hidden=true;
+
+if(document.hidden){
+  hidden=true;
+}
+
 };
+
 
 document.addEventListener(
-'visibilitychange',
-onVis,
-{once:true}
+  'visibilitychange',
+  onVis,
+  {
+    once:true
+  }
 );
 
-window.location.href=appUrl;
+
+window.location.href=
+appUrl;
+
 
 setTimeout(()=>{
-if(!hidden && document.visibilityState==='visible'){
-window.location.href=fallback;
+
+if(
+  !hidden &&
+  document.visibilityState==='visible'
+){
+
+window.location.href=
+fallback;
+
 }
+
 },1400);
+
 };
 
-document.getElementById('full').onclick=()=>{
-let s=document.querySelector('.map-shell');
 
-s.classList.toggle('map-full');
+/* =====================================================
+   SHARE JOURNEY
+===================================================== */
 
-document.getElementById('full').textContent=
-s.classList.contains('map-full')?
-'작게 보기':'지도 크게 보기';
+document
+.getElementById('shareRoute')
+.onclick=async()=>{
 
-setTimeout(()=>map.invalidateSize(),100)
-};
+if(!ids.length){
 
-document.getElementById('back').onclick=e=>{
-if(e.target.id==='back'){
-e.currentTarget.classList.remove('show')
+alert(
+  '먼저 Journey에 장소를 담아주세요.'
+);
+
+return;
+
 }
+
+
+const url=
+new URL(
+  location.href
+);
+
+
+url.searchParams.set(
+  'journey',
+  ids.join(',')
+);
+
+
+const places=
+ids
+.map(
+  id=>P.find(p=>p.id===id).name
+)
+.join(' → ');
+
+
+const shareData={
+
+title:
+'YOGIBARA · JEJU YOGA JOURNEY',
+
+text:
+`나의 제주 요가여행\n${places}`,
+
+url:
+url.toString()
+
 };
+
+
+try{
+
+if(navigator.share){
+
+await navigator.share(
+  shareData
+);
+
+}else{
+
+await navigator.clipboard.writeText(
+  url.toString()
+);
+
+alert(
+  'Journey 링크를 복사했습니다.'
+);
+
+}
+
+}catch(e){
+
+/* 공유 취소는 별도 처리하지 않음 */
+
+}
+
+};
+
+
+/* =====================================================
+   FULL SCREEN
+===================================================== */
+
+document
+.getElementById('full')
+.onclick=()=>{
+
+const s=
+document.querySelector(
+  '.map-shell'
+);
+
+s.classList.toggle(
+  'map-full'
+);
+
+
+document
+.getElementById('full')
+.textContent=
+s.classList.contains(
+  'map-full'
+)
+?'작게 보기'
+:'지도 크게 보기';
+
+
+setTimeout(
+  ()=>map.invalidateSize(),
+  100
+);
+
+};
+
+
+/* =====================================================
+   CLOSE SHEET
+===================================================== */
+
+document
+.getElementById('back')
+.onclick=e=>{
+
+if(
+  e.target.id==='back'
+){
+
+e.currentTarget
+.classList.remove(
+  'show'
+);
+
+}
+
+};
+
+
+/* =====================================================
+   INIT
+===================================================== */
 
 cards();
-stops();
-draw(0);
-map.fitBounds(bounds,{padding:[10,10]});
 
-setTimeout(()=>map.invalidateSize(),200);
+stops();
+
+draw(0);
+
+map.fitBounds(
+  bounds,
+  {
+    padding:[10,10]
+  }
+);
+
+setTimeout(
+  ()=>map.invalidateSize(),
+  200
+);
+
 </script>
+
 </body>
-</html>
+  </html>

@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17120d">
+<title>YOGIBARA V27</title>
+<style>
+html,body{margin:0;width:100%;height:100%;background:#0f0c09;overflow:hidden}
+#appFrame{display:block;width:min(100%,430px);height:100dvh;margin:0 auto;border:0;background:#17120d}
+#loading{position:fixed;inset:0;display:grid;place-items:center;background:#17120d;color:#f7efe5;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-size:14px;z-index:5}
+</style>
+</head>
+<body>
+<div id="loading">YOGIBARA를 여는 중…</div>
+<iframe id="appFrame" src="./app-26.html" title="YOGIBARA" allow="web-share; geolocation; clipboard-write; clipboard-read"></iframe>
+
+<script type="text/plain" id="v27-script">
+(function(){
+  if(window.__YOGIBARA_V27__) return;
+  window.__YOGIBARA_V27__=true;
+
+  function byId(id){return document.getElementById(id)}
+  function qa(sel,root=document){return [...root.querySelectorAll(sel)]}
+  function textOf(el){return (el?.innerText||el?.textContent||'').trim()}
+
+  function clickBottomNav(labels){
+    const list=Array.isArray(labels)?labels:[labels];
+    const candidates=qa('button,a,div,span');
+    for(const label of list){
+      const hit=candidates.find(el=>{
+        const t=textOf(el);
+        return t===label || t.replace(/\s+/g,'')===label.replace(/\s+/g,'');
+      });
+      if(hit){
+        const clickable=hit.closest('button,a') || hit;
+        clickable.click();
+        return true;
+      }
+    }
+    return false;
+  }
+  window.v27GoShare=function(){ clickBottomNav(['나눔공간','나눔']); };
+  window.v27GoRecord=function(){ clickBottomNav(['기록']); };
+  window.v27GoJourney=function(){ clickBottomNav(['여정']); };
+
+  function removeHeaderTagline(){
+    qa('p,small,span,div').forEach(el=>{
+      const t=textOf(el);
+      if((t==='수련은, 나에게서 끝나지 않는다.' || t==='수련은, 나에게서 끝나지 않는다') && el.getBoundingClientRect().top<150){
+        el.classList.add('v27Hidden');
+      }
+    });
+  }
+
+  function simplifyHome(){
+    const home=byId('home') || document.body;
+    if(!home) return;
+
+    qa('.card,.section,div',home).forEach(el=>{
+      const t=textOf(el);
+      if(!t) return;
+      const shouldHide =
+        (t.includes('바로돕기') && t.includes('내 여정 보기')) ||
+        t.includes('릴레이 참여') ||
+        t.includes('상품 구매로 나눔') ||
+        t.includes('기부요가 참여') ||
+        t.includes('연결해서 함께하기') ||
+        t.includes('수련은, 나에게서 끝나지 않는다.') ||
+        t.includes('수련은, 나에게서 끝나지 않는다') ||
+        t.includes('PRACTICE · SHARE · PEACE') ||
+        t.includes('여정도 만들고, 수련도 남기고') ||
+        t.includes('기록은 가볍게, 나눔은 더 쉽게');
+      if(shouldHide) el.classList.add('v27Hidden');
+    });
+
+    if(!byId('v27HomeSimple')){
+      const anchor=byId('homePurposeBanner') || home.firstElementChild;
+      const card=document.createElement('div');
+      card.id='v27HomeSimple';
+      card.className='v27HomeSimple card';
+      card.innerHTML=`
+        <div class="v27MiniKicker">YOGIBARA</div>
+        <h3>쉽게 기록하고, 쉽게 나눔에 참여해요.</h3>
+        <p>홈은 단순하게 두고, 기록은 기록 메뉴에서 보고, 나눔은 나눔 메뉴에서 한눈에 참여할 수 있게 정리했습니다.</p>
+        <div class="v27HomeBtns">
+          <button class="v27Btn primary" onclick="v27GoShare()">나눔으로 가기</button>
+          <button class="v27Btn" onclick="v27GoRecord()">기록 보기</button>
+          <button class="v27Btn" onclick="v27GoJourney()">여정 보기</button>
+        </div>
+      `;
+      if(anchor && anchor.parentElement) anchor.insertAdjacentElement('afterend',card);
+    }
+  }
+
+  function buildShareHub(){
+    const titleEl=qa('h1,h2,h3').find(el=>{ const t=textOf(el); return t==='나눔공간' || t==='나눔'; });
+    if(!titleEl) return;
+    if(byId('v27ShareHub')) return;
+    const anchor=titleEl.closest('div') || titleEl;
+    const wrap=document.createElement('div');
+    wrap.id='v27ShareHub';
+    wrap.className='v27ShareHub card';
+    wrap.innerHTML=`
+      <div class="v27MiniKicker">SHARE</div>
+      <h3>나눔 메뉴에서 쉽게 함께해요.</h3>
+      <p>어린이도 어렵지 않게 바로돕기, 릴레이 참여, 기부요가 참여, 상품 구매로 나눔에 함께할 수 있도록 정리했습니다.</p>
+      <div class="v27ShareGrid">
+        <button class="v27ShareTile" onclick="openDonateOnlySheet && openDonateOnlySheet('card')"><span>DONATE</span><b>바로돕기</b><small>바로 마음 보태기</small></button>
+        <button class="v27ShareTile" onclick="openDonateOnlySheet && openDonateOnlySheet('relay')"><span>RELAY</span><b>릴레이 참여</b><small>수련으로 마음 잇기</small></button>
+        <button class="v27ShareTile" onclick="openDonateOnlySheet && openDonateOnlySheet('yoga')"><span>CLASS</span><b>기부요가 참여</b><small>나누는 수련에 참여하기</small></button>
+        <button class="v27ShareTile" onclick="openDonateOnlySheet && openDonateOnlySheet('bottari')"><span>GOODS</span><b>상품 구매로 나눔</b><small>요가보따리로 함께하기</small></button>
+      </div>
+    `;
+    anchor.insertAdjacentElement('afterend',wrap);
+  }
+
+  function renameDonateLabels(){
+    qa('button,a').forEach(el=>{
+      const t=textOf(el);
+      if(t==='기부하기' || t==='카드로 기부' || t==='카드로 기부하기') el.textContent='바로돕기';
+    });
+  }
+
+  function applyV27(){
+    removeHeaderTagline();
+    renameDonateLabels();
+    simplifyHome();
+    buildShareHub();
+  }
+
+  const origRenderAll=window.renderAll;
+  if(typeof origRenderAll==='function'){
+    window.renderAll=function(){
+      origRenderAll();
+      setTimeout(applyV27,80);
+      setTimeout(applyV27,260);
+    };
+  }
+
+  applyV27();
+  setTimeout(applyV27,300);
+})();
+</script>
+
+<script>
+const frame=document.getElementById('appFrame');
+const loading=document.getElementById('loading');
+let injected=false;
+
+function deepInject(win){
+  try{
+    let currentWin=win;
+    let currentDoc=currentWin.document;
+    while(currentDoc.getElementById('appFrame') && currentDoc.getElementById('appFrame').contentWindow){
+      currentWin=currentDoc.getElementById('appFrame').contentWindow;
+      currentDoc=currentWin.document;
+    }
+    if(currentDoc.documentElement.dataset.v27Injected==='1') return;
+    currentDoc.documentElement.dataset.v27Injected='1';
+
+    const style=currentDoc.createElement('style');
+    style.textContent=`
+      .v27Hidden{display:none!important}
+      .v27HomeSimple{padding:15px;margin-bottom:10px;background:linear-gradient(160deg,rgba(255,255,255,.04),rgba(139,154,58,.08));border:1px solid rgba(255,255,255,.08)}
+      .v27MiniKicker{font-size:11px;letter-spacing:.18em;color:#c9ad82;font-weight:900}
+      .v27HomeSimple h3,.v27ShareHub h3{margin:8px 0 6px;font-size:24px;line-height:1.38;color:#f4ecdf}
+      .v27HomeSimple p,.v27ShareHub p{margin:0;color:#ddcdbb;font-size:11px;line-height:1.7}
+      .v27HomeBtns{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}
+      .v27Btn{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#f6efe4;border-radius:999px;padding:14px 12px;font-size:13px;font-weight:900}
+      .v27Btn.primary{background:#8b9a3a;border-color:#8b9a3a}
+      .v27ShareHub{padding:15px;margin:10px 0;background:linear-gradient(160deg,rgba(139,154,58,.10),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.08)}
+      .v27ShareGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+      .v27ShareTile{padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);text-align:left;color:#f7efe5}
+      .v27ShareTile span{display:block;font-size:9px;letter-spacing:.16em;color:#aac055;font-weight:900;margin-bottom:6px}
+      .v27ShareTile b{display:block;font-size:16px;line-height:1.35;margin-bottom:4px}
+      .v27ShareTile small{display:block;font-size:10px;color:#d4c3b2;line-height:1.5}
+      @media(max-width:360px){.v27ShareGrid{grid-template-columns:1fr}}
+    `;
+    currentDoc.head.appendChild(style);
+
+    const s=currentDoc.createElement('script');
+    s.textContent=document.getElementById('v27-script').textContent;
+    currentDoc.body.appendChild(s);
+
+    injected=true;
+    loading.style.display='none';
+  }catch(err){ console.error(err); }
+}
+
+frame.addEventListener('load',()=>{
+  const run=()=>{ try{ deepInject(frame.contentWindow); }catch(err){ console.error(err); } };
+  setTimeout(run,500);
+  setTimeout(run,1500);
+  setTimeout(run,2800);
+});
+setTimeout(()=>{ if(!injected) loading.style.display='none'; },3800);
+</script>
+</body>
+</html>

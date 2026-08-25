@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17120d">
+<title>YOGIBARA V28</title>
+<style>
+html,body{margin:0;width:100%;height:100%;background:#0f0c09;overflow:hidden}
+#appFrame{display:block;width:min(100%,430px);height:100dvh;margin:0 auto;border:0;background:#17120d}
+#loading{position:fixed;inset:0;display:grid;place-items:center;background:#17120d;color:#f7efe5;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-size:14px;z-index:5}
+</style>
+</head>
+<body>
+<div id="loading">YOGIBARA를 여는 중…</div>
+<iframe id="appFrame" src="./app-27.html" title="YOGIBARA" allow="web-share; geolocation; clipboard-write; clipboard-read"></iframe>
+
+<script type="text/plain" id="v28-script">
+(function(){
+  if(window.__YOGIBARA_V28__) return;
+  window.__YOGIBARA_V28__=true;
+
+  const MAP_URL='https://yogibara-map.vercel.app/';
+  const PARTNER_IDS={
+    anand:{name:'아난드요가',region:'제주',type:'YOGIBARA PARTNER'},
+    yogaroum:{name:'요가로움',region:'제주',type:'YOGIBARA PARTNER'},
+    yoga12:{name:'요가열두달',region:'제주',type:'YOGIBARA PARTNER'},
+    aewol7:{name:'애월7일요가원',region:'애월',type:'YOGIBARA PARTNER'},
+    prajna:{name:'쁘라즈나요가',region:'제주',type:'YOGIBARA PARTNER'},
+    comfort:{name:'컴포트플로우',region:'제주',type:'BRAND PARTNER'},
+    barabodayoga:{name:'바라보다요가',region:'조천',type:'YOGIBARA PARTNER'}
+  };
+
+  function byId(id){return document.getElementById(id)}
+  function qa(sel,root=document){return [...root.querySelectorAll(sel)]}
+  function textOf(el){return (el?.innerText||el?.textContent||'').trim()}
+  function today(){return typeof todayISO==='function'?todayISO():new Date().toISOString().slice(0,10)}
+
+  function selectedJourneyIds(){
+    try{return JSON.parse(localStorage.getItem('yr')||'[]').filter(Boolean)}catch(e){return []}
+  }
+  function selectedShareSpaces(){
+    return selectedJourneyIds().filter(id=>PARTNER_IDS[id]).map(id=>({id,...PARTNER_IDS[id]}));
+  }
+  function shareVisits(){
+    if(!window.state||!Array.isArray(state.entries)) return [];
+    return state.entries.filter(e=>e.shareSpaceVisit || (e.type==='share' && ((e.kind||'').includes('SHARE PARTNER') || (e.kind||'').includes('나눔공간 방문') || (e.name||'').includes('쁘라즈나')))).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  }
+
+  window.recordShareSpaceVisit=function(mapId){
+    const s=PARTNER_IDS[mapId];
+    if(!s || !window.state || !Array.isArray(state.entries)) return;
+    const date=today();
+    const already=state.entries.some(e=>e.shareSpaceVisit && e.mapId===mapId && e.date===date);
+    if(already){alert('오늘 방문 기록이 이미 있습니다.');return;}
+    const base=Date.now();
+    state.entries.push({
+      id:base,
+      type:'place',
+      date,
+      place:s.name,
+      region:s.region,
+      note:'YOGIBARA 나눔공간 방문',
+      private:false,
+      mapId,
+      linkedShareSpace:true
+    });
+    state.entries.push({
+      id:base+1,
+      type:'share',
+      date,
+      kind:'나눔공간 방문',
+      name:s.name,
+      amount:0,
+      note:'여정에서 이어진 나눔공간 방문 기록',
+      private:false,
+      mapId,
+      shareSpaceVisit:true,
+      linkedJourney:true
+    });
+    if(typeof save==='function') save();
+    if(typeof renderAll==='function') renderAll();
+    alert(`${s.name} 방문이\n여정 + 나눔 기록에 함께 저장되었습니다.`);
+  };
+
+  function simplifySharePage(){
+    const spaces=byId('spaces');
+    if(!spaces) return;
+
+    // bottom nav label
+    qa('nav button,.bottom button').forEach(btn=>{
+      if(textOf(btn)==='나눔공간'){
+        const icon=btn.querySelector('i');
+        btn.innerHTML=icon?`${icon.outerHTML}나눔`:'나눔';
+      }
+    });
+
+    // Remove map/search/yoga studio listing from Share page.
+    qa('.searchBox,.filterRow,.journeyBridge,.v25MapCard,#journeyMapBridge,#spaceList',spaces).forEach(el=>el.classList.add('v28Hidden'));
+    qa('.card,.section',spaces).forEach(el=>{
+      const t=textOf(el);
+      if(t.includes('YOGIBARA SHARE SPACE') || t.includes('나눔이 가능한 공간을 전국으로') || t.includes('요가원 · 지역 검색') || t.includes('지도에서 바로 내 여정 추가하기') || t.includes('한 곳에서 여정 · 수련 · 나눔 기록')) el.classList.add('v28Hidden');
+    });
+
+    if(!byId('v28ShareSimple')){
+      const title=qa('h1,h2,h3',spaces).find(el=>textOf(el)==='나눔공간' || textOf(el)==='나눔');
+      if(title) title.textContent='나눔';
+      const hub=byId('v27ShareHub');
+      if(hub){
+        const p=hub.querySelector('p');
+        if(p) p.textContent='바로돕기, 릴레이, 기부요가, 상품 구매처럼 지금 할 수 있는 나눔만 모았습니다.';
+        const goMap=document.createElement('button');
+        goMap.className='v28FindShareBtn';
+        goMap.textContent='나눔공간 찾기 → 여정';
+        goMap.onclick=()=>{ if(typeof go==='function') go('journey'); };
+        hub.appendChild(goMap);
+      }
+    }
+  }
+
+  function buildJourneyPage(){
+    const journey=byId('journey');
+    if(!journey) return;
+    if(byId('v28JourneyPage')){
+      renderJourneyLinkedLists();
+      return;
+    }
+
+    // Hide old journey stub/list. Keep screen header only.
+    qa('.card,.section',journey).forEach(el=>el.classList.add('v28Hidden'));
+    const title=qa('h1,h2,h3',journey).find(el=>textOf(el)==='여정');
+    const anchor=title?title.closest('.screenHead')||title:journey.firstElementChild;
+
+    const wrap=document.createElement('div');
+    wrap.id='v28JourneyPage';
+    wrap.className='v28JourneyPage';
+    wrap.innerHTML=`
+      <div class="v28JourneyIntro card">
+        <div class="v28Kicker">YOGIBARA MAP</div>
+        <h3>지도에서 여정을 만들고 나눔공간도 찾아요.</h3>
+        <p><b>Journey에 담기</b>는 가고 싶은 곳을 내 여정에 넣는 기능입니다. YOGIBARA PARTNER를 담으면 아래에 <b>나눔공간</b>으로 따로 보여요.</p>
+      </div>
+
+      <div class="v28MapCard card">
+        <iframe id="v28MapFrame" class="v28MapFrame" src="${MAP_URL}" title="YOGIBARA MAP"></iframe>
+      </div>
+
+      <div class="v28JourneyHelp card">
+        <div class="v28HelpNum">1</div><div><b>지도에서 Journey에 담기</b><small>가고 싶은 요가원과 나눔공간을 고릅니다.</small></div>
+        <div class="v28HelpNum">2</div><div><b>실제로 다녀오면 ‘다녀왔어요’</b><small>한 번 누르면 여정 기록과 나눔공간 방문 기록에 같이 저장됩니다.</small></div>
+      </div>
+
+      <section class="v28Section">
+        <div class="v28SectionHead"><b>여정에 담긴 나눔공간</b><small id="v28PlannedCount">0곳</small></div>
+        <div id="v28PlannedShareSpaces"></div>
+      </section>
+
+      <section class="v28Section">
+        <div class="v28SectionHead"><b>내가 다녀온 나눔공간</b><small id="v28VisitedCount">0회</small></div>
+        <div id="v28VisitedShareSpaces"></div>
+      </section>
+    `;
+    if(anchor) anchor.insertAdjacentElement('afterend',wrap); else journey.appendChild(wrap);
+
+    const frame=byId('v28MapFrame');
+    if(frame) frame.addEventListener('load',()=>setTimeout(renderJourneyLinkedLists,250));
+    renderJourneyLinkedLists();
+  }
+
+  function renderJourneyLinkedLists(){
+    const plannedEl=byId('v28PlannedShareSpaces');
+    const visitedEl=byId('v28VisitedShareSpaces');
+    if(!plannedEl || !visitedEl) return;
+
+    const planned=selectedShareSpaces();
+    const visits=shareVisits();
+    if(byId('v28PlannedCount')) byId('v28PlannedCount').textContent=`${planned.length}곳`;
+    if(byId('v28VisitedCount')) byId('v28VisitedCount').textContent=`${visits.length}회`;
+
+    plannedEl.innerHTML=planned.length?planned.map(s=>`
+      <div class="v28SpaceRow card">
+        <div><b>${s.name}</b><small>${s.type} · ${s.region}</small></div>
+        <button onclick="recordShareSpaceVisit('${s.id}')">다녀왔어요</button>
+      </div>
+    `).join(''):`<div class="v28Empty">지도에서 YOGIBARA PARTNER를 Journey에 담으면 여기에 나타납니다.</div>`;
+
+    visitedEl.innerHTML=visits.length?visits.map(e=>`
+      <div class="v28VisitRow">
+        <div><b>${e.name||e.place||'나눔공간'}</b><small>${e.date||''} · 나눔공간 방문</small></div>
+        <span>기록됨</span>
+      </div>
+    `).join(''):`<div class="v28Empty">아직 다녀온 나눔공간 기록이 없습니다.</div>`;
+  }
+
+  function watchJourneySelection(){
+    let prev='';
+    setInterval(()=>{
+      const now=JSON.stringify(selectedJourneyIds());
+      if(now!==prev){prev=now;renderJourneyLinkedLists();}
+    },1000);
+  }
+
+  function applyV28(){
+    simplifySharePage();
+    buildJourneyPage();
+  }
+
+  const origRenderAll=window.renderAll;
+  if(typeof origRenderAll==='function'){
+    window.renderAll=function(){
+      origRenderAll();
+      setTimeout(applyV28,80);
+      setTimeout(applyV28,260);
+    };
+  }
+
+  applyV28();
+  watchJourneySelection();
+  setTimeout(applyV28,300);
+})();
+</script>
+
+<script>
+const frame=document.getElementById('appFrame');
+const loading=document.getElementById('loading');
+let injected=false;
+
+function deepInject(win){
+  try{
+    let currentWin=win;
+    let currentDoc=currentWin.document;
+    while(currentDoc.getElementById('appFrame') && currentDoc.getElementById('appFrame').contentWindow){
+      currentWin=currentDoc.getElementById('appFrame').contentWindow;
+      currentDoc=currentWin.document;
+    }
+    if(currentDoc.documentElement.dataset.v28Injected==='1') return;
+    currentDoc.documentElement.dataset.v28Injected='1';
+
+    const style=currentDoc.createElement('style');
+    style.textContent=`
+      .v28Hidden{display:none!important}
+      .v28FindShareBtn{width:100%;margin-top:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#f6efe4;border-radius:999px;padding:13px 12px;font-size:12px;font-weight:900}
+      .v28JourneyPage{display:grid;gap:10px;padding-bottom:20px}.v28JourneyIntro,.v28MapCard,.v28JourneyHelp{padding:14px}.v28Kicker{font-size:10px;letter-spacing:.18em;color:#b7cd57;font-weight:900}.v28JourneyIntro h3{margin:7px 0 6px;font-size:23px;line-height:1.38}.v28JourneyIntro p{margin:0;color:#d5c5b2;font-size:11px;line-height:1.7}.v28MapCard{padding:0;overflow:hidden}.v28MapFrame{display:block;width:100%;height:560px;border:0;background:#fff}.v28JourneyHelp{display:grid;grid-template-columns:30px 1fr;gap:10px 9px;align-items:start}.v28HelpNum{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#8b9a3a;color:#fff;font-size:12px;font-weight:900}.v28JourneyHelp b{display:block;font-size:13px}.v28JourneyHelp small{display:block;margin-top:3px;color:#c8b8a5;font-size:10px;line-height:1.5}.v28Section{margin-top:4px}.v28SectionHead{display:flex;justify-content:space-between;align-items:end;margin:0 4px 8px}.v28SectionHead b{font-size:16px}.v28SectionHead small{font-size:10px;color:var(--muted)}.v28SpaceRow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:13px;margin-bottom:8px}.v28SpaceRow b,.v28VisitRow b{display:block;font-size:14px}.v28SpaceRow small,.v28VisitRow small{display:block;margin-top:3px;color:#c3b29e;font-size:10px}.v28SpaceRow button{border:0;border-radius:999px;background:#8b9a3a;color:#fff;padding:10px 12px;font-size:10px;font-weight:900}.v28VisitRow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 4px;border-bottom:1px solid rgba(255,255,255,.07)}.v28VisitRow span{font-size:9px;color:#b8d05a;font-weight:900}.v28Empty{padding:15px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:#cab9a6;font-size:10px;line-height:1.6}
+      @media(max-width:360px){.v28MapFrame{height:480px}}
+    `;
+    currentDoc.head.appendChild(style);
+
+    const s=currentDoc.createElement('script');
+    s.textContent=document.getElementById('v28-script').textContent;
+    currentDoc.body.appendChild(s);
+
+    injected=true;
+    loading.style.display='none';
+  }catch(err){console.error(err)}
+}
+
+frame.addEventListener('load',()=>{
+  const run=()=>{ try{ deepInject(frame.contentWindow); }catch(err){ console.error(err); } };
+  setTimeout(run,500);
+  setTimeout(run,1500);
+  setTimeout(run,2800);
+});
+setTimeout(()=>{ if(!injected) loading.style.display='none'; },3800);
+</script>
+</body>
+</html>

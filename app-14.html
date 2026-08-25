@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17120d">
+<title>YOGIBARA V14</title>
+<style>
+:root{
+  --bg:#18130e;
+  --panel:#241c15;
+  --panel2:#2d241b;
+  --soft:#f4ecdf;
+  --soft2:#e7dccb;
+  --ink:#f6efe6;
+  --muted:#c0b19d;
+  --olive:#7b8a34;
+  --olive2:#98a852;
+  --gold:#c79c5f;
+  --line:#5a4936;
+  --line2:rgba(255,255,255,.08);
+  --heart:#d98678;
+  --shadow:0 12px 30px rgba(0,0,0,.24);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#0f0c09;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.app{width:min(100%,430px);min-height:100vh;margin:auto;background:linear-gradient(180deg,#21180f,#17120d);padding-bottom:82px;position:relative;overflow-x:hidden}
+.top{
+  position:sticky;top:0;z-index:40;height:86px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 18px 12px;background:rgba(24,19,14,.96);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line2)
+}
+.brand{font:700 29px Georgia,serif;letter-spacing:.02em}
+.brand small{display:block;font:500 10px/1.4 system-ui;color:var(--muted);margin-top:4px;letter-spacing:0}
+.top-actions{display:flex;gap:8px}
+.iconBtn,.pillBtn{
+  border:1px solid var(--line2);background:rgba(255,255,255,.06);color:var(--ink);
+  border-radius:999px;height:42px;min-width:42px;padding:0 13px;font-weight:800
+}
+.pillBtn.primary{background:var(--olive);border-color:var(--olive)}
+.page{display:none;padding:0 14px 24px}.page.active{display:block}
+.card{
+  background:linear-gradient(180deg,rgba(55,43,32,.84),rgba(37,29,22,.92));
+  border:1px solid rgba(214,191,160,.18);border-radius:25px;box-shadow:var(--shadow)
+}
+.hero{padding:18px;margin-top:10px}
+.kicker{font-size:10px;letter-spacing:.18em;color:var(--gold);font-weight:900}
+.hero h1{font:600 31px/1.35 Georgia,"Noto Serif KR",serif;margin:10px 0 10px}
+.hero p{margin:0;color:var(--muted);line-height:1.7;font-size:13px}
+.primary{
+  border:0;background:var(--olive);color:#fff;border-radius:17px;padding:13px 16px;font-weight:900
+}
+.secondary{
+  border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink);
+  border-radius:15px;padding:11px 14px;font-weight:800
+}
+.wide{width:100%}
+.quick{
+  margin-top:14px;padding:14px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center
+}
+.quick b{font-size:16px}.quick small{display:block;color:var(--muted);margin-top:4px;line-height:1.5}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:12px 0}
+.stat{background:var(--soft);color:#3b3026;border-radius:21px;text-align:center;padding:14px 6px}
+.stat b{display:block;font-size:23px}.stat small{font-size:10px;color:#786856}
+.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.home-tile{min-height:148px;padding:16px}
+.home-tile .ico{font-size:25px;opacity:.9}.home-tile h3{font:600 22px/1.25 Georgia,"Noto Serif KR",serif;margin:12px 0 8px}
+.home-tile p{margin:0;color:var(--muted);font-size:12px;line-height:1.65}
+.section{margin-top:16px}
+.section-title{display:flex;justify-content:space-between;align-items:end;margin:0 4px 9px}
+.section-title b{font-size:16px}.section-title small{color:var(--muted);font-size:10px}
+.screenHead{display:flex;align-items:center;justify-content:space-between;padding:12px 2px 8px}
+.screenHead h2{margin:0;font-size:19px}
+.back{border:0;background:transparent;color:var(--ink);font-size:27px;padding:0 4px}
+.form{padding:14px}
+label{display:block;color:var(--muted);font-size:11px;font-weight:800;margin:8px 0}
+input,textarea,select{
+  width:100%;margin-top:5px;border:1px solid rgba(214,191,160,.18);
+  background:#f7f1e8;color:#332b23;border-radius:14px;padding:11px 12px;outline:none
+}
+textarea{min-height:84px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{
+  border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--muted);
+  border-radius:999px;padding:8px 11px;font-size:11px
+}
+.chip.active{background:var(--soft);color:#3c3025;border-color:var(--soft)}
+.calendar{padding:12px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-head b{font-size:17px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.dow{text-align:center;font-size:9px;color:var(--muted);padding:4px 0}
+.day{
+  aspect-ratio:1;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);
+  color:var(--ink);border-radius:11px;font-size:10px;position:relative
+}
+.day.empty{visibility:hidden}.day.has::after{
+  content:"";position:absolute;width:5px;height:5px;border-radius:50%;background:var(--gold);bottom:5px;left:50%;transform:translateX(-50%)
+}
+.day.today{outline:2px solid var(--olive2)}
+.timeline{display:grid;gap:9px}
+.entry{padding:13px}
+.entry-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.entry b{font-size:13px}.entry small{display:block;color:var(--muted);font-size:10px;margin-top:4px;line-height:1.5}
+.entry .noteText{margin-top:9px;color:#e7d9c6;font-size:12px;line-height:1.6}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.badge{border-radius:999px;padding:5px 8px;font-size:9px;background:rgba(255,255,255,.07);color:#e9dcc9}
+.badge.ok{background:#53642e;color:#fff}.badge.share{background:#6f5640;color:#fff}
+.miniActions{display:flex;gap:7px;margin-top:10px}
+.miniActions button{padding:8px 10px;border-radius:11px;font-size:10px}
+.map-card{padding:14px;overflow:hidden}
+.fake-map{
+  height:240px;border-radius:20px;position:relative;overflow:hidden;
+  background:
+    radial-gradient(circle at 22% 35%,rgba(111,143,94,.92) 0 6%,transparent 7%),
+    radial-gradient(circle at 66% 54%,rgba(133,159,109,.9) 0 5%,transparent 6%),
+    radial-gradient(circle at 74% 24%,rgba(98,126,78,.8) 0 4%,transparent 5%),
+    linear-gradient(155deg,#e6dfcf 0 35%,#bcd3cc 35% 38%,#d8d1bd 38% 62%,#bdd5cf 62% 65%,#dfd8c6 65%)
+}
+.pin{position:absolute;width:30px;height:30px;border-radius:50% 50% 50% 0;background:var(--olive);transform:rotate(-45deg);box-shadow:0 3px 8px rgba(0,0,0,.2)}
+.pin:after{content:"";position:absolute;width:8px;height:8px;background:#fff;border-radius:50%;left:11px;top:11px}
+.pin span{display:none}
+.journey-list{display:grid;gap:8px;margin-top:10px}
+.place-card{padding:12px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.place-card b{font-size:13px}.place-card small{display:block;color:var(--muted);margin-top:4px;font-size:10px}
+.progress{height:10px;background:rgba(255,255,255,.07);border-radius:999px;overflow:hidden}
+.progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--olive),var(--gold));width:0}
+.relaygrid{display:grid;grid-template-columns:repeat(9,1fr);gap:5px;margin-top:11px}
+.rnum{
+  aspect-ratio:1;border-radius:50%;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);
+  color:#9d8e7b;font-size:7px
+}
+.rnum.done{background:#6b573d;color:#f8ecd9;font-weight:900}.rnum.mine{background:var(--olive);color:white}
+.campaign{padding:15px}.campaign h3{margin:8px 0 8px;font-size:18px}.campaign p{margin:0;color:var(--muted);font-size:12px;line-height:1.6}
+.connect-card{padding:14px;display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center}
+.avatar-dot{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#cfad7f,#8b6b48);display:grid;place-items:center;font-size:22px}
+.connect-card b{font-size:13px}.connect-card small{display:block;color:var(--muted);margin-top:3px;font-size:10px}
+.connect-card button{padding:9px 12px;border-radius:12px;font-size:10px}
+.bottom{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,430px);
+  display:grid;grid-template-columns:repeat(5,1fr);background:rgba(22,17,12,.97);
+  border-top:1px solid rgba(255,255,255,.06);backdrop-filter:blur(12px);z-index:50;
+  padding-bottom:max(5px,env(safe-area-inset-bottom))
+}
+.bottom button{border:0;background:transparent;color:#d6c8b7;padding:10px 2px 11px;font-size:10px}
+.bottom button i{display:block;font-style:normal;font-size:20px;line-height:1.15;margin-bottom:2px}
+.bottom button.active{color:#b6cf58;font-weight:900}
+.sheet{
+  position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:100;display:none;align-items:flex-end;justify-content:center
+}
+.sheet.open{display:flex}
+.sheet-panel{
+  width:min(100%,430px);max-height:88vh;overflow:auto;background:#1e1711;border-radius:26px 26px 0 0;
+  border:1px solid rgba(255,255,255,.08);padding:16px 16px 28px
+}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#1e1711;z-index:3;padding-bottom:10px}
+.sheet-head h3{margin:0}.close{border:0;background:rgba(255,255,255,.07);color:white;width:36px;height:36px;border-radius:50%;font-size:20px}
+.verify-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:10px 0}
+.verify-tabs button{border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);border-radius:13px;padding:10px 4px;font-size:10px}
+.verify-tabs button.active{background:var(--soft);color:#352b22}
+.verify-pane{display:none}.verify-pane.active{display:block}
+.timerCircle{width:130px;height:130px;border-radius:50%;border:8px solid rgba(255,255,255,.08);display:grid;place-items:center;margin:16px auto;font-size:27px;font-weight:900}
+.photoPreview{width:100%;max-height:220px;object-fit:cover;border-radius:16px;margin-top:10px;display:none}
+.empty{padding:18px;text-align:center;color:var(--muted);font-size:11px}
+.book-card{padding:14px;background:linear-gradient(145deg,#4a3728,#2a2119)}
+.book-card h3{font:600 23px Georgia,"Noto Serif KR",serif;margin:6px 0}
+.book-card p{font-size:11px;color:#d8c9b6;line-height:1.6;margin:0 0 10px}
+.small-note{font-size:9px;color:var(--muted);line-height:1.5}
+@media(max-width:360px){.hero h1{font-size:28px}.home-tile h3{font-size:20px}.relaygrid{grid-template-columns:repeat(8,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand">YOGIBARA<small>수련은, 나에게서 끝나지 않는다.</small></div>
+  <div class="top-actions">
+    <button class="iconBtn" id="openBook">책</button>
+    <button class="pillBtn primary" id="topRecord">기록</button>
+  </div>
+</header>
+
+<main>
+<section class="page active" id="home">
+  <div class="hero card">
+    <div class="kicker">TODAY · PRACTICE · SHARE · PEACE</div>
+    <h1>오늘의 수련이<br>하나의 결이 됩니다.</h1>
+    <p>한 번의 수련 기록이 나의 다이어리에 남고, 장소의 여정이 되고, 사람과 연결되고, 나눔으로 이어집니다.</p>
+    <button class="primary wide" id="homeRecord" style="margin-top:14px">오늘의 수련 기록하기</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b id="homePractice">0</b><small>이번 달 수련</small></div>
+    <div class="stat"><b id="homeJourney">0</b><small>머문 장소</small></div>
+    <div class="stat"><b id="homeShare">0</b><small>나눔 참여</small></div>
+  </div>
+
+  <div class="campaign card" style="margin-bottom:10px">
+    <div class="kicker">지금 함께하는 나눔</div>
+    <h3>108인의 수리야 수련</h3>
+    <p>수련을 먼저 인증한 뒤 릴레이를 이어주세요. 수련은 나에게서 끝나지 않습니다.</p>
+    <div class="progress" style="margin-top:12px"><i id="homeProgress"></i></div>
+    <div class="small-note" style="margin-top:7px"><span id="homeRelayCount">37</span> / 108</div>
+  </div>
+
+  <div class="home-grid">
+    <button class="home-tile card" data-go="practice" style="text-align:left;color:inherit;border:1px solid rgba(214,191,160,.18)">
+      <div class="ico">◌</div><h3>수련일기</h3><p>달력과 일기로 매일의 수련을 차곡히 기록합니다.</p>
+    </button>
+    <button class="home-tile card" data-go="journey" style="text-align:left;color:inherit;border:1px solid rgba(214,191,160,.18)">
+      <div class="ico">⌖</div><h3>나의 여정</h3><p>수련이 머문 장소와 제주에서의 이동을 이어갑니다.</p>
+    </button>
+    <button class="home-tile card" data-go="share" style="text-align:left;color:inherit;border:1px solid rgba(214,191,160,.18)">
+      <div class="ico">♡</div><h3>나눔 기록</h3><p>인증된 수련으로 릴레이를 잇고 나눔의 흔적을 남깁니다.</p>
+    </button>
+    <button class="home-tile card" data-go="connect" style="text-align:left;color:inherit;border:1px solid rgba(214,191,160,.18)">
+      <div class="ico">∞</div><h3>연결</h3><p>같은 공간과 같은 수련을 지나온 사람과 연을 맺습니다.</p>
+    </button>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><b>최근 기록</b><small id="recentCount">0개</small></div>
+    <div id="recentList" class="timeline"></div>
+  </div>
+</section>
+
+<section class="page" id="practice">
+  <div class="screenHead"><button class="back" data-go="home">‹</button><h2>수련일기</h2><button class="pillBtn primary" id="practiceRecord">기록</button></div>
+
+  <div class="calendar card">
+    <div class="cal-head"><button class="iconBtn" id="prevMonth">‹</button><b id="calTitle"></b><button class="iconBtn" id="nextMonth">›</button></div>
+    <div class="cal-grid" id="calendarGrid"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><b>수련 기록</b><small id="practiceTotal">0개</small></div>
+    <div id="practiceList" class="timeline"></div>
+  </div>
+</section>
+
+<section class="page" id="journey">
+  <div class="screenHead"><button class="back" data-go="home">‹</button><h2>나의 여정</h2><button class="pillBtn" onclick="location.href='./index.html'">제주 지도</button></div>
+  <div class="map-card card">
+    <div class="kicker">MY PRACTICE JOURNEY</div>
+    <h3 style="margin:8px 0 10px">수련이 머문 장소</h3>
+    <div class="fake-map" id="journeyMap"></div>
+    <button class="primary wide" onclick="location.href='./index.html'" style="margin-top:12px">YOGIBARA 제주 지도 열기</button>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><b>나의 장소</b><small id="placeCount">0곳</small></div>
+    <div id="journeyList" class="journey-list"></div>
+  </div>
+</section>
+
+<section class="page" id="share">
+  <div class="screenHead"><button class="back" data-go="home">‹</button><h2>나눔 기록</h2><span></span></div>
+  <div class="campaign card">
+    <div class="kicker">108 RELAY</div>
+    <h3>108인의 수리야 수련</h3>
+    <p>수련을 기록하고 인증한 사람만 다음 번호를 이어갈 수 있습니다.</p>
+    <div class="progress" style="margin-top:12px"><i id="shareProgress"></i></div>
+    <div class="small-note" style="margin-top:7px"><span id="shareRelayCount">37</span> / 108</div>
+    <div class="relaygrid" id="relayGrid"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><b>릴레이에 연결 가능한 수련</b><small>인증 완료</small></div>
+    <div id="eligibleList" class="timeline"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><b>나의 나눔 기록</b><small id="shareHistoryCount">0개</small></div>
+    <div id="shareHistory" class="timeline"></div>
+  </div>
+</section>
+
+<section class="page" id="connect">
+  <div class="screenHead"><button class="back" data-go="home">‹</button><h2>연결</h2><span></span></div>
+  <div class="card" style="padding:14px;margin-bottom:10px">
+    <div class="kicker">연 맺기</div>
+    <h3 style="margin:8px 0 6px">같은 수련을 지나온 사람</h3>
+    <p style="margin:0;color:var(--muted);font-size:12px;line-height:1.6">팔로워 수 대신 같은 공간, 같은 릴레이, 같은 수련의 흔적으로 연결합니다.</p>
+  </div>
+  <div id="connectList" class="timeline"></div>
+</section>
+</main>
+
+<nav class="bottom">
+  <button class="active" data-go="home"><i>⌂</i>홈</button>
+  <button data-go="practice"><i>◌</i>수련</button>
+  <button data-go="journey"><i>⌖</i>여정</button>
+  <button data-go="share"><i>♡</i>나눔</button>
+  <button data-go="connect"><i>∞</i>연결</button>
+</nav>
+</div>
+
+<!-- 기록 sheet -->
+<div class="sheet" id="recordSheet"><div class="sheet-panel">
+  <div class="sheet-head"><h3>오늘의 수련 기록</h3><button class="close" data-close="recordSheet">×</button></div>
+  <div class="form card" style="box-shadow:none">
+    <div class="row">
+      <label>수련 종류
+        <select id="recType">
+          <option>하타요가</option><option>빈야사</option><option>아쉬탕가</option><option>명상</option><option>호흡</option><option>걷기</option><option>마음공부</option>
+        </select>
+      </label>
+      <label>시간(분)<input id="recMin" type="number" value="60" min="1"></label>
+    </div>
+    <label>날짜<input id="recDate" type="date"></label>
+    <label>장소<input id="recPlace" placeholder="집, 요가원, 바다, 오름…"></label>
+    <label>몸의 느낌<input id="recBody" placeholder="가벼움, 뻐근함, 편안함…"></label>
+    <label>마음 한 줄<textarea id="recNote" placeholder="수련 후 마음에 남은 것을 짧게 적어보세요."></textarea></label>
+    <button class="primary wide" id="savePracticeBtn">수련 기록 저장</button>
+  </div>
+</div></div>
+
+<!-- 인증 sheet -->
+<div class="sheet" id="verifySheet"><div class="sheet-panel">
+  <div class="sheet-head"><h3>수련 인증</h3><button class="close" data-close="verifySheet">×</button></div>
+  <div class="small-note">인증 완료된 수련만 108 릴레이에 사용할 수 있습니다.</div>
+  <div class="verify-tabs">
+    <button class="active" data-vtab="code">파트너 코드</button>
+    <button data-vtab="photo">사진 인증</button>
+    <button data-vtab="timer">타이머</button>
+  </div>
+  <div class="verify-pane active" data-vpane="code">
+    <label>파트너 인증 코드<input id="partnerCode" inputmode="numeric" placeholder="프로토타입 코드 1080"></label>
+    <button class="primary wide" id="verifyCodeBtn">코드로 인증</button>
+  </div>
+  <div class="verify-pane" data-vpane="photo">
+    <label>수련 사진<input id="photoInput" type="file" accept="image/*"></label>
+    <img id="photoPreview" class="photoPreview" alt="">
+    <button class="primary wide" id="verifyPhotoBtn" style="margin-top:10px">사진으로 인증</button>
+  </div>
+  <div class="verify-pane" data-vpane="timer">
+    <div class="timerCircle" id="timerCircle">10</div>
+    <button class="primary wide" id="timerBtn">10초 인증 시작</button>
+  </div>
+</div></div>
+
+<!-- 수련책 sheet -->
+<div class="sheet" id="bookSheet"><div class="sheet-panel">
+  <div class="sheet-head"><h3>나의 수련책</h3><button class="close" data-close="bookSheet">×</button></div>
+  <div class="book-card card">
+    <div class="kicker">MY PRACTICE BOOK</div>
+    <h3>나의 수련 2026</h3>
+    <p>수련일기, 머문 장소, 나눔 기록을 한 권으로 묶는 기능입니다. 지금은 미리보기만 두고 나중에 PDF·실물책 주문으로 확장할 수 있습니다.</p>
+    <div class="stats" style="margin-bottom:0">
+      <div class="stat"><b id="bookPractice">0</b><small>수련</small></div>
+      <div class="stat"><b id="bookJourney">0</b><small>장소</small></div>
+      <div class="stat"><b id="bookShare">0</b><small>나눔</small></div>
+    </div>
+  </div>
+</div></div>
+
+<script>
+const KEY='yogibara_v14';
+const DEMO_RELAY=37;
+const defaults={
+  practices:[],
+  shares:[],
+  connections:{},
+  calendarYear:(new Date()).getFullYear(),
+  calendarMonth:(new Date()).getMonth()
+};
+let state={...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')};
+if(!Array.isArray(state.practices))state.practices=[];
+if(!Array.isArray(state.shares))state.shares=[];
+if(!state.connections||typeof state.connections!=='object')state.connections={};
+
+const connectPeople=[
+  {id:'baram',name:'바람요기',meta:'호흡 · 걷기',reason:'같은 릴레이에 참여했어요.'},
+  {id:'sumi',name:'숨요기',meta:'하타요가 · 명상',reason:'같은 공간에서 수련했어요.'},
+  {id:'jeju',name:'제주요기',meta:'빈야사 · 여행',reason:'비슷한 장소의 여정을 지나왔어요.'},
+  {id:'hari',name:'하리요기',meta:'아쉬탕가 · 마음공부',reason:'최근 나눔 캠페인에서 만났어요.'}
+];
+
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function escapeHtml(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function todayISO(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function currentMonthPractices(){
+  const now=new Date();return state.practices.filter(p=>{const d=new Date(p.date+'T12:00:00');return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()})
+}
+function uniquePlaces(){return [...new Set(state.practices.map(p=>p.place.trim()).filter(Boolean))]}
+function relayCount(){return DEMO_RELAY+state.shares.length}
+
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));
+  document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.go===id));
+  renderAll();
+  window.scrollTo({top:0,behavior:'instant'});
+}
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+
+function openSheet(id){document.getElementById(id).classList.add('open')}
+function closeSheet(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeSheet(b.dataset.close));
+document.querySelectorAll('.sheet').forEach(s=>s.addEventListener('click',e=>{if(e.target===s)s.classList.remove('open')}));
+
+function openRecord(){
+  recDate.value=todayISO();
+  recType.value='하타요가';recMin.value=60;recPlace.value='';recBody.value='';recNote.value='';
+  openSheet('recordSheet');
+}
+topRecord.onclick=openRecord;homeRecord.onclick=openRecord;practiceRecord.onclick=openRecord;
+openBook.onclick=()=>{renderBook();openSheet('bookSheet')};
+
+savePracticeBtn.onclick=()=>{
+  const p={
+    id:Date.now(),
+    type:recType.value,
+    min:Math.max(1,Number(recMin.value)||60),
+    date:recDate.value||todayISO(),
+    place:recPlace.value.trim(),
+    body:recBody.value.trim(),
+    note:recNote.value.trim(),
+    verified:false,
+    verifyMethod:'',
+    photo:'',
+    used:false
+  };
+  state.practices.push(p);save();closeSheet('recordSheet');renderAll();go('practice');
+};
+
+function renderHome(){
+  homePractice.textContent=currentMonthPractices().length;
+  homeJourney.textContent=uniquePlaces().length;
+  homeShare.textContent=state.shares.length;
+  const rc=relayCount();
+  homeRelayCount.textContent=rc;homeProgress.style.width=Math.min(100,rc/108*100)+'%';
+  const rec=state.practices.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id).slice(0,3);
+  recentCount.textContent=state.practices.length+'개';
+  recentList.innerHTML=rec.length?rec.map(entryHtml).join(''):`<div class="empty card">아직 수련 기록이 없습니다.<br>오늘의 수련을 먼저 남겨보세요.</div>`;
+}
+function entryHtml(p){
+  return `<div class="entry card">
+    <div class="entry-head"><div><b>${escapeHtml(p.type)} · ${p.min}분</b><small>${escapeHtml(p.date)}${p.place?' · '+escapeHtml(p.place):''}</small></div>
+      <span class="badge ${p.verified?'ok':''}">${p.verified?'인증 완료':'미인증'}</span></div>
+    ${p.body?`<div class="badges"><span class="badge">몸 · ${escapeHtml(p.body)}</span></div>`:''}
+    ${p.note?`<div class="noteText">${escapeHtml(p.note)}</div>`:''}
+    <div class="miniActions">
+      ${!p.verified?`<button class="secondary" onclick="openVerify(${p.id})">수련 인증</button>`:''}
+      ${p.verified&&!p.used?`<button class="secondary" onclick="go('share')">릴레이 연결</button>`:''}
+    </div>
+  </div>`;
+}
+
+function renderCalendar(){
+  const y=state.calendarYear,m=state.calendarMonth;
+  calTitle.textContent=`${y}년 ${m+1}월`;
+  const first=new Date(y,m,1),last=new Date(y,m+1,0);
+  const dows=['일','월','화','수','목','금','토'];
+  const rows=[];
+  dows.forEach(d=>rows.push(`<div class="dow">${d}</div>`));
+  for(let i=0;i<first.getDay();i++)rows.push(`<button class="day empty"></button>`);
+  for(let day=1;day<=last.getDate();day++){
+    const iso=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const has=state.practices.some(p=>p.date===iso);
+    const today=iso===todayISO();
+    rows.push(`<button class="day ${has?'has':''} ${today?'today':''}" onclick="filterByDate('${iso}')">${day}</button>`);
+  }
+  calendarGrid.innerHTML=rows.join('');
+}
+prevMonth.onclick=()=>{state.calendarMonth--;if(state.calendarMonth<0){state.calendarMonth=11;state.calendarYear--}save();renderCalendar()}
+nextMonth.onclick=()=>{state.calendarMonth++;if(state.calendarMonth>11){state.calendarMonth=0;state.calendarYear++}save();renderCalendar()}
+window.filterByDate=(iso)=>{
+  const found=state.practices.filter(p=>p.date===iso).sort((a,b)=>b.id-a.id);
+  practiceList.innerHTML=found.length?found.map(entryHtml).join(''):`<div class="empty card">${iso}에는 기록이 없습니다.</div>`;
+};
+
+function renderPractice(){
+  renderCalendar();
+  practiceTotal.textContent=state.practices.length+'개';
+  const list=state.practices.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+  practiceList.innerHTML=list.length?list.map(entryHtml).join(''):`<div class="empty card">아직 수련일기가 없습니다.</div>`;
+}
+
+let verifyTarget=null,timerHandle=null,photoData='';
+window.openVerify=(id)=>{
+  verifyTarget=id;partnerCode.value='';photoInput.value='';photoPreview.style.display='none';photoPreview.src='';photoData='';
+  document.querySelectorAll('[data-vtab]').forEach((b,i)=>b.classList.toggle('active',i===0));
+  document.querySelectorAll('[data-vpane]').forEach((p,i)=>p.classList.toggle('active',i===0));
+  timerCircle.textContent='10';timerBtn.disabled=false;timerBtn.textContent='10초 인증 시작';
+  openSheet('verifySheet');
+};
+document.querySelectorAll('[data-vtab]').forEach(b=>b.onclick=()=>{
+  const t=b.dataset.vtab;
+  document.querySelectorAll('[data-vtab]').forEach(x=>x.classList.toggle('active',x===b));
+  document.querySelectorAll('[data-vpane]').forEach(p=>p.classList.toggle('active',p.dataset.vpane===t));
+});
+function finishVerify(method,photo=''){
+  const p=state.practices.find(x=>x.id===verifyTarget);if(!p)return;
+  p.verified=true;p.verifyMethod=method;p.photo=photo;save();closeSheet('verifySheet');renderAll();
+}
+verifyCodeBtn.onclick=()=>{if(partnerCode.value.trim()!=='1080')return alert('프로토타입 코드가 맞지 않습니다.');finishVerify('파트너 코드')};
+photoInput.onchange=e=>{
+  const f=e.target.files?.[0];if(!f)return;
+  const reader=new FileReader();reader.onload=ev=>{photoData=ev.target.result;photoPreview.src=photoData;photoPreview.style.display='block'};reader.readAsDataURL(f);
+};
+verifyPhotoBtn.onclick=()=>{if(!photoData)return alert('사진을 먼저 선택해주세요.');finishVerify('사진 인증',photoData)};
+timerBtn.onclick=()=>{
+  if(timerHandle)return;
+  let left=10;timerBtn.disabled=true;timerBtn.textContent='인증 중…';timerCircle.textContent=left;
+  timerHandle=setInterval(()=>{left--;timerCircle.textContent=left;if(left<=0){clearInterval(timerHandle);timerHandle=null;finishVerify('타이머 인증')}},1000);
+};
+
+function renderJourney(){
+  const places=uniquePlaces();
+  placeCount.textContent=places.length+'곳';
+  journeyMap.innerHTML='';
+  places.slice(0,6).forEach((p,i)=>{
+    const pin=document.createElement('div');pin.className='pin';
+    const pos=[[18,64],[48,28],[66,55],[74,18],[30,25],[54,72]][i%6];
+    pin.style.left=pos[0]+'%';pin.style.top=pos[1]+'%';journeyMap.appendChild(pin);
+  });
+  journeyList.innerHTML=places.length?places.map(place=>{
+    const ps=state.practices.filter(p=>p.place===place);
+    const last=ps.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];
+    return `<div class="place-card card"><div><b>${escapeHtml(place)}</b><small>${ps.length}번의 수련 · 최근 ${escapeHtml(last.date)}</small></div><span class="badge">${[...new Set(ps.map(x=>x.type))].length}종</span></div>`;
+  }).join(''):`<div class="empty card">수련 기록에 장소를 적으면 여정에 자동으로 쌓입니다.</div>`;
+}
+
+function renderShare(){
+  const count=relayCount();
+  shareRelayCount.textContent=count;shareProgress.style.width=Math.min(100,count/108*100)+'%';
+  const mine=new Set(state.shares.map(x=>x.number));
+  relayGrid.innerHTML=Array.from({length:108},(_,i)=>{
+    const n=i+1,done=n<=count;
+    return `<button class="rnum ${done?'done':''} ${mine.has(n)?'mine':''}" ${mine.has(n)?`onclick="showShare(${n})"`:''}>${String(n).padStart(3,'0')}</button>`;
+  }).join('');
+  const eligible=state.practices.filter(p=>p.verified&&!p.used);
+  eligibleList.innerHTML=eligible.length?eligible.map(p=>`<div class="entry card">
+    <b>${escapeHtml(p.type)} · ${p.min}분</b><small>${escapeHtml(p.date)}${p.place?' · '+escapeHtml(p.place):''}</small>
+    <div class="badges"><span class="badge ok">${escapeHtml(p.verifyMethod)}</span></div>
+    <button class="primary wide" style="margin-top:10px" onclick="joinRelay(${p.id})">이 수련으로 릴레이 잇기</button>
+  </div>`).join(''):`<div class="empty card">인증 완료 후 아직 사용하지 않은 수련이 없습니다.</div>`;
+  shareHistoryCount.textContent=state.shares.length+'개';
+  shareHistory.innerHTML=state.shares.length?state.shares.slice().reverse().map(s=>`<div class="entry card"><b>${s.number}번째 릴레이</b><small>${escapeHtml(s.date)} · ${escapeHtml(s.type)} ${s.min}분</small><div class="badges"><span class="badge share">나눔에 연결됨</span></div></div>`).join(''):`<div class="empty card">아직 나눔 기록이 없습니다.</div>`;
+}
+window.joinRelay=(id)=>{
+  const p=state.practices.find(x=>x.id===id);if(!p||!p.verified||p.used)return;
+  const number=relayCount()+1;if(number>108)return alert('108 릴레이가 모두 채워졌습니다.');
+  p.used=true;state.shares.push({number,id:p.id,type:p.type,min:p.min,date:p.date,place:p.place,verifyMethod:p.verifyMethod});save();renderAll();
+};
+window.showShare=(num)=>{
+  const s=state.shares.find(x=>x.number===num);if(!s)return;
+  alert(`${num}번째 릴레이\n${s.type} ${s.min}분\n${s.date}${s.place?'\n'+s.place:''}`);
+};
+
+function renderConnect(){
+  connectList.innerHTML=connectPeople.map((p,i)=>{
+    const on=!!state.connections[p.id];
+    return `<div class="connect-card card"><div class="avatar-dot">${['☼','◌','⌖','♡'][i%4]}</div><div><b>${p.name}</b><small>${p.meta}<br>${p.reason}</small></div><button class="${on?'secondary':'primary'}" onclick="toggleConnect('${p.id}')">${on?'연결됨':'연 맺기'}</button></div>`;
+  }).join('');
+}
+window.toggleConnect=id=>{state.connections[id]=!state.connections[id];save();renderConnect()};
+
+function renderBook(){
+  bookPractice.textContent=state.practices.length;
+  bookJourney.textContent=uniquePlaces().length;
+  bookShare.textContent=state.shares.length;
+}
+function renderAll(){renderHome();renderPractice();renderJourney();renderShare();renderConnect();renderBook();save()}
+renderAll();
+</script>
+</body>
+</html>

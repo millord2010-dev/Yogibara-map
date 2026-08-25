@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17120d">
+<title>YOGIBARA V18</title>
+<style>
+:root{
+  --bg:#17120d;--bg2:#201810;--panel:#261d15;--panel2:#30251b;
+  --soft:#f4ecdf;--ink:#f7efe5;--muted:#c2b29e;--line:rgba(255,255,255,.08);
+  --olive:#7b8a34;--olive2:#98aa4d;--gold:#c99b5a;--terr:#c47761;--blue:#789aa3;
+  --shadow:0 12px 30px rgba(0,0,0,.23);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#0f0c09;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+.app{width:min(100%,430px);min-height:100vh;margin:auto;background:linear-gradient(180deg,var(--bg2),var(--bg));padding-bottom:84px;position:relative;overflow-x:hidden}
+.top{height:82px;position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;padding:16px 17px 11px;background:rgba(23,18,13,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.brand{font:700 28px Georgia,serif}.brand small{display:block;font:500 10px system-ui;color:var(--muted);margin-top:4px}
+.topActions{display:flex;gap:8px}
+.round,.pill{border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink);border-radius:999px;height:40px}
+.round{width:40px}.pill{padding:0 14px;font-weight:800}.pill.primary{background:var(--olive);border-color:var(--olive)}
+.page{display:none;padding:0 14px 24px}.page.active{display:block}
+.card{background:linear-gradient(180deg,rgba(60,46,33,.82),rgba(37,29,22,.92));border:1px solid rgba(215,191,159,.17);border-radius:24px;box-shadow:var(--shadow)}
+.hero{padding:18px;margin-top:10px}.kicker{font-size:10px;letter-spacing:.16em;color:var(--gold);font-weight:900}
+.hero h1{font:600 30px/1.35 Georgia,"Noto Serif KR",serif;margin:9px 0}.hero p{margin:0;color:var(--muted);font-size:13px;line-height:1.7}
+.bigRecord{margin-top:14px;width:100%;border:0;background:var(--olive);color:#fff;border-radius:18px;padding:15px 16px;font-weight:900;font-size:15px}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:11px 0}
+.sum{background:var(--soft);color:#3a3027;border-radius:18px;text-align:center;padding:12px 3px}.sum b{display:block;font-size:18px}.sum small{font-size:8px;color:#746655}
+.insight{padding:14px;margin-bottom:10px}.insight h3{margin:7px 0 5px;font-size:18px}.insight p{margin:0;color:var(--muted);font-size:11px;line-height:1.6}
+.quickGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.quickBtn{border:1px solid var(--line);background:rgba(255,255,255,.045);color:var(--ink);border-radius:20px;min-height:118px;text-align:left;padding:14px}
+.quickBtn i{display:block;font-style:normal;font-size:24px}.quickBtn b{display:block;margin-top:10px;font-size:14px}.quickBtn small{display:block;color:var(--muted);font-size:10px;line-height:1.5;margin-top:4px}
+.section{margin-top:16px}.sectionTitle{display:flex;justify-content:space-between;align-items:end;margin:0 4px 9px}.sectionTitle b{font-size:16px}.sectionTitle small{font-size:10px;color:var(--muted)}
+.entry{padding:13px;margin-bottom:8px}.entryTop{display:flex;justify-content:space-between;gap:10px}.entry b{font-size:13px}.entry small{display:block;color:var(--muted);font-size:10px;margin-top:3px}.entry p{margin:8px 0 0;font-size:12px;line-height:1.55;color:#eadcca}
+.tagRow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.tag{border-radius:999px;background:rgba(255,255,255,.07);padding:5px 8px;font-size:9px;color:#e7dac8}.tag.money{background:#705643}.tag.share{background:#53642e}.tag.place{background:#48636a}
+.screenHead{display:flex;align-items:center;justify-content:space-between;padding:12px 2px 8px}.screenHead h2{margin:0;font-size:19px}.back{border:0;background:transparent;color:var(--ink);font-size:27px}
+.filterRow{display:flex;gap:7px;overflow:auto;padding-bottom:4px}.filterBtn{white-space:nowrap;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);border-radius:999px;padding:8px 12px;font-size:10px}.filterBtn.active{background:var(--soft);color:#3b3025}
+.searchBox{padding:12px}.searchBox input{width:100%;border:1px solid rgba(255,255,255,.08);background:var(--soft);color:#362d24;border-radius:14px;padding:11px 12px}
+.spaceCard{padding:13px;margin-bottom:9px}.spaceTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.spaceCard h3{margin:0;font-size:16px}.spaceCard p{margin:5px 0 0;color:var(--muted);font-size:10px;line-height:1.55}.shareBadge{border-radius:999px;background:var(--olive);padding:5px 8px;font-size:9px;font-weight:900;color:#fff;white-space:nowrap}.normalBadge{border-radius:999px;background:rgba(255,255,255,.08);padding:5px 8px;font-size:9px;color:#ddd;white-space:nowrap}
+.spaceMeta{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.metaBox{background:rgba(255,255,255,.05);border-radius:14px;padding:9px}.metaBox b{font-size:12px}.metaBox small{display:block;color:var(--muted);font-size:9px;margin-top:3px}
+.mapStub{height:220px;border-radius:20px;position:relative;overflow:hidden;background:
+radial-gradient(circle at 20% 30%,rgba(111,143,94,.9) 0 4%,transparent 5%),
+radial-gradient(circle at 61% 49%,rgba(133,159,109,.9) 0 4%,transparent 5%),
+radial-gradient(circle at 78% 22%,rgba(98,126,78,.8) 0 3.5%,transparent 4.5%),
+linear-gradient(150deg,#e5ddca 0 36%,#bfd4cf 36% 39%,#d8cfbc 39% 64%,#bdd4cf 64% 67%,#ded6c3 67%)}
+.pin{position:absolute;width:28px;height:28px;border-radius:50% 50% 50% 0;background:var(--olive);transform:rotate(-45deg);box-shadow:0 3px 8px rgba(0,0,0,.18)}
+.pin:after{content:"";position:absolute;width:8px;height:8px;border-radius:50%;background:white;left:10px;top:10px}
+.profileHero{padding:16px}.handle{color:var(--gold);font-size:10px}.profileHero h2{font:600 28px Georgia,"Noto Serif KR",serif;margin:6px 0}.profileHero p{margin:0;color:var(--muted);font-size:12px;line-height:1.6}
+.profileStats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px}.pstat{background:rgba(255,255,255,.05);border-radius:14px;text-align:center;padding:10px 4px}.pstat b{display:block;font-size:17px}.pstat small{font-size:8px;color:var(--muted)}
+.connectCard{padding:13px;display:grid;grid-template-columns:46px 1fr auto;gap:10px;align-items:center;margin-bottom:8px}.avatar{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#d4af7e,#7c654c);font-size:20px}.connectCard b{font-size:12px}.connectCard small{display:block;color:var(--muted);font-size:9px;margin-top:3px}.connectCard button{border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);border-radius:12px;padding:8px 10px;font-size:9px}
+.guest{padding:12px;margin-bottom:7px}.guest b{font-size:11px}.guest small{display:block;color:var(--muted);font-size:9px;margin-top:3px}.guest p{margin:7px 0 0;font-size:11px;line-height:1.5}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,430px);display:grid;grid-template-columns:repeat(5,1fr);background:rgba(21,16,12,.97);border-top:1px solid var(--line);backdrop-filter:blur(12px);z-index:50;padding-bottom:max(5px,env(safe-area-inset-bottom))}
+.bottom button{border:0;background:transparent;color:#d5c7b6;padding:10px 2px 11px;font-size:10px}.bottom button i{display:block;font-style:normal;font-size:20px;line-height:1.1;margin-bottom:2px}.bottom button.active{color:#b8d05a;font-weight:900}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:100;display:none;align-items:flex-end;justify-content:center}.sheet.open{display:flex}.sheetPanel{width:min(100%,430px);max-height:90vh;overflow:auto;background:#1d1711;border-radius:26px 26px 0 0;border:1px solid var(--line);padding:16px 16px 28px}.sheetHead{display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#1d1711;padding-bottom:10px;z-index:2}.sheetHead h3{margin:0}.close{width:36px;height:36px;border:0;border-radius:50%;background:rgba(255,255,255,.07);color:#fff;font-size:20px}
+.typeGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.typeBtn{border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);border-radius:18px;padding:14px;text-align:left}.typeBtn i{font-style:normal;font-size:23px}.typeBtn b{display:block;margin-top:8px;font-size:13px}.typeBtn small{display:block;color:var(--muted);font-size:9px;line-height:1.45;margin-top:3px}
+.form{padding:13px}.form label{display:block;color:var(--muted);font-size:10px;font-weight:800;margin:8px 0}.form input,.form select,.form textarea{width:100%;margin-top:5px;border:1px solid rgba(255,255,255,.08);background:var(--soft);color:#342b22;border-radius:13px;padding:10px 11px}.form textarea{min-height:74px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.saveBtn{width:100%;border:0;border-radius:16px;padding:13px 14px;background:var(--olive);color:white;font-weight:900;margin-top:8px}
+.onboarding{position:fixed;inset:0;background:#17120d;z-index:200;display:none;align-items:center;justify-content:center;padding:22px}.onboarding.open{display:flex}.onCard{width:min(100%,390px);padding:20px}.onCard h1{font:600 31px Georgia,"Noto Serif KR",serif;margin:7px 0}.onCard p{color:var(--muted);font-size:12px;line-height:1.6;margin:0 0 14px}.interestGrid{display:flex;gap:7px;flex-wrap:wrap}.interest{border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);border-radius:999px;padding:8px 11px;font-size:10px}.interest.active{background:var(--soft);color:#3a3027}
+.empty{padding:17px;text-align:center;color:var(--muted);font-size:10px}
+.note{font-size:9px;color:var(--muted);line-height:1.55}
+
+.shareCard{
+  padding:16px;background:linear-gradient(145deg,#f2eadc,#dfd3bd);color:#3a3026;
+  border-radius:24px;box-shadow:var(--shadow);position:relative;overflow:hidden
+}
+.shareCard:before{
+  content:"";position:absolute;width:120px;height:120px;border-radius:50%;
+  background:rgba(123,138,52,.12);right:-35px;top:-35px
+}
+.shareCard .kicker{color:#7f6a49}.shareCard h3{font:600 22px/1.35 Georgia,"Noto Serif KR",serif;margin:8px 0}
+.shareCard p{margin:0;color:#6f6252;font-size:11px;line-height:1.65}
+.shareCard .cardMeta{margin-top:12px;font-size:10px;color:#776956}
+.cardActions{display:flex;gap:8px;margin-top:10px}.cardActions button{flex:1}
+.privateNote{font-size:9px;color:var(--muted);line-height:1.55;margin-top:5px}
+.ageHint{margin-top:9px;border-radius:15px;background:rgba(255,255,255,.05);padding:10px;font-size:10px;color:var(--muted);line-height:1.55}
+
+@media(max-width:360px){.summary{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand">YOGIBARA<small>수련은, 나에게서 끝나지 않는다.</small></div>
+  <div class="topActions">
+    <button class="round" id="profileBtn">나</button>
+    <button class="pill primary" id="topAddBtn">+ 기록</button>
+  </div>
+</header>
+
+<main>
+<section class="page active" id="home">
+  <div class="hero card">
+    <div class="kicker">MY YOGA LIFE</div>
+    <h1>내 요가생활을<br>가볍게 모아요.</h1>
+    <p>매일 쓰지 않아도 괜찮아요. 수련한 날, 요가복을 산 날, 새로운 공간에 간 날, 나눔에 참여한 날만 한 줄 남겨도 충분합니다.</p>
+    <button class="bigRecord" id="homeAddBtn">+ 오늘 뭐 남길까요?</button>
+  </div>
+
+  <div class="summary">
+    <div class="sum"><b id="sumPractice">0</b><small>수련</small></div>
+    <div class="sum"><b id="sumSpend">0</b><small>지출</small></div>
+    <div class="sum"><b id="sumPlaces">0</b><small>장소</small></div>
+    <div class="sum"><b id="sumShare">0</b><small>나눔</small></div>
+  </div>
+
+  <div id="insightCard" class="insight card"></div>
+
+  <div class="section">
+    <div class="sectionTitle"><b>빠르게 남기기</b><small>10초 기록</small></div>
+    <div class="quickGrid">
+      <button class="quickBtn" data-type="practice"><i>◌</i><b>수련했어요</b><small>종류 · 시간 · 장소만</small></button>
+      <button class="quickBtn" data-type="spend"><i>₩</i><b>요가에 썼어요</b><small>수련비 · 요가복 · 소품</small></button>
+      <button class="quickBtn" data-type="place"><i>⌖</i><b>새로운 곳에 갔어요</b><small>공간 하나만 남겨도 돼요</small></button>
+      <button class="quickBtn" data-type="share"><i>♡</i><b>나눔했어요</b><small>캠페인 · 나눔공간 이용</small></button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sectionTitle"><b>나의 YOGIBARA CARD</b><small>보여주기 좋은 기록</small></div>
+    <div id="homeShareCard"></div>
+  </div>
+
+  <div class="section">
+    <div class="sectionTitle"><b>최근 내 기록</b><small id="homeRecordCount">0개</small></div>
+    <div id="homeTimeline"></div>
+  </div>
+</section>
+
+<section class="page" id="record">
+  <div class="screenHead"><button class="back" data-go="home">‹</button><h2>내 기록</h2><button class="pill primary" id="recordAddBtn">+ 기록</button></div>
+  <div class="filterRow" id="recordFilters">
+    <button class="filterBtn active" data-filter="all">전체</button>
+    <button class="filterBtn" data-filter="practice">수련</button>
+    <button class="filterBtn" data-filter="spend">지출</button>
+    <button class="filterBtn" data-filter="place">장소</button>
+    <button class="filterBtn" data-filter="share">나눔</button>
+  </div>
+  <div class="section" id="recordTimeline"></div>
+</section>
+
+<section class="page" id="spaces">
+  <div class="screenHead"><button class="back" data-go="home">‹</button><h2>나눔공간</h2><button class="pill" onclick="location.href='./index.html'">제주 지도</button></div>
+  <div class="searchBox card"><input id="spaceSearch" placeholder="요가원 · 지역 검색"></div>
+  <div class="filterRow" id="regionFilters" style="margin:10px 0">
+    <button class="filterBtn active" data-region="all">전국</button>
+    <button class="filterBtn" data-region="서울">서울</button>
+    <button class="filterBtn" data-region="경기">경기</button>
+    <button class="filterBtn" data-region="부산">부산</button>
+    <button class="filterBtn" data-region="제주">제주</button>
+  </div>
+
+  <div class="card" style="padding:14px;margin-bottom:10px">
+    <div class="kicker">YOGIBARA SHARE SPACE</div>
+    <h3 style="margin:7px 0 5px">나눔이 가능한 공간을 전국으로</h3>
+    <p style="margin:0;color:var(--muted);font-size:11px;line-height:1.6">일반 요가원도 찾을 수 있지만, YOGIBARA SHARE PARTNER는 원데이 수련이 실제 나눔으로 연결되는 공간으로 따로 표시합니다.</p>
+  </div>
+
+  <div id="spaceList"></div>
+</section>
+
+<section class="page" id="journey">
+  <div class="screenHead"><button class="back" data-go="home">‹</button><h2>여정</h2><span></span></div>
+  <div class="card" style="padding:13px">
+    <div class="mapStub" id="journeyMap"></div>
+    <div class="note" style="margin-top:8px">같은 공간을 20번 가도 장소는 1곳, 방문 기록은 20회로 쌓입니다.</div>
+  </div>
+  <div class="section">
+    <div class="sectionTitle"><b>내가 머문 요가공간</b><small id="journeyCount">0곳</small></div>
+    <div id="journeyList"></div>
+  </div>
+</section>
+
+<section class="page" id="connect">
+  <div class="screenHead"><button class="back" data-go="home">‹</button><h2>연결</h2><span></span></div>
+  <div class="card" style="padding:14px;margin-bottom:10px">
+    <div class="kicker">연 맺기</div>
+    <h3 style="margin:7px 0 5px">같은 수련과 공간을 지나온 사람</h3>
+    <p style="margin:0;color:var(--muted);font-size:11px;line-height:1.6">연을 맺으면 상대의 작은 공간에 들어가 수련·여정·나눔을 보고 방명록을 남길 수 있습니다.</p>
+  </div>
+  <div id="connectList"></div>
+</section>
+
+<section class="page" id="my">
+  <div class="screenHead"><button class="back" data-go="home">‹</button><h2>나의 YOGIBARA</h2><span></span></div>
+  <div class="profileHero card">
+    <div class="handle" id="myHandle">@yogi</div>
+    <h2 id="myName">바라요기</h2>
+    <p id="myBio"></p>
+    <div class="ageHint" id="myAgeHint"></div>
+    <div class="profileStats">
+      <div class="pstat"><b id="myPractice">0</b><small>수련</small></div>
+      <div class="pstat"><b id="mySpend">0</b><small>지출기록</small></div>
+      <div class="pstat"><b id="myPlaces">0</b><small>장소</small></div>
+      <div class="pstat"><b id="myShare">0</b><small>나눔</small></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="sectionTitle"><b>내 요가생활 한눈에</b><small>자동 요약</small></div>
+    <div id="myInsights"></div>
+  </div>
+</section>
+
+<section class="page" id="person">
+  <div class="screenHead"><button class="back" onclick="go('connect')">‹</button><h2>YOGI 공간</h2><span></span></div>
+  <div class="profileHero card">
+    <div class="handle" id="personHandle">@baramyogi</div>
+    <h2 id="personName">바람요기</h2>
+    <p id="personBio"></p>
+    <div class="profileStats">
+      <div class="pstat"><b id="personPractice">126</b><small>수련</small></div>
+      <div class="pstat"><b id="personPlaces">9</b><small>장소</small></div>
+      <div class="pstat"><b id="personShare">7</b><small>나눔</small></div>
+      <div class="pstat"><b id="personGuest">0</b><small>방명록</small></div>
+    </div>
+    <button class="bigRecord" id="personConnectBtn">연 맺기</button>
+  </div>
+
+  <div class="section">
+    <div class="sectionTitle"><b>최근 수련</b><small>공개 기록</small></div>
+    <div id="personPracticeList"></div>
+  </div>
+
+  <div class="section">
+    <div class="sectionTitle"><b>방명록</b><small>연결 후 작성 가능</small></div>
+    <div class="card form" id="guestForm">
+      <label>한 줄 남기기<textarea id="guestText" placeholder="오늘 같은 공간에서 수련해서 반가웠어요."></textarea></label>
+      <button class="saveBtn" id="guestBtn">남기기</button>
+      <div class="note" id="guestHelp" style="margin-top:7px"></div>
+    </div>
+    <div id="guestList" style="margin-top:8px"></div>
+  </div>
+</section>
+</main>
+
+<nav class="bottom">
+  <button class="active" data-go="home"><i>⌂</i>홈</button>
+  <button data-go="record"><i>＋</i>기록</button>
+  <button data-go="spaces"><i>♡</i>나눔공간</button>
+  <button data-go="journey"><i>⌖</i>여정</button>
+  <button data-go="connect"><i>∞</i>연결</button>
+</nav>
+</div>
+
+<!-- 기록 선택 -->
+<div class="sheet" id="typeSheet"><div class="sheetPanel">
+  <div class="sheetHead"><h3>오늘 뭐 남길까요?</h3><button class="close" data-close="typeSheet">×</button></div>
+  <div class="typeGrid">
+    <button class="typeBtn" data-type="practice"><i>◌</i><b>수련했어요</b><small>종류 · 시간 · 장소</small></button>
+    <button class="typeBtn" data-type="spend"><i>₩</i><b>요가에 썼어요</b><small>요가복 · 수련비 · 소품</small></button>
+    <button class="typeBtn" data-type="place"><i>⌖</i><b>새로운 곳에 갔어요</b><small>공간만 남겨도 돼요</small></button>
+    <button class="typeBtn" data-type="share"><i>♡</i><b>나눔했어요</b><small>캠페인 · 나눔공간</small></button>
+  </div>
+</div></div>
+
+<!-- 기록 입력 -->
+<div class="sheet" id="entrySheet"><div class="sheetPanel">
+  <div class="sheetHead"><h3 id="entryTitle">기록하기</h3><button class="close" data-close="entrySheet">×</button></div>
+  <div class="form card">
+    <input id="entryType" type="hidden">
+    <label>날짜<input id="entryDate" type="date"></label>
+
+    <div id="practiceFields">
+      <div class="row">
+        <label>수련 종류<select id="practiceKind"><option>하타요가</option><option>빈야사</option><option>아쉬탕가</option><option>명상</option><option>호흡</option><option>걷기</option></select></label>
+        <label>시간(분)<input id="practiceMin" type="number" value="60" min="1"></label>
+      </div>
+      <label>장소<input id="practicePlace" placeholder="집, 아난드요가, 바다…"></label>
+      <label>한 줄만 남길까요? <span class="note">(선택)</span><textarea id="practiceNote" placeholder="오늘 몸이 가벼웠다."></textarea></label>
+    </div>
+
+    <div id="spendFields" style="display:none">
+      <div class="row">
+        <label>금액(원)<input id="spendAmount" type="number" value="30000" min="0" step="1000"></label>
+        <label>분류<select id="spendCategory"><option>수련비</option><option>요가복</option><option>매트·소품</option><option>워크숍</option><option>여행·숙소</option><option>기타</option></select></label>
+      </div>
+      <label>무엇에 썼나요?<input id="spendItem" placeholder="요가복, 월회비, 매트…"></label>
+      <label>메모 <span class="note">(선택)</span><textarea id="spendNote" placeholder="마음에 든 색, 산 곳 등"></textarea></label>
+    </div>
+
+    <div id="placeFields" style="display:none">
+      <label>장소 이름<input id="placeName" placeholder="요가원, 바다, 오름, 여행지…"></label>
+      <label>지역<input id="placeRegion" placeholder="서울 성수 / 제주 애월 / 부산 해운대…"></label>
+      <label>한 줄 <span class="note">(선택)</span><textarea id="placeNote" placeholder="다시 가고 싶은 곳이었다."></textarea></label>
+    </div>
+
+    <div id="shareFields" style="display:none">
+      <label>나눔 종류<select id="shareKind"><option>108 릴레이</option><option>SHARE PARTNER 원데이</option><option>브랜드 후원 캠페인</option><option>직접 기부</option><option>기타</option></select></label>
+      <label>공간 또는 캠페인<input id="shareName" placeholder="쁘라즈나요가 / 수리야 108 릴레이…"></label>
+      <label>연결된 금액 <span class="note">(없으면 0)</span><input id="shareAmount" type="number" value="0" min="0" step="1000"></label>
+      <label>한 줄 <span class="note">(선택)</span><textarea id="shareNote" placeholder="오늘 수련이 나눔으로 이어졌다."></textarea></label>
+    </div>
+
+    <button class="saveBtn" id="saveEntryBtn">저장</button>
+  </div>
+</div></div>
+
+<!-- 가입 -->
+<div class="onboarding" id="onboarding">
+  <div class="onCard card">
+    <div class="kicker">WELCOME TO YOGIBARA</div>
+    <h1>내 요가생활을<br>만들어볼까요?</h1>
+    <p>실명도 프로필 사진도 필요 없어요. 요기 이름 하나와 관심 있는 것만 고르면 바로 시작됩니다.</p>
+    <div class="form" style="padding:0">
+      <label>요기 이름<input id="joinName" placeholder="바라요기"></label>
+      <label>사는 지역<input id="joinRegion" placeholder="제주 / 서울 / 부산…"></label>
+      <label>연령대
+        <select id="joinAge">
+          <option value="">선택해주세요</option>
+          <option>20대</option>
+          <option>30대</option>
+          <option>40대</option>
+          <option>50대</option>
+          <option>60대+</option>
+        </select>
+        <div class="privateNote">연령대는 서비스 개선을 위한 통계에만 사용하고 공개 프로필에는 표시하지 않습니다.</div>
+      </label>
+      <label>관심 있는 것</label>
+      <div class="interestGrid" id="interestGrid">
+        <button class="interest" data-int="수련">수련</button>
+        <button class="interest" data-int="명상">명상</button>
+        <button class="interest" data-int="요가여행">요가여행</button>
+        <button class="interest" data-int="요가복">요가복</button>
+        <button class="interest" data-int="나눔">나눔</button>
+        <button class="interest" data-int="사람">사람</button>
+      </div>
+      <button class="saveBtn" id="joinBtn" style="margin-top:14px">내 YOGIBARA 만들기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY='yogibara_v18';
+const defaultState={
+  joined:false,
+  profile:{name:'바라요기',region:'제주',ageGroup:'40대',interests:['수련','나눔']},
+  entries:[],
+  connections:{},
+  guestbooks:{},
+  currentPerson:'baram',
+  recordFilter:'all',
+  regionFilter:'all'
+};
+let state={...defaultState,...JSON.parse(localStorage.getItem(KEY)||'{}')};
+if(!Array.isArray(state.entries))state.entries=[];
+if(!state.connections)state.connections={};
+if(!state.guestbooks)state.guestbooks={};
+if(!state.profile)state.profile={name:'바라요기',region:'제주',ageGroup:'40대',interests:['수련','나눔']};
+if(!state.profile.ageGroup)state.profile.ageGroup='40대';
+if(!Array.isArray(state.profile.interests))state.profile.interests=['수련'];
+
+const spaces=[
+  {id:'yogaroum',name:'요가로움',region:'제주',area:'제주',share:false,desc:'YOGIBARA PARTNER · 수련과 나눔의 흐름을 함께하는 공간'},
+  {id:'12month',name:'요가열두달',region:'제주',area:'제주',share:false,desc:'YOGIBARA PARTNER · 제주 수련 공간'},
+  {id:'aewol7',name:'애월7일요가원',region:'제주',area:'애월',share:false,desc:'YOGIBARA PARTNER · 애월의 수련 공간'},
+  {id:'prajna',name:'쁘라즈나요가',region:'제주',area:'제주시',share:true,desc:'YOGIBARA SHARE PARTNER 예시 · 원데이 수련의 일부가 나눔으로 연결'},
+  {id:'baraboda',name:'바라보다요가',region:'제주',area:'조천',share:false,desc:'YOGIBARA PARTNER · 조천의 수련 공간'},
+  {id:'anand',name:'아난드요가',region:'제주',area:'제주',share:false,desc:'YOGIBARA PARTNER · SPECIAL'},
+  {id:'seoul-demo',name:'서울 나눔공간 모집중',region:'서울',area:'서울',share:true,desc:'전국 확대용 자리 · 실제 파트너 등록 전 예시 카드'},
+  {id:'gyeonggi-demo',name:'경기 나눔공간 모집중',region:'경기',area:'경기',share:true,desc:'전국 확대용 자리 · 실제 파트너 등록 전 예시 카드'},
+  {id:'busan-demo',name:'부산 나눔공간 모집중',region:'부산',area:'부산',share:true,desc:'전국 확대용 자리 · 실제 파트너 등록 전 예시 카드'}
+];
+
+const people=[
+  {id:'baram',name:'바람요기',handle:'@baramyogi',bio:'제주에서 하타와 호흡을 꾸준히 이어가요.',stats:{practice:126,places:9,share:7},practices:[
+    {date:'2026-08-24',text:'하타요가 70분 · 아난드요가'},
+    {date:'2026-08-22',text:'호흡 20분 · 제주 바다'}
+  ]},
+  {id:'sum',name:'숨요기',handle:'@sumyogi',bio:'명상과 천천히 이어가는 수련을 좋아합니다.',stats:{practice:91,places:6,share:5},practices:[
+    {date:'2026-08-23',text:'명상 30분 · 집'},
+    {date:'2026-08-20',text:'하타요가 80분 · 쁘라즈나요가'}
+  ]},
+  {id:'jeju',name:'제주요기',handle:'@jeju_yogi',bio:'수련과 여행을 함께 기록합니다.',stats:{practice:73,places:18,share:3},practices:[
+    {date:'2026-08-24',text:'빈야사 50분 · 애월'},
+    {date:'2026-08-19',text:'걷기 90분 · 오름'}
+  ]}
+];
+
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function todayISO(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function won(n){return Number(n||0).toLocaleString('ko-KR')+'원'}
+function entries(type){return type==='all'?state.entries:state.entries.filter(e=>e.type===type)}
+function practices(){return state.entries.filter(e=>e.type==='practice')}
+function spends(){return state.entries.filter(e=>e.type==='spend')}
+function shares(){return state.entries.filter(e=>e.type==='share')}
+function placeNames(){
+  const names=[];
+  state.entries.forEach(e=>{
+    if(e.type==='practice'&&e.place)names.push(e.place);
+    if(e.type==='place'&&e.place)names.push(e.place);
+    if(e.type==='share'&&e.name)names.push(e.name);
+  });
+  return [...new Set(names.filter(Boolean))];
+}
+function monthlyEntries(){
+  const now=new Date();
+  return state.entries.filter(e=>{const d=new Date(e.date+'T12:00:00');return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()})
+}
+
+function ageTheme(){
+  const age=state.profile.ageGroup||'';
+  if(age==='20대') return {
+    title:'새로운 공간과 취향이 당신의 요가생활을 만들고 있어요.',
+    desc:'새롭게 다녀온 공간과 보여주고 싶은 순간을 카드로 남겨보세요.'
+  };
+  if(age==='30대') return {
+    title:'시간과 지출까지 모으면 내 요가생활이 더 잘 보여요.',
+    desc:'수련비, 요가복, 워크숍 같은 지출도 가볍게 남겨두면 나만의 패턴이 보여요.'
+  };
+  if(age==='40대') return {
+    title:'꾸준함이 가장 큰 기록이 됩니다.',
+    desc:'같은 공간을 오래 다닌 횟수와 반복되는 수련의 흐름을 자연스럽게 보여드릴게요.'
+  };
+  if(age==='50대') return {
+    title:'몸을 위해 만든 시간이 그대로 남습니다.',
+    desc:'수련 횟수보다 회복, 호흡, 편안했던 공간과 사람의 기록을 천천히 모아보세요.'
+  };
+  if(age==='60대+') return {
+    title:'가까운 공간과 편안한 수련을 중심으로 보여드려요.',
+    desc:'복잡한 기록보다 오래 이어갈 수 있는 수련과 좋은 연결을 쉽게 남기세요.'
+  };
+  return {title:'내 요가생활이 쌓이고 있어요.',desc:'몇 번만 기록해도 나에게 맞는 패턴을 찾아드려요.'};
+}
+
+function latestCardData(){
+  const sorted=state.entries.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+  const share=sorted.find(e=>e.type==='share');
+  if(share){
+    return {
+      kind:'나눔',
+      title:'오늘의 마음이 누군가에게 이어졌습니다.',
+      body:share.name?`${share.name}에서 이어진 나눔의 기록입니다.`:'나의 요가생활이 한 번 더 나눔으로 연결되었습니다.',
+      meta:`${share.date} · ${share.kind||'나눔'}`
+    };
+  }
+  const practice=sorted.find(e=>e.type==='practice');
+  if(practice){
+    return {
+      kind:'수련',
+      title:'오늘도 나를 위한 시간을 만들었습니다.',
+      body:practice.place?`${practice.place}에서 ${practice.kind} ${practice.min}분.`:`${practice.kind} ${practice.min}분의 수련을 남겼습니다.`,
+      meta:`${practice.date} · MY YOGA LIFE`
+    };
+  }
+  const place=sorted.find(e=>e.type==='place');
+  if(place){
+    return {
+      kind:'여정',
+      title:'나의 요가여정에 새로운 장소가 생겼습니다.',
+      body:place.place?`${place.place}${place.region?' · '+place.region:''}`:'새로운 공간을 기록했습니다.',
+      meta:`${place.date} · MY JOURNEY`
+    };
+  }
+  const spend=sorted.find(e=>e.type==='spend');
+  if(spend){
+    return {
+      kind:'요가생활',
+      title:'내가 좋아하는 요가생활을 하나 더 모았습니다.',
+      body:`${spend.category}${spend.item?' · '+spend.item:''}`,
+      meta:`${spend.date} · MY YOGA LIFE`
+    };
+  }
+  return null;
+}
+
+function shareCardText(){
+  const c=latestCardData(); if(!c) return '';
+  return `${c.title}\n${c.body}\n${c.meta}\n\n수련은, 나에게서 끝나지 않는다. #YOGIBARA`;
+}
+
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));
+  document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.go===id));
+  renderAll();window.scrollTo({top:0,behavior:'instant'});
+}
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+function openSheet(id){document.getElementById(id).classList.add('open')}
+function closeSheet(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeSheet(b.dataset.close));
+document.querySelectorAll('.sheet').forEach(s=>s.addEventListener('click',e=>{if(e.target===s)s.classList.remove('open')}));
+
+function openType(){openSheet('typeSheet')}
+topAddBtn.onclick=openType;homeAddBtn.onclick=openType;recordAddBtn.onclick=openType;
+document.querySelectorAll('.quickBtn,[data-type].typeBtn').forEach(b=>b.onclick=()=>openEntry(b.dataset.type));
+
+function openEntry(type){
+  closeSheet('typeSheet');
+  entryType.value=type;entryDate.value=todayISO();
+  practiceFields.style.display=type==='practice'?'block':'none';
+  spendFields.style.display=type==='spend'?'block':'none';
+  placeFields.style.display=type==='place'?'block':'none';
+  shareFields.style.display=type==='share'?'block':'none';
+  const titles={practice:'수련했어요',spend:'요가에 썼어요',place:'새로운 곳에 갔어요',share:'나눔했어요'};
+  entryTitle.textContent=titles[type];
+  openSheet('entrySheet');
+}
+
+saveEntryBtn.onclick=()=>{
+  const type=entryType.value,date=entryDate.value||todayISO();
+  let e={id:Date.now(),type,date};
+  if(type==='practice'){
+    e.kind=practiceKind.value;e.min=Math.max(1,Number(practiceMin.value)||60);e.place=practicePlace.value.trim();e.note=practiceNote.value.trim();
+  } else if(type==='spend'){
+    e.amount=Math.max(0,Number(spendAmount.value)||0);e.category=spendCategory.value;e.item=spendItem.value.trim();e.note=spendNote.value.trim();
+  } else if(type==='place'){
+    e.place=placeName.value.trim();e.region=placeRegion.value.trim();e.note=placeNote.value.trim();
+  } else if(type==='share'){
+    e.kind=shareKind.value;e.name=shareName.value.trim();e.amount=Math.max(0,Number(shareAmount.value)||0);e.note=shareNote.value.trim();
+  }
+  state.entries.push(e);save();closeSheet('entrySheet');renderAll();go('home');
+};
+
+function entryHtml(e){
+  if(e.type==='practice') return `<div class="entry card"><div class="entryTop"><div><b>${esc(e.kind)} · ${e.min}분</b><small>${esc(e.date)}${e.place?' · '+esc(e.place):''}</small></div><span class="tag">수련</span></div>${e.note?`<p>${esc(e.note)}</p>`:''}</div>`;
+  if(e.type==='spend') return `<div class="entry card"><div class="entryTop"><div><b>${esc(e.item||e.category)} · ${won(e.amount)}</b><small>${esc(e.date)} · ${esc(e.category)}</small></div><span class="tag money">지출</span></div>${e.note?`<p>${esc(e.note)}</p>`:''}</div>`;
+  if(e.type==='place') return `<div class="entry card"><div class="entryTop"><div><b>${esc(e.place||'새로운 장소')}</b><small>${esc(e.date)}${e.region?' · '+esc(e.region):''}</small></div><span class="tag place">장소</span></div>${e.note?`<p>${esc(e.note)}</p>`:''}</div>`;
+  return `<div class="entry card"><div class="entryTop"><div><b>${esc(e.kind)}</b><small>${esc(e.date)}${e.name?' · '+esc(e.name):''}</small></div><span class="tag share">나눔</span></div>${e.amount?`<div class="tagRow"><span class="tag money">${won(e.amount)}</span></div>`:''}${e.note?`<p>${esc(e.note)}</p>`:''}</div>`;
+}
+
+function renderHome(){
+  const month=monthlyEntries();
+  const mp=month.filter(e=>e.type==='practice').length;
+  const ms=month.filter(e=>e.type==='spend').reduce((s,e)=>s+(e.amount||0),0);
+  const mplaces=new Set(month.filter(e=>e.type==='practice'||e.type==='place').map(e=>e.place).filter(Boolean)).size;
+  const msh=month.filter(e=>e.type==='share').length;
+  sumPractice.textContent=mp;sumSpend.textContent=ms>=10000?Math.round(ms/10000)+'만':ms;sumPlaces.textContent=mplaces;sumShare.textContent=msh;
+  const topSpend={};spends().forEach(e=>topSpend[e.category]=(topSpend[e.category]||0)+(e.amount||0));
+  const bestSpend=Object.entries(topSpend).sort((a,b)=>b[1]-a[1])[0];
+  const placeCounts={};practices().forEach(e=>{if(e.place)placeCounts[e.place]=(placeCounts[e.place]||0)+1});
+  const topPlace=Object.entries(placeCounts).sort((a,b)=>b[1]-a[1])[0];
+  const age=ageTheme();
+  let title=age.title, body=age.desc;
+  if(topPlace){title=`가장 자주 머문 곳 · ${topPlace[0]}`;body=`지금까지 ${topPlace[1]}번의 수련 기록이 이 공간에 쌓였어요. ${age.desc}`}
+  else if(bestSpend){title=`가장 많이 쓴 항목 · ${bestSpend[0]}`;body=`지금까지 ${won(bestSpend[1])}을 기록했어요. ${age.desc}`}
+  insightCard.innerHTML=`<div class="kicker">YOGIBARA가 발견한 것</div><h3>${esc(title)}</h3><p>${esc(body)}</p>`;
+
+  const card=latestCardData();
+  homeShareCard.innerHTML=card?`<div class="shareCard">
+    <div class="kicker">YOGIBARA CARD · ${esc(card.kind)}</div>
+    <h3>${esc(card.title)}</h3>
+    <p>${esc(card.body)}</p>
+    <div class="cardMeta">${esc(card.meta)}<br>수련은, 나에게서 끝나지 않는다.</div>
+    <div class="cardActions">
+      <button class="pill" onclick="copyShareCard()">문구 복사</button>
+      <button class="pill primary" onclick="shareYogibaraCard()">공유하기</button>
+    </div>
+  </div>`:`<div class="empty card">기록 하나를 남기면 공유할 수 있는 YOGIBARA CARD가 자동으로 만들어집니다.</div>`;
+
+  const list=state.entries.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id).slice(0,5);
+  homeRecordCount.textContent=state.entries.length+'개';
+  homeTimeline.innerHTML=list.length?list.map(entryHtml).join(''):`<div class="empty card">아직 기록이 없어요.<br>첫 기록은 10초면 충분합니다.</div>`;
+}
+window.copyShareCard=async()=>{
+  const text=shareCardText(); if(!text)return;
+  try{await navigator.clipboard.writeText(text);alert('공유 문구를 복사했습니다.');}
+  catch(e){alert(text)}
+};
+window.shareYogibaraCard=async()=>{
+  const text=shareCardText();if(!text)return;
+  if(navigator.share){
+    try{await navigator.share({title:'YOGIBARA',text});return;}catch(e){}
+  }
+  copyShareCard();
+};
+
+function renderRecord(){
+  recordFilters.querySelectorAll('.filterBtn').forEach(b=>b.classList.toggle('active',b.dataset.filter===state.recordFilter));
+  const list=entries(state.recordFilter).slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+  recordTimeline.innerHTML=list.length?list.map(entryHtml).join(''):`<div class="empty card">이 항목의 기록이 아직 없습니다.</div>`;
+}
+recordFilters.querySelectorAll('.filterBtn').forEach(b=>b.onclick=()=>{state.recordFilter=b.dataset.filter;save();renderRecord()});
+
+function renderSpaces(){
+  regionFilters.querySelectorAll('.filterBtn').forEach(b=>b.classList.toggle('active',b.dataset.region===state.regionFilter));
+  const q=spaceSearch.value.trim().toLowerCase();
+  const list=spaces.filter(s=>(state.regionFilter==='all'||s.region===state.regionFilter)&&(!q||`${s.name} ${s.region} ${s.area}`.toLowerCase().includes(q)));
+  spaceList.innerHTML=list.length?list.map(s=>`<div class="spaceCard card">
+    <div class="spaceTop"><div><h3>${esc(s.name)}</h3><p>${esc(s.area)} · ${esc(s.desc)}</p></div>${s.share?'<span class="shareBadge">나눔 가능</span>':'<span class="normalBadge">요가공간</span>'}</div>
+    <div class="spaceMeta">
+      <div class="metaBox"><b>${s.share?'원데이 → 나눔':'수련 기록 가능'}</b><small>${s.share?'실제 파트너 조건에 따라 연결':'방문·수련을 내 여정에 기록'}</small></div>
+      <div class="metaBox"><b>${esc(s.region)}</b><small>전국 지역 필터</small></div>
+    </div>
+    <button class="bigRecord" style="margin-top:10px;padding:11px" onclick="recordSpace('${s.id}')">내 기록에 남기기</button>
+  </div>`).join(''):`<div class="empty card">이 지역은 아직 등록된 공간이 없습니다.</div>`;
+}
+regionFilters.querySelectorAll('.filterBtn').forEach(b=>b.onclick=()=>{state.regionFilter=b.dataset.region;save();renderSpaces()});
+spaceSearch.oninput=renderSpaces;
+window.recordSpace=id=>{
+  const s=spaces.find(x=>x.id===id);if(!s)return;
+  openEntry('place');placeName.value=s.name;placeRegion.value=s.area;
+};
+
+function renderJourney(){
+  const counts={};
+  state.entries.forEach(e=>{
+    const p=(e.type==='practice'||e.type==='place')?e.place:'';if(!p)return;
+    if(!counts[p])counts[p]={count:0,last:e.date};
+    counts[p].count++;if(e.date>counts[p].last)counts[p].last=e.date;
+  });
+  const arr=Object.entries(counts).sort((a,b)=>b[1].count-a[1].count);
+  journeyCount.textContent=arr.length+'곳';
+  journeyMap.innerHTML='';
+  const pos=[[18,64],[48,28],[66,55],[74,18],[30,25],[54,72]];
+  arr.slice(0,6).forEach((_,i)=>{const pin=document.createElement('div');pin.className='pin';pin.style.left=pos[i][0]+'%';pin.style.top=pos[i][1]+'%';journeyMap.appendChild(pin)});
+  journeyList.innerHTML=arr.length?arr.map(([name,v])=>`<div class="spaceCard card"><div class="spaceTop"><div><h3>${esc(name)} · ${v.count}회</h3><p>최근 기록 ${esc(v.last)}</p></div><span class="normalBadge">${v.count===1?'첫 기록':v.count+'회'}</span></div></div>`).join(''):`<div class="empty card">수련이나 장소를 남기면 여정이 자동으로 만들어집니다.</div>`;
+}
+function renderConnect(){
+  connectList.innerHTML=people.map((p,i)=>{const on=!!state.connections[p.id];return `<div class="connectCard card">
+    <div class="avatar">${['☼','◌','⌖'][i%3]}</div><div><b>${p.name}</b><small>${p.bio}</small></div>
+    <button onclick="openPerson('${p.id}')">${on?'공간 보기':'연 맺기'}</button>
+  </div>`}).join('');
+}
+window.openPerson=id=>{state.currentPerson=id;if(!state.connections[id])state.connections[id]=true;save();go('person');renderPerson()};
+function currentPerson(){return people.find(p=>p.id===state.currentPerson)||people[0]}
+function renderPerson(){
+  const p=currentPerson(),on=!!state.connections[p.id];
+  personHandle.textContent=p.handle;personName.textContent=p.name;personBio.textContent=p.bio;
+  personPractice.textContent=p.stats.practice;personPlaces.textContent=p.stats.places;personShare.textContent=p.stats.share;
+  personConnectBtn.textContent=on?'연결됨 · 연 끊기':'연 맺기';
+  personConnectBtn.onclick=()=>{state.connections[p.id]=!state.connections[p.id];save();renderPerson();renderConnect()};
+  personPracticeList.innerHTML=p.practices.map(x=>`<div class="entry card"><b>${esc(x.text)}</b><small>${esc(x.date)}</small></div>`).join('');
+  if(!Array.isArray(state.guestbooks[p.id]))state.guestbooks[p.id]=[{name:'숨요기',date:'2026-08-20',text:'오늘의 수련도 편안하게 이어가세요.'}];
+  const gs=state.guestbooks[p.id];personGuest.textContent=gs.length;
+  guestText.disabled=!on;guestBtn.disabled=!on;guestHelp.textContent=on?'연결된 사람에게 방명록을 남길 수 있어요.':'먼저 연을 맺어주세요.';
+  guestList.innerHTML=gs.slice().reverse().map(g=>`<div class="guest card"><b>${esc(g.name)}</b><small>${esc(g.date)}</small><p>${esc(g.text)}</p></div>`).join('');
+}
+guestBtn.onclick=()=>{const p=currentPerson();if(!state.connections[p.id])return;const t=guestText.value.trim();if(!t)return;state.guestbooks[p.id].push({name:state.profile.name,date:todayISO(),text:t});guestText.value='';save();renderPerson()};
+
+function renderMy(){
+  const totalSpend=spends().reduce((s,e)=>s+(e.amount||0),0);
+  myHandle.textContent='@'+state.profile.name.replace(/\s+/g,'').toLowerCase();
+  myName.textContent=state.profile.name;
+  myBio.textContent=`${state.profile.region||'지역 미설정'} · ${(state.profile.interests||[]).join(' · ')}`;
+  const age=ageTheme();
+  myAgeHint.textContent=`연령대는 공개되지 않습니다. YOGIBARA는 ${state.profile.ageGroup||'연령 미설정'} 사용 패턴을 서비스 개선 통계에 반영하도록 설계됩니다. ${age.desc}`;
+  myPractice.textContent=practices().length;mySpend.textContent=spends().length;myPlaces.textContent=placeNames().length;myShare.textContent=shares().length;
+  const cats={};spends().forEach(e=>cats[e.category]=(cats[e.category]||0)+(e.amount||0));
+  const topCat=Object.entries(cats).sort((a,b)=>b[1]-a[1])[0];
+  myInsights.innerHTML=`
+    <div class="insight card"><div class="kicker">요가에 쓴 돈</div><h3>${won(totalSpend)}</h3><p>${topCat?`가장 많이 쓴 항목은 ${esc(topCat[0])}이에요.`:'아직 지출 기록이 없어요.'}</p></div>
+    <div class="insight card"><div class="kicker">나의 여정</div><h3>${placeNames().length}곳</h3><p>새로운 곳을 찾아다니지 않아도 괜찮아요. 같은 공간을 오래 다닌 기록도 그대로 남습니다.</p></div>
+    <div class="insight card"><div class="kicker">나의 나눔</div><h3>${shares().length}번</h3><p>캠페인과 나눔공간에서 이어진 기록이 여기에 모입니다.</p></div>`;
+}
+profileBtn.onclick=()=>go('my');
+
+function renderAll(){renderHome();renderRecord();renderSpaces();renderJourney();renderConnect();renderPerson();renderMy();save()}
+renderAll();
+
+interestGrid.querySelectorAll('.interest').forEach(b=>b.onclick=()=>{
+  b.classList.toggle('active');
+});
+joinBtn.onclick=()=>{
+  const name=joinName.value.trim()||'바라요기';
+  const region=joinRegion.value.trim()||'지역 미설정';
+  const ageGroup=joinAge.value;
+  if(!ageGroup)return alert('연령대를 선택해주세요.');
+  const interests=[...interestGrid.querySelectorAll('.interest.active')].map(b=>b.dataset.int);
+  state.profile={name,region,ageGroup,interests:interests.length?interests:['수련']};
+  state.joined=true;save();onboarding.classList.remove('open');renderAll();
+};
+if(!state.joined)onboarding.classList.add('open');
+</script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17120d">
+<title>YOGIBARA V26</title>
+<style>
+html,body{margin:0;width:100%;height:100%;background:#0f0c09;overflow:hidden}
+#appFrame{display:block;width:min(100%,430px);height:100dvh;margin:0 auto;border:0;background:#17120d}
+#loading{position:fixed;inset:0;display:grid;place-items:center;background:#17120d;color:#f7efe5;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-size:14px;z-index:5}
+</style>
+</head>
+<body>
+<div id="loading">YOGIBARA를 여는 중…</div>
+<iframe id="appFrame" src="./app-25.html" title="YOGIBARA" allow="web-share; geolocation; clipboard-write; clipboard-read"></iframe>
+
+<script type="text/plain" id="v26-script">
+(function(){
+  if(window.__YOGIBARA_V26__) return;
+  window.__YOGIBARA_V26__=true;
+
+  function byId(id){return document.getElementById(id)}
+  function q(sel,root=document){return root.querySelector(sel)}
+  function qa(sel,root=document){return [...root.querySelectorAll(sel)]}
+  function textOf(el){return (el?.innerText||el?.textContent||'').trim()}
+
+  function renameDonateWords(){
+    qa('button,a').forEach(el=>{
+      const t=textOf(el);
+      if(t==='기부하기' || t==='카드로 기부' || t==='카드로 기부하기') el.textContent='바로돕기';
+    });
+  }
+
+  function simplifyHeader(){
+    qa('p,small,div,span').forEach(el=>{
+      const t=textOf(el);
+      if(t==='수련은, 나에게서 끝나지 않는다.' || t==='수련은, 나에게서 끝나지 않는다'){
+        if(el.closest('header') || el.getBoundingClientRect().top < 140) el.style.display='none';
+      }
+    });
+  }
+
+  function cleanHome(){
+    const home=byId('home') || document.body;
+    if(!home) return;
+    qa('.card,.section,div',home).forEach(el=>{
+      const t=textOf(el);
+      if(!t) return;
+      if(t.includes('최근 내 기록') || t.includes('보여주기 좋은 기록')) el.classList.add('v26Hidden');
+    });
+    const heroBtn=qa('button',home).find(b=>textOf(b)==='기부하기');
+    if(heroBtn) heroBtn.textContent='바로돕기';
+  }
+
+  function mapPageOnly(){
+    qa('.journeyBridge,.v25MapCard,.card').forEach(el=>{
+      const t=textOf(el);
+      const hasMap=el.querySelector('iframe');
+      if(hasMap && (t.includes('YOGIBARA MAP') || t.includes('여정') || t.includes('지도'))){
+        const parent=el.parentElement;
+        if(parent){
+          qa('.card,.spaceCard,section,div',parent).forEach(sib=>{
+            if(sib===el) return;
+            const st=textOf(sib);
+            if(st.includes('내 기록에 남기기') || st.includes('수련 기록 가능') || st.includes('전국 지역 필터') || st.includes('요가공간')) sib.classList.add('v26Hidden');
+          });
+        }
+      }
+    });
+  }
+
+  function typeInfo(e){
+    if(e.type==='practice') return {label:'수련', title:`${e.kind||'수련'} · ${e.min||''}분`, sub:[e.place].filter(Boolean).join(' · '), note:e.note||'', amount:''};
+    if(e.type==='place') return {label:'장소', title:e.place||'장소 기록', sub:[e.region].filter(Boolean).join(' · '), note:e.note||'', amount:''};
+    if(e.type==='share'){
+      let label='나눔';
+      if((e.kind||'').includes('108') || (e.name||'').includes('릴레이')) label='릴레이 참여';
+      else if((e.kind||'').includes('SHARE PARTNER') || (e.name||'').includes('원데이')) label='원데이 나눔';
+      else if((e.name||'').includes('기부요가') || (e.note||'').includes('기부요가')) label='기부요가';
+      return {label, title:e.kind||'나눔', sub:[e.name].filter(Boolean).join(' · '), note:e.note||'', amount:e.amount?won(Number(e.amount)||0):''};
+    }
+    if(e.type==='spend'){
+      let label='기록';
+      if(e.category==='요가보따리 구매') label='상품구매';
+      else if(e.category==='기부요가 참여') label='기부요가';
+      else if(e.category==='릴레이 응원 기부(나눔)') label='릴레이 응원';
+      else if(e.category==='직접 카드기부') label='바로돕기';
+      else label='지출';
+      return {label, title:e.item||e.category||'지출', sub:[e.category].filter(Boolean).join(' · '), note:e.note||'', amount:e.amount?won(Number(e.amount)||0):''};
+    }
+    return {label:'기록', title:'기록', sub:'', note:'', amount:''};
+  }
+
+  function renderRecordPage(){
+    const titleEl=qa('h1,h2,h3').find(el=>textOf(el)==='내 기록');
+    if(!titleEl || !window.state || !Array.isArray(state.entries)) return;
+    const anchorBtns=qa('button').filter(b=>['전체','수련','지출','장소','나눔'].includes(textOf(b)));
+    const anchor=anchorBtns.length ? anchorBtns[anchorBtns.length-1].closest('div') : titleEl;
+    if(!anchor) return;
+    const existing=byId('recordDateView');
+    if(existing) existing.remove();
+
+    qa('.entry.card,.empty.card').forEach(el=>el.classList.add('v26Hidden'));
+
+    const view=document.createElement('div');
+    view.id='recordDateView';
+    view.className='recordDateView';
+
+    const items=state.entries.slice().sort((a,b)=>{
+      const da=(a.date||'').localeCompare(b.date||'');
+      if(da!==0) return -da;
+      return (b.id||0)-(a.id||0);
+    });
+
+    if(!items.length){
+      view.innerHTML='<div class="recordEmptyCard">아직 기록이 없습니다. +기록에서 수련, 장소, 나눔을 남겨보세요.</div>';
+    }else{
+      const grouped={};
+      items.forEach(e=>{ const d=e.date||'날짜 없음'; (grouped[d]||(grouped[d]=[])).push(e); });
+      view.innerHTML=Object.keys(grouped).sort((a,b)=>b.localeCompare(a)).map(date=>{
+        const rows=grouped[date].map(e=>{
+          const info=typeInfo(e);
+          return `<div class="recordLine"><div class="recordLineMain"><div class="recordLineTitle">${info.title}</div><div class="recordLineSub">${info.sub||''}</div>${info.note?`<div class="recordLineNote">${info.note}</div>`:''}</div><div class="recordLineSide">${info.amount?`<div class="recordLineAmount">${info.amount}</div>`:''}<span class="recordLineTag">${info.label}</span></div></div>`;
+        }).join('');
+        return `<section class="recordDaySection"><div class="recordDayTitle">${date}</div><div class="recordDayCard">${rows}</div></section>`;
+      }).join('');
+    }
+
+    anchor.insertAdjacentElement('afterend',view);
+  }
+
+  function transformDonateModal(){
+    const title=qa('h2,h3,.sheetTitle,.modalTitle').find(el=>{
+      const t=textOf(el);
+      return t.includes('요가에 썼어요') || t==='기부하기' || t==='바로돕기';
+    });
+    if(!title) return;
+    title.textContent='바로돕기';
+    const short=qa('div,p,small').find(el=>textOf(el).includes('나눔 지출 바로가기'));
+    if(short && !byId('donateEasyGuide')){
+      const box=document.createElement('div');
+      box.id='donateEasyGuide';
+      box.className='donateEasyGuide';
+      box.innerHTML=`
+        <div class="donateEasyTitle">쉽게 돕는 방법</div>
+        <div class="donateEasyGrid">
+          <button type="button" class="donateEasyBtn" onclick="openDonateOnlySheet && openDonateOnlySheet('card')">바로돕기</button>
+          <button type="button" class="donateEasyBtn" onclick="openDonateOnlySheet && openDonateOnlySheet('relay')">릴레이 응원</button>
+          <button type="button" class="donateEasyBtn" onclick="openDonateOnlySheet && openDonateOnlySheet('yoga')">기부요가 참여</button>
+          <button type="button" class="donateEasyBtn" onclick="openDonateOnlySheet && openDonateOnlySheet('bottari')">요가보따리 구매</button>
+        </div>
+      `;
+      short.insertAdjacentElement('beforebegin',box);
+    }
+    const cat=byId('spendCategory');
+    if(cat){
+      cat.innerHTML=['직접 카드기부','릴레이 응원 기부(나눔)','기부요가 참여','요가보따리 구매'].map(v=>`<option>${v}</option>`).join('');
+    }
+  }
+
+  function applyV26(){
+    renameDonateWords();
+    simplifyHeader();
+    cleanHome();
+    mapPageOnly();
+    renderRecordPage();
+    transformDonateModal();
+  }
+
+  const origRenderAll=window.renderAll;
+  if(typeof origRenderAll==='function'){
+    window.renderAll=function(){
+      origRenderAll();
+      setTimeout(applyV26,80);
+      setTimeout(applyV26,260);
+    };
+  }
+  applyV26();
+  setTimeout(applyV26,300);
+})();
+</script>
+
+<script>
+const frame=document.getElementById('appFrame');
+const loading=document.getElementById('loading');
+let injected=false;
+
+function deepInject(win){
+  try{
+    let currentWin=win;
+    let currentDoc=currentWin.document;
+    while(currentDoc.getElementById('appFrame') && currentDoc.getElementById('appFrame').contentWindow){
+      currentWin=currentDoc.getElementById('appFrame').contentWindow;
+      currentDoc=currentWin.document;
+    }
+    if(currentDoc.documentElement.dataset.v26Injected==='1') return;
+    currentDoc.documentElement.dataset.v26Injected='1';
+
+    const style=currentDoc.createElement('style');
+    style.textContent=`
+      .v26Hidden{display:none!important}
+      .recordDateView{display:grid;gap:14px;margin-top:14px}.recordDayTitle{font-size:13px;font-weight:900;color:#c8b38c;margin-bottom:8px}.recordDayCard{padding:6px 0;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}.recordLine{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:flex-start;padding:12px 14px}.recordLine + .recordLine{border-top:1px solid rgba(255,255,255,.06)}.recordLineTitle{font-size:17px;font-weight:900;color:#f6efe4;line-height:1.4}.recordLineSub{margin-top:3px;color:#cbb9a5;font-size:11px;line-height:1.5}.recordLineNote{margin-top:6px;color:#e5dacc;font-size:11px;line-height:1.55}.recordLineSide{display:grid;justify-items:end;gap:6px}.recordLineAmount{font-size:12px;font-weight:900;color:#f0d6b2}.recordLineTag{display:inline-flex;align-items:center;padding:6px 9px;border-radius:999px;background:rgba(139,154,58,.20);color:#edf2db;font-size:9px;font-weight:900;white-space:nowrap}.recordEmptyCard{padding:16px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:#eadfce;font-size:12px;line-height:1.7}
+      .donateEasyGuide{margin:10px 0 12px;padding:12px;border-radius:18px;background:rgba(139,154,58,.10);border:1px solid rgba(139,154,58,.14)}.donateEasyTitle{font-size:12px;font-weight:900;color:#f3eadf;margin-bottom:8px}.donateEasyGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.donateEasyBtn{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);color:#fff;border-radius:14px;padding:12px 10px;font-size:11px;font-weight:900;text-align:left}
+      @media(max-width:360px){.donateEasyGrid{grid-template-columns:1fr}}
+    `;
+    currentDoc.head.appendChild(style);
+
+    const s=currentDoc.createElement('script');
+    s.textContent=document.getElementById('v26-script').textContent;
+    currentDoc.body.appendChild(s);
+    injected=true;
+    loading.style.display='none';
+  }catch(err){console.error(err)}
+}
+
+frame.addEventListener('load',()=>{
+  const run=()=>{ try{ deepInject(frame.contentWindow); }catch(err){ console.error(err); } };
+  setTimeout(run,500);
+  setTimeout(run,1500);
+  setTimeout(run,2800);
+});
+setTimeout(()=>{ if(!injected) loading.style.display='none'; },3800);
+</script>
+</body>
+</html>

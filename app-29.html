@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17120d">
+<title>YOGIBARA V29</title>
+<style>
+html,body{margin:0;width:100%;height:100%;background:#0f0c09;overflow:hidden}
+#appFrame{display:block;width:min(100%,430px);height:100dvh;margin:0 auto;border:0;background:#17120d}
+#loading{position:fixed;inset:0;display:grid;place-items:center;background:#17120d;color:#f7efe5;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-size:14px;z-index:5}
+</style>
+</head>
+<body>
+<div id="loading">YOGIBARA를 여는 중…</div>
+<iframe id="appFrame" src="./app-28.html" title="YOGIBARA" allow="web-share; geolocation; clipboard-write; clipboard-read"></iframe>
+
+<script type="text/plain" id="v29-script">
+(function(){
+  if(window.__YOGIBARA_V29__) return;
+  window.__YOGIBARA_V29__=true;
+
+  function removeRepeatedShareButtons(){
+    document.querySelectorAll('.v28FindShareBtn').forEach(el=>el.remove());
+    document.querySelectorAll('button,a').forEach(el=>{
+      if((el.textContent||'').trim()==='나눔공간 찾기 → 여정') el.remove();
+    });
+  }
+
+  function applyV29(){
+    removeRepeatedShareButtons();
+  }
+
+  const oldRenderAll=window.renderAll;
+  if(typeof oldRenderAll==='function'){
+    window.renderAll=function(){
+      oldRenderAll();
+      setTimeout(applyV29,40);
+      setTimeout(applyV29,180);
+      setTimeout(applyV29,420);
+    };
+  }
+
+  applyV29();
+  setTimeout(applyV29,250);
+  setTimeout(applyV29,800);
+})();
+</script>
+
+<script>
+const frame=document.getElementById('appFrame');
+const loading=document.getElementById('loading');
+let injected=false;
+
+function deepInject(win){
+  try{
+    let currentWin=win;
+    let currentDoc=currentWin.document;
+    while(currentDoc.getElementById('appFrame') && currentDoc.getElementById('appFrame').contentWindow){
+      currentWin=currentDoc.getElementById('appFrame').contentWindow;
+      currentDoc=currentWin.document;
+    }
+    if(currentDoc.documentElement.dataset.v29Injected==='1') return;
+    currentDoc.documentElement.dataset.v29Injected='1';
+
+    const style=currentDoc.createElement('style');
+    style.textContent=`.v28FindShareBtn{display:none!important}`;
+    currentDoc.head.appendChild(style);
+
+    const s=currentDoc.createElement('script');
+    s.textContent=document.getElementById('v29-script').textContent;
+    currentDoc.body.appendChild(s);
+
+    injected=true;
+    loading.style.display='none';
+  }catch(err){console.error(err)}
+}
+
+frame.addEventListener('load',()=>{
+  const run=()=>{ try{ deepInject(frame.contentWindow); }catch(err){ console.error(err); } };
+  setTimeout(run,500);
+  setTimeout(run,1400);
+  setTimeout(run,2600);
+});
+setTimeout(()=>{ if(!injected) loading.style.display='none'; },3600);
+</script>
+</body>
+</html>

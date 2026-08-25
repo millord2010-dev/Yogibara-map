@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17120d">
+<title>YOGIBARA V22</title>
+<style>
+html,body{margin:0;width:100%;height:100%;background:#0f0c09;overflow:hidden}
+#appFrame{display:block;width:min(100%,430px);height:100dvh;margin:0 auto;border:0;background:#17120d}
+#loading{position:fixed;inset:0;display:grid;place-items:center;background:#17120d;color:#f7efe5;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-size:14px;z-index:5}
+</style>
+</head>
+<body>
+<div id="loading">YOGIBARA를 여는 중…</div>
+<iframe id="appFrame" src="./app-21.html" title="YOGIBARA" allow="web-share; geolocation; clipboard-write; clipboard-read"></iframe>
+
+<script type="text/plain" id="v22-script">
+(function(){
+  if(window.__YOGIBARA_V22__) return;
+  window.__YOGIBARA_V22__=true;
+
+  const ROOT_MAP_URL='https://yogibara-map.vercel.app/';
+  const HUB_URL='https://app.notion.com/p/YOGIBARA-Hub-d3ddb38248404e049194ab0a34514fd6?source=copy_link';
+
+  function byId(id){return document.getElementById(id)}
+  function profileName(){return (state.profile&&state.profile.name)||'바라요기'}
+  function publicEntries(){return state.entries.filter(e=>!e.private)}
+  function amountVisible(){return state.amountVisibility!=='hide'}
+  function ensureState(){
+    if(!state.amountVisibility) state.amountVisibility='show';
+    if(!state.storyBenefit) state.storyBenefit={shares:0,lastClaim:''};
+    save();
+  }
+  function isDonationSpend(e){
+    return !!(e&&e.type==='spend'&&['요가보따리 구매','기부요가 참여','릴레이 응원 기부(나눔)','직접 카드기부'].includes(e.category));
+  }
+  function isDonationEntry(e){return !!(e&&(e.type==='share'||isDonationSpend(e)))}
+  function donationLabelForEntry(e){
+    if(!e) return '나눔';
+    if(e.type==='share'){
+      const kind=String(e.kind||'');
+      const name=String(e.name||'');
+      if(kind.includes('SHARE PARTNER')||name.includes('원데이')) return '원데이 나눔';
+      if(kind.includes('108')||name.includes('릴레이')) return '릴레이 참여';
+      if(name.includes('기부요가')||name.includes('쁘라즈나')) return '기부요가';
+      return '나눔';
+    }
+    if(e.type==='spend'){
+      if(e.category==='요가보따리 구매') return '요가보따리';
+      if(e.category==='기부요가 참여') return '기부요가';
+      if(e.category==='릴레이 응원 기부(나눔)') return '릴레이 응원';
+      if(e.category==='직접 카드기부') return '카드기부';
+    }
+    return '나눔';
+  }
+  function donationIcon(label){
+    return ({'원데이 나눔':'●','릴레이 참여':'∞','기부요가':'◌','요가보따리':'▣','카드기부':'♥','릴레이 응원':'↗','나눔':'♡'})[label]||'♡';
+  }
+  function donationStats(label){
+    const source=state.entries.filter(isDonationEntry);
+    const list=label?source.filter(e=>donationLabelForEntry(e)===label):source;
+    return {count:list.length,total:list.reduce((s,e)=>s+(Number(e.amount)||0),0)};
+  }
+  function storyBenefitInfo(){
+    const s=(state.storyBenefit&&state.storyBenefit.shares)||0;
+    if(s<1) return {current:'첫 공유를 하면 응원 배지를 드려요.',next:'첫 공유 혜택',remain:1-s};
+    if(s<3) return {current:'응원 배지 획득 완료',next:'3회 공유 시 요가보따리 2,000원 혜택',remain:3-s};
+    if(s<5) return {current:'요가보따리 2,000원 혜택 달성',next:'5회 공유 시 파트너 원데이 우선 알림',remain:5-s};
+    return {current:'파트너 원데이 우선 알림 혜택 달성',next:'혜택 유지 중',remain:0};
+  }
+  window.claimStoryBenefit=function(){
+    ensureState();
+    state.storyBenefit.shares=(state.storyBenefit.shares||0)+1;
+    state.storyBenefit.lastClaim=todayISO?todayISO():new Date().toISOString().slice(0,10);
+    save();
+    renderAll();
+    const info=storyBenefitInfo();
+    alert(`스토리 공유 혜택이 반영되었습니다.\n현재 공유 ${state.storyBenefit.shares}회\n${info.current}`);
+  };
+  function latestCardData(){
+    const sorted=publicEntries().slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+    const target=sorted.find(isDonationEntry)||sorted.find(e=>e.type==='practice')||sorted.find(e=>e.type==='place')||sorted.find(e=>e.type==='spend');
+    if(!target) return null;
+    const actor=profileName();
+    const label=isDonationEntry(target)?donationLabelForEntry(target):'수련';
+    const stat=donationStats(label);
+    let body='';
+    if(target.type==='share') body=target.name?`${target.name}에서 이어진 나눔의 기록입니다.`:'오늘의 수련과 마음이 나눔으로 이어졌습니다.';
+    else if(target.type==='spend'&&isDonationSpend(target)) body=`${target.category}${target.item?' · '+target.item:''}에 함께한 기록입니다.`;
+    else if(target.type==='practice') body=target.place?`${target.place}에서 ${target.kind} ${target.min}분의 수련을 남겼습니다.`:`${target.kind} ${target.min}분의 수련을 남겼습니다.`;
+    else if(target.type==='place') body=target.place?`${target.place}${target.region?' · '+target.region:''}의 기록입니다.`:'새로운 공간의 기록입니다.';
+    else body=`${target.category||'요가생활'}${target.item?' · '+target.item:''}`;
+    return {
+      entry:target,
+      actor,
+      title:`${actor}님이 수련으로 함께 마음을 모았습니다.`,
+      subtitle:'나의 수련이 누군가에게 희망이 됩니다.',
+      body,
+      meta:`${target.date} · ${target.type==='share'?(target.kind||'나눔'):(target.paymentMethod||'기록')}`,
+      badge:label,
+      badgeIcon:donationIcon(label),
+      countText:`누적 ${stat.count}회`,
+      amountText: stat.total ? (amountVisible()?`누적 금액 ${won(stat.total)}`:'누적 금액 비공개') : ''
+    };
+  }
+
+  function wrapText(ctx,text,x,y,maxWidth,lineHeight,maxLines){
+    const chars=[...String(text||'')]; let line='', lines=[];
+    chars.forEach(ch=>{ const test=line+ch; if(ctx.measureText(test).width>maxWidth&&line){lines.push(line); line=ch;} else line=test; });
+    if(line) lines.push(line);
+    if(lines.length>maxLines){ lines=lines.slice(0,maxLines); const last=lines[maxLines-1]; lines[maxLines-1]=last.slice(0,Math.max(0,last.length-1))+'…'; }
+    lines.forEach((ln,i)=>ctx.fillText(ln,x,y+i*lineHeight));
+    return y+lines.length*lineHeight;
+  }
+  function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+  function pill(ctx,x,y,w,h,bg,txt,color,size){ roundRect(ctx,x,y,w,h,h/2); ctx.fillStyle=bg; ctx.fill(); ctx.fillStyle=color; ctx.font=`800 ${size||23}px sans-serif`; ctx.fillText(txt,x+18,y+h*0.64); }
+  function makeStoryCanvas(){
+    const c=latestCardData(); if(!c) throw new Error('공개 기록이 없습니다.');
+    const canvas=document.createElement('canvas'); canvas.width=1080; canvas.height=1920; const ctx=canvas.getContext('2d');
+    const bg=ctx.createLinearGradient(0,0,0,1920); bg.addColorStop(0,'#1d160f'); bg.addColorStop(.58,'#130f0b'); bg.addColorStop(1,'#0c0907'); ctx.fillStyle=bg; ctx.fillRect(0,0,1080,1920);
+    ctx.fillStyle='rgba(152,170,77,.14)'; ctx.beginPath(); ctx.arc(934,252,256,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='rgba(244,236,223,.08)'; ctx.beginPath(); ctx.arc(150,1640,160,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#f6efe4'; ctx.font='700 88px Georgia, serif'; ctx.fillText('YOGIBARA',86,165);
+    ctx.fillStyle='#d3c2ac'; ctx.font='500 30px sans-serif'; ctx.fillText('수련은, 나에게서 끝나지 않는다.',86,216);
+
+    roundRect(ctx,66,348,948,1180,60); ctx.fillStyle='#f2eadc'; ctx.fill(); ctx.strokeStyle='rgba(120,103,74,.12)'; ctx.lineWidth=2; ctx.stroke();
+    ctx.fillStyle='#8d7a5c'; ctx.font='800 28px sans-serif'; ctx.fillText('YOGIBARA CARD · 나눔',124,438);
+    pill(ctx,124,478,280,56,'#7b8a34',`${c.badgeIcon} ${c.badge}`,'#f8f4ea',24);
+    pill(ctx,420,478,180,56,'#ddd2be',c.countText,'#5d5143',23);
+    ctx.fillStyle='#302820'; ctx.font='700 56px sans-serif'; let y=wrapText(ctx,c.title,124,646,820,76,4);
+    ctx.fillStyle='#6c5e50'; ctx.font='700 36px sans-serif'; y=wrapText(ctx,c.subtitle,124,y+36,820,48,3);
+    ctx.fillStyle='#6f6252'; ctx.font='500 38px sans-serif'; y=wrapText(ctx,c.body,124,y+64,820,58,5);
+    ctx.fillStyle='#7a6e60'; ctx.font='700 30px sans-serif'; ctx.fillText(c.meta,124,1288);
+    if(c.amountText){ ctx.fillStyle='#8d7a5c'; ctx.font='800 30px sans-serif'; ctx.fillText(c.amountText,124,1340); }
+    ctx.fillStyle='#8d7a5c'; ctx.font='500 32px sans-serif'; wrapText(ctx,'오늘의 수련과 마음이 YOGIBARA를 통해 누군가의 내일을 응원합니다.',124,1416,804,50,3);
+    pill(ctx,124,1508,340,74,'#7b8a34','나눔의 기록','#f7f3ea',32);
+    ctx.fillStyle='#5e5142'; ctx.font='600 28px sans-serif'; ctx.fillText('나의 YOGIBARA CARD',124,1662); ctx.fillText(`@${profileName().replace(/\s+/g,'').toLowerCase()}`,124,1708);
+    ctx.fillStyle='#d3c2ac'; ctx.font='800 30px sans-serif'; ctx.fillText('PRACTICE · SHARE · PEACE',124,1788); ctx.fillStyle='#9b8b76'; ctx.font='500 24px sans-serif'; ctx.fillText('V22',930,1788);
+    return canvas;
+  }
+  function dataUrlToFile(dataUrl,name){ const p=dataUrl.split(','), mime=(p[0].match(/:(.*?);/)||[])[1]||'image/png'; const bin=atob(p[1]); const bytes=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i); return new File([bytes],name,{type:mime}); }
+  function cardFilename(){ const c=latestCardData(); return `YOGIBARA_story_${(c?.entry?.date||new Date().toISOString().slice(0,10))}.png`; }
+  window.downloadYogibaraCard=function(){ try{ const url=makeStoryCanvas().toDataURL('image/png'); const a=document.createElement('a'); a.href=url; a.download=cardFilename(); document.body.appendChild(a); a.click(); a.remove(); }catch(e){ alert(e.message||'이미지를 만들 수 없습니다.'); } };
+  window.shareYogibaraCard=function(){
+    try{ const dataUrl=makeStoryCanvas().toDataURL('image/png'); const file=dataUrlToFile(dataUrl,cardFilename()); if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){ navigator.share({files:[file],title:'YOGIBARA CARD'}).catch(e=>{ if(e&&e.name!=='AbortError') alert('공유창을 열지 못했습니다. 이미지 저장을 이용해주세요.'); }); return; } const a=document.createElement('a'); a.href=dataUrl; a.download=cardFilename(); document.body.appendChild(a); a.click(); a.remove(); alert('스토리용 이미지를 저장했습니다. Instagram 스토리에서 이미지를 불러와 올려주세요.'); }catch(e){ alert(e.message||'공유할 수 없습니다.'); }
+  };
+
+  function renderHomeV22(){
+    const container=byId('homeShareCard'); if(!container) return;
+    const c=latestCardData(); const total=donationStats(); const benefit=storyBenefitInfo();
+    const shareMarkup=c?`<div class="sharePreviewWrap"><div class="sharePreviewCard"><div class="shareTopLine">YOGIBARA CARD · 나눔</div><div class="shareBadgeRow"><span class="storyTypeChip">${esc(c.badgeIcon)} ${esc(c.badge)}</span><span class="storyCountChip">${esc(c.countText)}</span></div><h3>${esc(c.title)}</h3><h4>${esc(c.subtitle)}</h4><p>${esc(c.body)}</p><div class="shareMeta">${esc(c.meta)}${c.amountText?`<br>${esc(c.amountText)}`:''}<br>수련은, 나에게서 끝나지 않는다.</div><div class="cardActions story"><button class="pill" onclick="downloadYogibaraCard()">이미지 저장</button><button class="pill primary" onclick="shareYogibaraCard()">스토리에 공유</button></div><div class="storyHelp">공유창에서 Instagram을 선택한 뒤 스토리로 올리세요. 금액 공개 여부는 내 설정에서 조정할 수 있습니다.</div></div></div>`:'<div class="empty card">기록 하나를 남기면 스토리에 공유할 수 있는 YOGIBARA CARD가 자동으로 만들어집니다.</div>';
+    container.innerHTML=`${shareMarkup}<div class="benefitCard card"><div class="kicker">스토리 공유 혜택</div><h3>${(state.storyBenefit&&state.storyBenefit.shares)||0}회 공유</h3><p>${esc(benefit.current)}${benefit.remain>0?` · 다음 혜택까지 ${benefit.remain}회 남았어요.`:''}</p><div class="benefitList"><span>1회 · 응원 배지</span><span>3회 · 요가보따리 2,000원 혜택</span><span>5회 · 파트너 원데이 우선 알림</span></div><div class="cardActions"><button class="pill primary" onclick="claimStoryBenefit()">스토리 공유했어요</button></div></div><div class="donationStatCard card"><div class="kicker">나눔 지출 · 참여 누적</div><h3>${amountVisible()?won(total.total):'금액 비공개'}</h3><p>총 ${total.count}회의 나눔 기록이 쌓였습니다. 기부요가, 릴레이 참여, 원데이 나눔, 요가보따리, 카드기부가 각각 따로 표시됩니다.</p></div><div class="hubNewsCard card"><div class="kicker">YOGIBARA HUB</div><h3>총 기부금 · 환아 소식 · 새소식</h3><p>허브에서 자세한 누적 기부금과 환아 소식을 보고, 새 업데이트가 올라오면 앱 새소식에서도 확인할 수 있어요.</p><div class="cardActions"><button class="pill primary" onclick="window.open('${HUB_URL}','_blank','noopener')">허브 보러가기</button></div></div>`;
+  }
+
+  function renderMoneySetting(){
+    const target=byId('privacySettingsSection'); if(!target||byId('amountVisibilitySection')) return;
+    const wrap=document.createElement('div'); wrap.id='amountVisibilitySection'; wrap.className='settingsSection';
+    wrap.innerHTML=`<div class="sectionTitle"><b>금액 공개 설정</b><small>공개 기록과 별도로</small></div><div class="card settingsCard"><label class="moneySettingLabel">나눔 기록은 공개하되 누적 금액은<select id="amountVisibilitySelect"><option value="show">공개</option><option value="hide">비공개</option></select></label><div class="settingsActions"><button class="pill primary" id="saveAmountVisibilityBtn">금액 공개 설정 저장</button></div><div class="settingsNote">스토리 공유 이미지와 홈 카드의 누적 금액 표시에만 적용됩니다.</div></div>`;
+    target.insertAdjacentElement('afterend',wrap);
+    byId('amountVisibilitySelect').value=state.amountVisibility||'show';
+    byId('saveAmountVisibilityBtn').onclick=()=>{ state.amountVisibility=byId('amountVisibilitySelect').value; save(); renderAll(); alert(state.amountVisibility==='show'?'누적 금액을 공개하도록 저장했습니다.':'누적 금액을 비공개로 저장했습니다.'); };
+  }
+
+  function enhanceSpacesPage(){
+    const spaceList=byId('spaceList');
+    if(!spaceList||byId('journeyMapBridge')) return;
+    const wrap=document.createElement('div'); wrap.id='journeyMapBridge'; wrap.className='card journeyBridge';
+    wrap.innerHTML=`<div class="kicker">JEJU YOGA MAP</div><h3>지도에서 바로 내 여정 추가하기</h3><p>제주 지도에서 Journey에 담기, 동선 보기, 공유 기능까지 모두 사용할 수 있어요. 아래 지도에서 바로 둘러보거나 크게 열어보세요.</p><div class="mapBridgeFrameWrap"><iframe class="mapBridgeFrame" src="${ROOT_MAP_URL}" title="YOGIBARA MAP"></iframe></div><div class="cardActions"><a class="pill primary mapLinkBtn" href="${ROOT_MAP_URL}" target="_blank" rel="noopener">지도 크게 보기</a><a class="pill mapLinkBtn" href="${ROOT_MAP_URL}" target="_blank" rel="noopener">내 여정 만들기</a></div>`;
+    spaceList.insertAdjacentElement('beforebegin',wrap);
+  }
+
+  const origRenderHome=renderHome;
+  renderHome=function(){ origRenderHome(); renderHomeV22(); };
+  const origRenderMy=renderMy;
+  renderMy=function(){ origRenderMy(); renderMoneySetting(); };
+  const origRenderAll=renderAll;
+  renderAll=function(){ origRenderAll(); setTimeout(enhanceSpacesPage,30); };
+
+  ensureState();
+  renderAll();
+})();
+</script>
+
+<script>
+const frame=document.getElementById('appFrame');
+const loading=document.getElementById('loading');
+let injected=false;
+
+function injectIntoInner(innerFrame){
+  try{
+    const d=innerFrame.contentDocument;
+    if(!d || d.documentElement.dataset.v22Injected==='1') return;
+    d.documentElement.dataset.v22Injected='1';
+    const style=d.createElement('style');
+    style.textContent=`
+      .sharePreviewWrap{margin-bottom:10px}.sharePreviewCard{padding:18px;background:linear-gradient(150deg,#f5eee1,#e8dcc2);border-radius:26px;box-shadow:0 12px 28px rgba(0,0,0,.18);position:relative;overflow:hidden}.sharePreviewCard:before{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(123,138,52,.12);right:-22px;top:-18px}.shareTopLine{font-size:11px;letter-spacing:.18em;color:#8a755a;font-weight:900;position:relative;z-index:1}.shareBadgeRow{position:relative;z-index:1;display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.storyTypeChip,.storyCountChip{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:7px 12px;font-size:10px;font-weight:900}.storyTypeChip{background:#7b8a34;color:#fff}.storyCountChip{background:#e5d9c5;color:#5d5143}.sharePreviewCard h3{position:relative;z-index:1;margin:14px 0 8px;font:700 28px/1.35 "Noto Serif KR",Georgia,serif;color:#332a21}.sharePreviewCard h4{position:relative;z-index:1;margin:0 0 12px;font-size:16px;color:#6b5e50}.sharePreviewCard p{position:relative;z-index:1;margin:0;color:#6f6252;font-size:12px;line-height:1.7}.shareMeta{position:relative;z-index:1;margin-top:18px;color:#7b6d5d;font-size:11px;line-height:1.6}.storyHelp{margin-top:8px;color:#8e7f6c;font-size:9px;line-height:1.55}.cardActions.story{display:grid;grid-template-columns:1fr 1.2fr;gap:8px}.cardActions.story button{width:100%;min-width:0}.benefitCard,.donationStatCard,.hubNewsCard{padding:15px;margin-top:10px}.benefitCard h3,.donationStatCard h3,.hubNewsCard h3{margin:7px 0 5px;font-size:24px}.benefitCard p,.donationStatCard p,.hubNewsCard p{margin:0;color:var(--muted);font-size:11px;line-height:1.6}.benefitList{display:grid;gap:6px;margin-top:10px;font-size:10px;color:#eadcca}.benefitList span{padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.04)}.journeyBridge{padding:14px;margin-bottom:10px}.journeyBridge h3{margin:7px 0 5px;font-size:20px}.journeyBridge p{margin:0;color:var(--muted);font-size:11px;line-height:1.6}.mapBridgeFrameWrap{margin-top:12px;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:#0f0c09}.mapBridgeFrame{display:block;width:100%;height:250px;border:0;background:#fff}.mapLinkBtn{text-decoration:none;text-align:center}.moneySettingLabel{display:block;color:var(--muted);font-size:10px;font-weight:800}.moneySettingLabel select{width:100%;margin-top:6px;border:1px solid rgba(255,255,255,.08);background:var(--soft);color:#342b22;border-radius:13px;padding:10px 11px}
+    `;
+    d.head.appendChild(style);
+    const s=d.createElement('script');
+    s.textContent=document.getElementById('v22-script').textContent;
+    d.body.appendChild(s);
+    injected=true;
+    loading.style.display='none';
+  }catch(err){ console.error(err); }
+}
+
+frame.addEventListener('load',()=>{
+  try{
+    const outerDoc=frame.contentDocument;
+    const attach=()=>{
+      const innerFrame=outerDoc.getElementById('appFrame');
+      if(!innerFrame){ setTimeout(attach,120); return; }
+      innerFrame.addEventListener('load',()=>setTimeout(()=>injectIntoInner(innerFrame),220));
+      setTimeout(()=>injectIntoInner(innerFrame),900);
+    };
+    attach();
+  }catch(err){ loading.textContent='앱을 불러오지 못했습니다. 새로고침해 주세요.'; console.error(err); }
+});
+
+setTimeout(()=>{ if(!injected) loading.style.display='none'; },3000);
+</script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17120d">
+<title>YOGIBARA V24</title>
+<style>
+html,body{margin:0;width:100%;height:100%;background:#0f0c09;overflow:hidden}
+#appFrame{display:block;width:min(100%,430px);height:100dvh;margin:0 auto;border:0;background:#17120d}
+#loading{position:fixed;inset:0;display:grid;place-items:center;background:#17120d;color:#f7efe5;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-size:14px;z-index:5}
+</style>
+</head>
+<body>
+<div id="loading">YOGIBARA를 여는 중…</div>
+<iframe id="appFrame" src="./app-23.html" title="YOGIBARA" allow="web-share; geolocation; clipboard-write; clipboard-read"></iframe>
+
+<script type="text/plain" id="v24-script">
+(function(){
+  if(window.__YOGIBARA_V24__) return;
+  window.__YOGIBARA_V24__=true;
+
+  function byId(id){return document.getElementById(id)}
+
+  function addPurposeBanner(){
+    const home=byId('home') || document.body;
+    if(!home || byId('homePurposeBanner')) return;
+
+    let anchor=null;
+    const candidates=[...home.querySelectorAll('.card,.section')];
+    anchor=candidates.find(el=>{
+      const t=(el.innerText||'').trim();
+      return t.includes('수련은, 나에게서 끝나지 않는다.') || t.includes('함께 만드는 나눔 문화') || t.includes('수련은, 나에게서 끝나지 않는다');
+    }) || home.firstElementChild;
+
+    const banner=document.createElement('div');
+    banner.id='homePurposeBanner';
+    banner.className='purposeBanner card';
+    banner.innerHTML=`
+      <div class="purposeKicker">NOW WE SUPPORT</div>
+      <h3>지금 돕고 있는 어린이와 병원</h3>
+      <div class="purposeMain">세브란스병원 · 김○○ 환아 치료 지원</div>
+      <p>YOGIBARA의 나눔은 지금 세브란스병원에서 치료가 필요한 어린이에게 이어지고 있습니다. 수련, 릴레이, 상품 구매, 나누는 수업이 모두 이 마음으로 연결됩니다.</p>
+      <div class="purposeTags">
+        <span>현재 나눔 목적</span>
+        <span>환아 치료 지원</span>
+        <span>허브에서 소식 보기</span>
+      </div>
+    `;
+
+    if(anchor && anchor.parentElement) anchor.parentElement.insertBefore(banner, anchor);
+    else home.insertAdjacentElement('afterbegin', banner);
+  }
+
+  function applyV24(){
+    addPurposeBanner();
+  }
+
+  const origRenderAll=window.renderAll;
+  if(typeof origRenderAll==='function'){
+    window.renderAll=function(){
+      origRenderAll();
+      setTimeout(applyV24, 40);
+    };
+  }
+
+  applyV24();
+  setTimeout(applyV24, 300);
+})();
+</script>
+
+<script>
+const frame=document.getElementById('appFrame');
+const loading=document.getElementById('loading');
+let injected=false;
+
+function deepInject(win){
+  try{
+    let currentWin=win;
+    let currentDoc=currentWin.document;
+    while(currentDoc.getElementById('appFrame') && currentDoc.getElementById('appFrame').contentWindow){
+      currentWin=currentDoc.getElementById('appFrame').contentWindow;
+      currentDoc=currentWin.document;
+    }
+    if(currentDoc.documentElement.dataset.v24Injected==='1') return;
+    currentDoc.documentElement.dataset.v24Injected='1';
+
+    const style=currentDoc.createElement('style');
+    style.textContent=`
+      .purposeBanner{padding:15px;margin-bottom:10px;background:linear-gradient(160deg,rgba(123,138,52,.18),rgba(255,255,255,.04));border:1px solid rgba(166,188,86,.22)}
+      .purposeKicker{font-size:10px;letter-spacing:.18em;color:#b8d05a;font-weight:900}
+      .purposeBanner h3{margin:8px 0 6px;font-size:23px;line-height:1.35;color:#f6efe4}
+      .purposeMain{font-size:16px;font-weight:800;color:#fff3df;margin-bottom:8px}
+      .purposeBanner p{margin:0;color:#e4d6c7;font-size:11px;line-height:1.7}
+      .purposeTags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+      .purposeTags span{display:inline-flex;align-items:center;padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.06);color:#f2e6d7;font-size:9px;font-weight:800}
+    `;
+    currentDoc.head.appendChild(style);
+
+    const s=currentDoc.createElement('script');
+    s.textContent=document.getElementById('v24-script').textContent;
+    currentDoc.body.appendChild(s);
+
+    injected=true;
+    loading.style.display='none';
+  }catch(err){console.error(err)}
+}
+
+frame.addEventListener('load',()=>{
+  const run=()=>{ try{ deepInject(frame.contentWindow); }catch(err){ console.error(err); } };
+  setTimeout(run,500);
+  setTimeout(run,1400);
+  setTimeout(run,2600);
+});
+setTimeout(()=>{ if(!injected) loading.style.display='none'; },3500);
+</script>
+</body>
+</html>

@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17120d">
+<title>YOGIBARA V20</title>
+<style>
+html,body{margin:0;width:100%;height:100%;background:#0f0c09;overflow:hidden}
+#appFrame{display:block;width:min(100%,430px);height:100dvh;margin:0 auto;border:0;background:#17120d}
+#loading{position:fixed;inset:0;display:grid;place-items:center;background:#17120d;color:#f7efe5;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-size:14px;z-index:5}
+</style>
+</head>
+<body>
+<div id="loading">YOGIBARA를 여는 중…</div>
+<iframe id="appFrame" src="./app-18.html" title="YOGIBARA" allow="web-share; geolocation; clipboard-write; clipboard-read"></iframe>
+
+<script type="text/plain" id="enhancement-script">
+(function(){
+  const VERSION='V20';
+  const DONATION_CATEGORIES=['요가보따리 구매','기부요가 참여','릴레이 응원 기부(나눔)','직접 카드기부'];
+  const ALL_SPEND_CATEGORIES=['수련비','요가복','매트·소품','워크숍','여행·숙소','요가보따리 구매','기부요가 참여','릴레이 응원 기부(나눔)','직접 카드기부','기타'];
+
+  function byId(id){return document.getElementById(id)}
+  function formatStartMonth(dateStr){
+    if(!dateStr) return '';
+    const m=/^(\d{4})-(\d{2})/.exec(dateStr);
+    return m?`기록 시작 · ${m[1]}년 ${Number(m[2])}월`:'';
+  }
+  function isDonationSpend(e){
+    return !!(e && e.type==='spend' && DONATION_CATEGORIES.includes(e.category));
+  }
+  function publicEntries(){
+    return state.entries.filter(e=>!e.private);
+  }
+  function defaultPrivacy(){
+    if(!state.privacyDefaults){
+      state.privacyDefaults={practice:'public',spend:'public',place:'public',share:'public'};
+    }
+  }
+  function donationSummary(){
+    const donationEntries=state.entries.filter(isDonationSpend);
+    return {
+      count:donationEntries.length,
+      total:donationEntries.reduce((s,e)=>s+(Number(e.amount)||0),0),
+      publicCount:donationEntries.filter(e=>!e.private).length
+    };
+  }
+  function ensureEntryDefaults(){
+    defaultPrivacy();
+    state.entries.forEach(e=>{
+      if(typeof e.private!=='boolean') e.private=false;
+      if(e.type==='spend') e.donationSpend=isDonationSpend(e);
+      if(!e.paymentMethod && e.type==='spend') e.paymentMethod='기록';
+    });
+    save();
+  }
+  function getVisibilityDefault(type){
+    defaultPrivacy();
+    return state.privacyDefaults[type]||'public';
+  }
+
+  function latestCardData(){
+    const sorted=publicEntries().slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+    const share=sorted.find(e=>e.type==='share');
+    if(share){
+      return {
+        kind:'나눔',
+        title:'나의 수련이 누군가에게 희망이 됩니다.',
+        body:share.name?`${share.name}에서 이어진 나눔의 기록입니다.`:'오늘의 수련과 마음이 따뜻한 나눔으로 이어졌습니다.',
+        meta:`${share.date} · ${share.kind||'나눔'}`
+      };
+    }
+    const donationSpend=sorted.find(isDonationSpend);
+    if(donationSpend){
+      return {
+        kind:'나눔지출',
+        title:'나의 수련이 누군가에게 희망이 됩니다.',
+        body:`${donationSpend.category}${donationSpend.item?' · '+donationSpend.item:''}로 마음을 보탰습니다.`,
+        meta:`${donationSpend.date} · ${donationSpend.paymentMethod||'카드'} 결제`
+      };
+    }
+    const practice=sorted.find(e=>e.type==='practice');
+    if(practice){
+      return {
+        kind:'수련',
+        title:'나의 수련이 누군가에게 희망이 됩니다.',
+        body:practice.place?`${practice.place}에서 ${practice.kind} ${practice.min}분의 시간을 남겼습니다.`:`${practice.kind} ${practice.min}분의 수련을 남겼습니다.`,
+        meta:`${practice.date} · MY YOGA LIFE`
+      };
+    }
+    const place=sorted.find(e=>e.type==='place');
+    if(place){
+      return {
+        kind:'여정',
+        title:'나의 수련이 누군가에게 희망이 됩니다.',
+        body:place.place?`${place.place}${place.region?' · '+place.region:''}의 기록입니다.`:'새로운 공간의 기록입니다.',
+        meta:`${place.date} · MY JOURNEY`
+      };
+    }
+    const spend=sorted.find(e=>e.type==='spend');
+    if(spend){
+      return {
+        kind:'요가생활',
+        title:'나의 수련이 누군가에게 희망이 됩니다.',
+        body:`${spend.category}${spend.item?' · '+spend.item:''}`,
+        meta:`${spend.date} · MY YOGA LIFE`
+      };
+    }
+    return null;
+  }
+
+  function wrapText(ctx,text,x,y,maxWidth,lineHeight,maxLines){
+    const chars=[...String(text||'')];
+    let line='', lines=[];
+    chars.forEach(ch=>{
+      const test=line+ch;
+      if(ctx.measureText(test).width>maxWidth && line){
+        lines.push(line);
+        line=ch;
+      }else line=test;
+    });
+    if(line) lines.push(line);
+    if(lines.length>maxLines){
+      lines=lines.slice(0,maxLines);
+      const last=lines[maxLines-1];
+      lines[maxLines-1]=last.slice(0,Math.max(0,last.length-1))+'…';
+    }
+    lines.forEach((ln,i)=>ctx.fillText(ln,x,y+i*lineHeight));
+    return y+lines.length*lineHeight;
+  }
+  function roundRectPath(ctx,x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+  function makeStoryCanvas(){
+    const c=latestCardData();
+    if(!c) throw new Error('공개 기록이 없습니다.');
+    const canvas=document.createElement('canvas');
+    canvas.width=1080;canvas.height=1920;
+    const ctx=canvas.getContext('2d');
+
+    const bg=ctx.createLinearGradient(0,0,0,1920);
+    bg.addColorStop(0,'#1e1711');
+    bg.addColorStop(.55,'#15100c');
+    bg.addColorStop(1,'#0d0907');
+    ctx.fillStyle=bg;
+    ctx.fillRect(0,0,1080,1920);
+
+    ctx.fillStyle='rgba(152,170,77,.14)';
+    ctx.beginPath();ctx.arc(925,250,260,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(244,236,223,.08)';
+    ctx.beginPath();ctx.arc(180,1620,180,0,Math.PI*2);ctx.fill();
+
+    ctx.fillStyle='#f6efe4';
+    ctx.font='700 88px Georgia, serif';
+    ctx.fillText('YOGIBARA',86,170);
+    ctx.fillStyle='#d3c2ac';
+    ctx.font='500 30px sans-serif';
+    ctx.fillText('수련은, 나에게서 끝나지 않는다.',86,220);
+
+    roundRectPath(ctx,66,360,948,1160,60);
+    ctx.fillStyle='#f2eadc';
+    ctx.fill();
+    ctx.lineWidth=2;
+    ctx.strokeStyle='rgba(120,103,74,.13)';
+    ctx.stroke();
+
+    ctx.fillStyle='#8d7a5c';
+    ctx.font='800 28px sans-serif';
+    ctx.fillText(`YOGIBARA CARD · ${c.kind}`,124,455);
+
+    ctx.fillStyle='#7b8a34';
+    roundRectPath(ctx,124,495,280,56,28);
+    ctx.fill();
+    ctx.fillStyle='#f8f4ea';
+    ctx.font='800 24px sans-serif';
+    ctx.fillText('PRACTICE · SHARE',150,531);
+
+    ctx.fillStyle='#332a21';
+    ctx.font='700 68px sans-serif';
+    let y=wrapText(ctx,c.title,124,665,815,86,4);
+
+    ctx.fillStyle='#6b5e50';
+    ctx.font='500 38px sans-serif';
+    y=wrapText(ctx,c.body,124,y+52,815,58,5);
+
+    ctx.fillStyle='#7a6e60';
+    ctx.font='700 30px sans-serif';
+    ctx.fillText(c.meta,124,1300);
+
+    ctx.fillStyle='#8d7a5c';
+    ctx.font='500 32px sans-serif';
+    wrapText(ctx,'오늘의 수련과 마음이 YOGIBARA를 통해 누군가의 내일을 응원합니다.',124,1388,800,50,3);
+
+    ctx.fillStyle='#7b8a34';
+    roundRectPath(ctx,124,1505,330,74,37);
+    ctx.fill();
+    ctx.fillStyle='#f7f3ea';
+    ctx.font='800 32px sans-serif';
+    ctx.fillText('나눔의 기록',206,1552);
+
+    ctx.fillStyle='#5e5142';
+    ctx.font='600 28px sans-serif';
+    ctx.fillText('나의 YOGIBARA CARD',124,1662);
+    ctx.fillText(`@${(state.profile?.name||'yogi').replace(/\s+/g,'').toLowerCase()}`,124,1708);
+
+    ctx.fillStyle='#d3c2ac';
+    ctx.font='800 30px sans-serif';
+    ctx.fillText('PRACTICE · SHARE · PEACE',124,1788);
+    ctx.fillStyle='#9b8b76';
+    ctx.font='500 24px sans-serif';
+    ctx.fillText(VERSION,930,1788);
+    return canvas;
+  }
+  function dataUrlToFile(dataUrl,name){
+    const parts=dataUrl.split(',');
+    const mime=(parts[0].match(/:(.*?);/)||[])[1]||'image/png';
+    const bin=atob(parts[1]);
+    const bytes=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+    return new File([bytes],name,{type:mime});
+  }
+  function cardFilename(){
+    const c=latestCardData();
+    return `YOGIBARA_story_${(c?.meta||todayISO()).slice(0,10)}.png`;
+  }
+  window.downloadYogibaraCard=function(){
+    try{
+      const url=makeStoryCanvas().toDataURL('image/png');
+      const a=document.createElement('a');
+      a.href=url;a.download=cardFilename();document.body.appendChild(a);a.click();a.remove();
+    }catch(e){
+      alert(e.message||'이미지를 만들 수 없습니다.');
+    }
+  };
+  window.shareYogibaraCard=function(){
+    try{
+      const dataUrl=makeStoryCanvas().toDataURL('image/png');
+      const file=dataUrlToFile(dataUrl,cardFilename());
+      if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+        navigator.share({files:[file],title:'YOGIBARA CARD'}).catch(e=>{
+          if(e && e.name!=='AbortError') alert('공유창을 열지 못했습니다. 이미지 저장을 이용해주세요.');
+        });
+        return;
+      }
+      const a=document.createElement('a');
+      a.href=dataUrl;a.download=cardFilename();document.body.appendChild(a);a.click();a.remove();
+      alert('스토리용 이미지를 저장했습니다. Instagram 스토리에서 이미지를 불러와 올려주세요.');
+    }catch(e){
+      alert(e.message||'공유할 수 없습니다.');
+    }
+  };
+
+  function ensureSpendEnhancements(){
+    const spendCategory=byId('spendCategory');
+    if(spendCategory){
+      spendCategory.innerHTML=ALL_SPEND_CATEGORIES.map(v=>`<option>${v}</option>`).join('');
+    }
+    if(!byId('spendPaymentWrap')){
+      const amountInput=byId('spendAmount');
+      if(amountInput){
+        const payment=document.createElement('label');
+        payment.id='spendPaymentWrap';
+        payment.innerHTML='결제 방식<select id="spendPayment"><option>카드</option><option>계좌이체</option><option>현장결제</option><option>기록</option></select>';
+        const amountLabel=amountInput.closest('label');
+        if(amountLabel && amountLabel.parentElement){
+          amountLabel.parentElement.insertAdjacentElement('afterend',payment);
+        }
+      }
+    }
+    if(!byId('spendSupportShortcuts')){
+      const wrap=document.createElement('div');
+      wrap.id='spendSupportShortcuts';
+      wrap.className='supportShortcuts';
+      wrap.innerHTML=`
+        <div class="supportHead">나눔 지출 바로가기</div>
+        <div class="supportGrid">
+          <button type="button" class="supportBtn" data-preset="bottari">
+            <b>요가보따리 구매</b>
+            <small>굿즈 구매 기록</small>
+          </button>
+          <button type="button" class="supportBtn" data-preset="donate">
+            <b>카드로 기부</b>
+            <small>직접 카드기부 기록</small>
+          </button>
+          <button type="button" class="supportBtn" data-preset="relay">
+            <b>릴레이 응원 기부</b>
+            <small>응원 나눔 기록</small>
+          </button>
+          <button type="button" class="supportBtn" data-preset="charityYoga">
+            <b>기부요가 참여</b>
+            <small>기부 수련 참여 기록</small>
+          </button>
+        </div>
+        <div class="supportNote">실제 결제 연동 전 단계의 프로토타입입니다. 버튼을 누르면 지출 기록이 빠르게 입력됩니다.</div>
+      `;
+      const spendFields=byId('spendFields');
+      if(spendFields) spendFields.insertAdjacentElement('afterbegin',wrap);
+      wrap.querySelectorAll('[data-preset]').forEach(btn=>{
+        btn.onclick=()=>applySpendPreset(btn.dataset.preset);
+      });
+    }
+  }
+  function applySpendPreset(type){
+    const presetMap={
+      bottari:{category:'요가보따리 구매',item:'YOGIBARA 요가보따리',amount:39000,note:'굿즈 구매로 나눔에 함께합니다.',payment:'카드'},
+      donate:{category:'직접 카드기부',item:'YOGIBARA 카드기부',amount:10000,note:'카드로 마음을 보탰습니다.',payment:'카드'},
+      relay:{category:'릴레이 응원 기부(나눔)',item:'릴레이 응원 기부',amount:5000,note:'릴레이 캠페인을 응원합니다.',payment:'카드'},
+      charityYoga:{category:'기부요가 참여',item:'기부요가 참여',amount:30000,note:'수련이 나눔으로 이어지는 시간.',payment:'카드'}
+    };
+    const preset=presetMap[type];
+    if(!preset) return;
+    openEntry('spend');
+    setTimeout(()=>{
+      if(byId('spendCategory')) byId('spendCategory').value=preset.category;
+      if(byId('spendItem')) byId('spendItem').value=preset.item;
+      if(byId('spendAmount')) byId('spendAmount').value=preset.amount;
+      if(byId('spendNote')) byId('spendNote').value=preset.note;
+      if(byId('spendPayment')) byId('spendPayment').value=preset.payment;
+      if(byId('entryVisibility')) byId('entryVisibility').value='public';
+    },40);
+  }
+
+  function ensurePrivacyChoice(){
+    const entryDateEl=byId('entryDate');
+    if(entryDateEl && !byId('entryVisibility')){
+      const holder=document.createElement('div');
+      holder.className='privacyChoice';
+      holder.innerHTML='공개 범위<select id="entryVisibility"><option value="public">공개 · 연결된 사람에게 보여요</option><option value="private">나만 보기 · 다른 사람에게 숨겨요</option></select><div class="privateNote">기본값은 내 설정에서 한 번에 바꿀 수 있습니다.</div>';
+      entryDateEl.closest('label').insertAdjacentElement('afterend',holder);
+    }
+  }
+
+  const originalOpenEntry=openEntry;
+  openEntry=function(type){
+    originalOpenEntry(type);
+    ensureSpendEnhancements();
+    ensurePrivacyChoice();
+    const v=byId('entryVisibility');
+    if(v) v.value=getVisibilityDefault(type);
+    if(type==='spend' && byId('spendPayment')) byId('spendPayment').value='기록';
+  };
+
+  byId('saveEntryBtn').onclick=()=>{
+    const type=byId('entryType').value;
+    const date=byId('entryDate').value||todayISO();
+    let e={id:Date.now(),type,date,private:byId('entryVisibility')?.value==='private'};
+    if(type==='practice'){
+      e.kind=byId('practiceKind').value;
+      e.min=Math.max(1,Number(byId('practiceMin').value)||60);
+      e.place=byId('practicePlace').value.trim();
+      e.note=byId('practiceNote').value.trim();
+    } else if(type==='spend'){
+      e.amount=Math.max(0,Number(byId('spendAmount').value)||0);
+      e.category=byId('spendCategory').value;
+      e.item=byId('spendItem').value.trim();
+      e.note=byId('spendNote').value.trim();
+      e.paymentMethod=byId('spendPayment')?.value||'기록';
+      e.donationSpend=isDonationSpend(e);
+    } else if(type==='place'){
+      e.place=byId('placeName').value.trim();
+      e.region=byId('placeRegion').value.trim();
+      e.note=byId('placeNote').value.trim();
+    } else if(type==='share'){
+      e.kind=byId('shareKind').value;
+      e.name=byId('shareName').value.trim();
+      e.amount=Math.max(0,Number(byId('shareAmount').value)||0);
+      e.note=byId('shareNote').value.trim();
+    }
+    state.entries.push(e);
+    save();
+    closeSheet('entrySheet');
+    renderAll();
+    go('home');
+  };
+
+  window.toggleEntryPrivacy=function(id){
+    const e=state.entries.find(x=>x.id===id);
+    if(!e) return;
+    e.private=!e.private;
+    save();
+    renderAll();
+  };
+
+  entryHtml=function(e){
+    const visibilityTag=e.private?'<span class="tag private">🔒 나만 보기</span>':'<span class="tag">공개</span>';
+    const inlineBtn=`<button class="privacyMini" onclick="toggleEntryPrivacy(${e.id})">${e.private?'공개로':'나만 보기'}</button>`;
+    if(e.type==='practice'){
+      return `<div class="entry card"><div class="entryTop"><div><b>${esc(e.kind)} · ${e.min}분</b><small>${esc(e.date)}${e.place?' · '+esc(e.place):''}</small></div><div class="tagRow">${visibilityTag}<span class="tag">수련</span>${inlineBtn}</div></div>${e.note?`<p>${esc(e.note)}</p>`:''}</div>`;
+    }
+    if(e.type==='spend'){
+      const donationTag=isDonationSpend(e)?'<span class="tag share">나눔지출</span>':'';
+      const payTag=e.paymentMethod?`<span class="tag place">${esc(e.paymentMethod)}</span>`:'';
+      return `<div class="entry card"><div class="entryTop"><div><b>${esc(e.item||e.category)} · ${won(e.amount)}</b><small>${esc(e.date)} · ${esc(e.category)}</small></div><div class="tagRow">${visibilityTag}<span class="tag money">지출</span>${donationTag}${payTag}${inlineBtn}</div></div>${e.note?`<p>${esc(e.note)}</p>`:''}</div>`;
+    }
+    if(e.type==='place'){
+      return `<div class="entry card"><div class="entryTop"><div><b>${esc(e.place||'새로운 장소')}</b><small>${esc(e.date)}${e.region?' · '+esc(e.region):''}</small></div><div class="tagRow">${visibilityTag}<span class="tag place">장소</span>${inlineBtn}</div></div>${e.note?`<p>${esc(e.note)}</p>`:''}</div>`;
+    }
+    return `<div class="entry card"><div class="entryTop"><div><b>${esc(e.kind)}</b><small>${esc(e.date)}${e.name?' · '+esc(e.name):''}</small></div><div class="tagRow">${visibilityTag}<span class="tag share">나눔</span>${inlineBtn}</div></div>${e.amount?`<div class="tagRow"><span class="tag money">${won(e.amount)}</span></div>`:''}${e.note?`<p>${esc(e.note)}</p>`:''}</div>`;
+  };
+
+  function renderHomeDonationCard(){
+    const container=byId('homeShareCard');
+    if(!container) return;
+    const card=latestCardData();
+    const donation=donationSummary();
+    const shareMarkup=card?`
+      <div class="sharePreviewWrap">
+        <div class="sharePreviewCard">
+          <div class="shareTopLine">YOGIBARA CARD · ${esc(card.kind)}</div>
+          <h3>${esc(card.title)}</h3>
+          <p>${esc(card.body)}</p>
+          <div class="shareMeta">${esc(card.meta)}<br>수련은, 나에게서 끝나지 않는다.</div>
+          <div class="cardActions story">
+            <button class="pill" onclick="downloadYogibaraCard()">이미지 저장</button>
+            <button class="pill primary" onclick="shareYogibaraCard()">스토리에 공유</button>
+          </div>
+          <div class="storyHelp">공유창에서 Instagram을 선택한 뒤 스토리로 올리세요. 1080×1920 PNG 이미지로 공유됩니다.</div>
+        </div>
+      </div>
+    `:`<div class="empty card">기록 하나를 남기면 스토리에 공유할 수 있는 YOGIBARA CARD가 자동으로 만들어집니다.</div>`;
+    container.innerHTML=`
+      ${shareMarkup}
+      <div class="donationStatCard card">
+        <div class="kicker">나눔 지출 누적</div>
+        <h3>${won(donation.total)}</h3>
+        <p>${donation.count}건의 나눔 지출이 쌓였습니다. 요가보따리, 기부요가, 릴레이 응원, 카드기부를 따로 모아 보여줍니다.</p>
+      </div>
+    `;
+  }
+
+  const originalRenderHome=renderHome;
+  renderHome=function(){
+    originalRenderHome();
+    renderHomeDonationCard();
+  };
+
+  // 실제 지도
+  let journeyLeafletMap=null, journeyLayer=null, journeyRenderToken=0;
+  const knownCoords={
+    '요가로움':[33.4920,126.4296],
+    '요가열두달':[33.4704,126.5469],
+    '애월7일요가원':[33.4375,126.3302],
+    '쁘라즈나요가':[33.4767,126.5567],
+    '바라보다요가':[33.5000,126.6600],
+    '아난드요가':[33.476477052022,126.48176932399],
+    '제주':[33.385,126.545],
+    '제주시':[33.4996,126.5312],
+    '애월':[33.450,126.320]
+  };
+  function loadGeoCache(){try{return JSON.parse(localStorage.getItem('yogibara_geo_v20')||'{}')}catch(e){return {}}}
+  function saveGeoCache(c){try{localStorage.setItem('yogibara_geo_v20',JSON.stringify(c))}catch(e){}}
+  async function geocodePlace(name){
+    const exact=knownCoords[name]; if(exact) return exact;
+    const cache=loadGeoCache(); if(cache[name]) return cache[name];
+    try{
+      const q=encodeURIComponent(name+' 대한민국');
+      const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=ko&q=${q}`);
+      if(!r.ok) return null;
+      const data=await r.json();
+      if(data && data[0]){
+        const c=[Number(data[0].lat),Number(data[0].lon)];
+        cache[name]=c; saveGeoCache(cache); return c;
+      }
+    }catch(e){}
+    return null;
+  }
+  function ensureJourneyMap(){
+    const el=byId('journeyMap');
+    if(!el || !window.L) return null;
+    if(!journeyLeafletMap){
+      el.innerHTML='';
+      journeyLeafletMap=L.map(el,{zoomControl:true,minZoom:3,maxZoom:19}).setView([33.385,126.545],9);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(journeyLeafletMap);
+      journeyLayer=L.layerGroup().addTo(journeyLeafletMap);
+    }
+    setTimeout(()=>journeyLeafletMap.invalidateSize(),80);
+    return journeyLeafletMap;
+  }
+  renderJourney=function(){
+    const counts={};
+    state.entries.forEach(e=>{
+      const p=(e.type==='practice'||e.type==='place')?e.place:'';
+      if(!p) return;
+      if(!counts[p]) counts[p]={count:0,last:e.date};
+      counts[p].count++;
+      if(e.date>counts[p].last) counts[p].last=e.date;
+    });
+    const arr=Object.entries(counts).sort((a,b)=>b[1].count-a[1].count);
+    byId('journeyCount').textContent=arr.length+'곳';
+    byId('journeyList').innerHTML=arr.length?arr.map(([name,v])=>`<div class="spaceCard card"><div class="spaceTop"><div><h3>${esc(name)} · ${v.count}회</h3><p>최근 기록 ${esc(v.last)}</p></div><span class="normalBadge">${v.count===1?'첫 기록':v.count+'회'}</span></div></div>`).join(''):'<div class="empty card">수련이나 장소를 남기면 여정이 자동으로 만들어집니다.</div>';
+    const map=ensureJourneyMap();
+    if(!map) return;
+    journeyLayer.clearLayers();
+    const token=++journeyRenderToken;
+    if(!arr.length){map.setView([33.385,126.545],9);return;}
+    Promise.all(arr.map(async([name,v])=>({name,v,c:await geocodePlace(name)}))).then(items=>{
+      if(token!==journeyRenderToken) return;
+      const points=[];
+      items.forEach(({name,v,c})=>{
+        if(!c) return;
+        points.push(c);
+        L.circleMarker(c,{radius:9,weight:3,color:'#f7efe5',fillColor:'#7b8a34',fillOpacity:1}).bindPopup(`<b>${esc(name)}</b><br>방문 기록 ${v.count}회<br>최근 ${esc(v.last)}`).addTo(journeyLayer);
+      });
+      if(points.length===1) map.setView(points[0],14);
+      else if(points.length>1) map.fitBounds(points,{padding:[28,28],maxZoom:13});
+      else map.setView([33.385,126.545],9);
+      setTimeout(()=>map.invalidateSize(),80);
+    });
+  };
+
+  // 프로필 시작 월
+  function ensureProfileSince(){
+    const personBio=byId('personBio');
+    if(personBio && !byId('personSince')){
+      const el=document.createElement('div');el.id='personSince';el.className='profileSince';personBio.insertAdjacentElement('afterend',el);
+    }
+    const myBio=byId('myBio');
+    if(myBio && !byId('mySince')){
+      const el=document.createElement('div');el.id='mySince';el.className='profileSince';myBio.insertAdjacentElement('afterend',el);
+    }
+  }
+  const originalRenderPerson=renderPerson;
+  renderPerson=function(){
+    originalRenderPerson();
+    ensureProfileSince();
+    const p=currentPerson();
+    const publicPractices=(p.practices||[]).filter(x=>!x.private);
+    const first=publicPractices.map(x=>x.date).filter(Boolean).sort()[0];
+    if(byId('personSince')) byId('personSince').textContent=formatStartMonth(first)||'기록 시작일 미표시';
+    byId('personPracticeList').innerHTML=publicPractices.length?publicPractices.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<div class="entry card"><b>${esc(x.text)}</b><small>${esc(x.date)}</small></div>`).join(''):'<div class="empty card">공개한 수련 기록이 없습니다.</div>';
+  };
+
+  function ensureSettingsPanel(){
+    if(byId('privacySettingsSection')) return;
+    const myInsights=byId('myInsights');
+    if(!myInsights) return;
+    const wrap=document.createElement('div');
+    wrap.id='privacySettingsSection';
+    wrap.className='settingsSection';
+    wrap.innerHTML=`
+      <div class="sectionTitle"><b>기록 공개 설정</b><small>내 설정에서 한 번에</small></div>
+      <div class="card settingsCard">
+        <div class="settingsGrid">
+          <label>수련<select id="privacyPractice"><option value="public">전체 공개</option><option value="private">전체 나만 보기</option></select></label>
+          <label>지출<select id="privacySpend"><option value="public">전체 공개</option><option value="private">전체 나만 보기</option></select></label>
+          <label>장소<select id="privacyPlace"><option value="public">전체 공개</option><option value="private">전체 나만 보기</option></select></label>
+          <label>나눔<select id="privacyShare"><option value="public">전체 공개</option><option value="private">전체 나만 보기</option></select></label>
+        </div>
+        <div class="settingsActions">
+          <button class="pill" id="savePrivacyDefaultsBtn">앞으로 기록 기본값 저장</button>
+          <button class="pill primary" id="applyPrivacyExistingBtn">기존 기록에도 적용</button>
+        </div>
+        <div class="settingsNote">지금부터의 기본 공개 범위와 기존 기록 전체를 한 번에 나눌 수 있습니다.</div>
+      </div>
+    `;
+    myInsights.insertAdjacentElement('afterend',wrap);
+    byId('savePrivacyDefaultsBtn').onclick=savePrivacyDefaults;
+    byId('applyPrivacyExistingBtn').onclick=applyPrivacyToExisting;
+  }
+  function renderPrivacySettings(){
+    defaultPrivacy();
+    ensureSettingsPanel();
+    if(byId('privacyPractice')) byId('privacyPractice').value=state.privacyDefaults.practice;
+    if(byId('privacySpend')) byId('privacySpend').value=state.privacyDefaults.spend;
+    if(byId('privacyPlace')) byId('privacyPlace').value=state.privacyDefaults.place;
+    if(byId('privacyShare')) byId('privacyShare').value=state.privacyDefaults.share;
+  }
+  function savePrivacyDefaults(){
+    defaultPrivacy();
+    state.privacyDefaults.practice=byId('privacyPractice').value;
+    state.privacyDefaults.spend=byId('privacySpend').value;
+    state.privacyDefaults.place=byId('privacyPlace').value;
+    state.privacyDefaults.share=byId('privacyShare').value;
+    save();
+    alert('앞으로 기록할 기본 공개 설정을 저장했습니다.');
+  }
+  function applyPrivacyToExisting(){
+    savePrivacyDefaults();
+    state.entries.forEach(e=>{
+      const mode=state.privacyDefaults[e.type]||'public';
+      e.private=(mode==='private');
+    });
+    save();
+    renderAll();
+    alert('기존 기록에도 공개 설정을 적용했습니다.');
+  }
+
+  const originalRenderMy=renderMy;
+  renderMy=function(){
+    originalRenderMy();
+    ensureProfileSince();
+    const first=state.entries.map(e=>e.date).filter(Boolean).sort()[0];
+    if(byId('mySince')) byId('mySince').textContent=formatStartMonth(first)||'첫 기록을 남기면 시작 월이 표시됩니다.';
+    const donation=donationSummary();
+    const myInsights=byId('myInsights');
+    if(myInsights && !byId('donationInsightsCard')){
+      myInsights.insertAdjacentHTML('beforeend',`<div class="insight card" id="donationInsightsCard"><div class="kicker">나눔 지출 누적</div><h3 id="donationTotalText">0원</h3><p id="donationTotalDesc"></p></div>`);
+    }
+    if(byId('donationTotalText')) byId('donationTotalText').textContent=won(donation.total);
+    if(byId('donationTotalDesc')) byId('donationTotalDesc').textContent=`총 ${donation.count}건의 나눔 지출이 기록되었습니다. 요가보따리, 기부요가, 릴레이 응원, 카드기부를 따로 모아 보여줍니다.`;
+    renderPrivacySettings();
+  };
+
+  ensureEntryDefaults();
+  ensurePrivacyChoice();
+  ensureSpendEnhancements();
+  renderAll();
+  setTimeout(()=>{try{renderJourney()}catch(e){}},150);
+})();
+</script>
+
+<script>
+const frame=document.getElementById('appFrame');
+const loading=document.getElementById('loading');
+frame.addEventListener('load',()=>{
+  try{
+    const d=frame.contentDocument;
+    if(!d) return;
+    const leafletCss=d.createElement('link');
+    leafletCss.rel='stylesheet';
+    leafletCss.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    d.head.appendChild(leafletCss);
+
+    const style=d.createElement('style');
+    style.textContent=`
+      #journeyMap{height:300px!important;background:#d9d1bf!important;isolation:isolate;border-radius:20px;overflow:hidden}
+      #journeyMap .leaflet-control-attribution{font-size:7px}
+      #journeyMap .leaflet-control-zoom a{color:#3a3027}
+      .profileSince{margin-top:9px;color:#d8c8b5;font-size:10px;font-weight:700;letter-spacing:.02em}
+      .privacyChoice{margin-top:10px;padding:10px;border-radius:14px;background:rgba(255,255,255,.05);color:var(--muted);font-size:10px;font-weight:800}
+      .privacyChoice select,.settingsGrid select,#spendPayment{width:100%;margin-top:6px;border:1px solid rgba(255,255,255,.08);background:var(--soft);color:#342b22;border-radius:13px;padding:10px 11px}
+      .tag.private{background:#4a4137;color:#f3e8d8}
+      .privacyMini{border:1px solid var(--line);background:rgba(255,255,255,.04);color:#e7dac8;border-radius:999px;padding:4px 7px;font-size:8px;white-space:nowrap}
+      .storyHelp{margin-top:8px;color:#8e7f6c;font-size:9px;line-height:1.55}
+      .cardActions.story{display:grid;grid-template-columns:1fr 1.2fr;gap:8px}
+      .cardActions.story button{width:100%;min-width:0}
+      .sharePreviewWrap{margin-bottom:10px}
+      .sharePreviewCard{padding:18px;background:linear-gradient(150deg,#f5eee1,#e8dcc2);border-radius:26px;box-shadow:0 12px 28px rgba(0,0,0,.18);position:relative;overflow:hidden}
+      .sharePreviewCard:before{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(123,138,52,.12);right:-22px;top:-18px}
+      .shareTopLine{font-size:11px;letter-spacing:.18em;color:#8a755a;font-weight:900;position:relative;z-index:1}
+      .sharePreviewCard h3{position:relative;z-index:1;margin:14px 0 10px;font:700 28px/1.35 "Noto Serif KR",Georgia,serif;color:#332a21}
+      .sharePreviewCard p{position:relative;z-index:1;margin:0;color:#6f6252;font-size:12px;line-height:1.7}
+      .shareMeta{position:relative;z-index:1;margin-top:18px;color:#7b6d5d;font-size:11px;line-height:1.6}
+      .donationStatCard{padding:15px;margin-top:10px}
+      .donationStatCard h3{margin:7px 0 5px;font-size:24px}
+      .donationStatCard p{margin:0;color:var(--muted);font-size:11px;line-height:1.6}
+      .supportShortcuts{margin-bottom:12px;padding:12px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}
+      .supportHead{font-size:11px;font-weight:900;color:#e8dcc9;margin-bottom:8px}
+      .supportGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+      .supportBtn{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);color:var(--ink);border-radius:14px;padding:12px;text-align:left}
+      .supportBtn b{display:block;font-size:12px}
+      .supportBtn small{display:block;margin-top:4px;color:var(--muted);font-size:9px;line-height:1.45}
+      .supportNote{margin-top:8px;color:var(--muted);font-size:9px;line-height:1.45}
+      .settingsSection{margin-top:16px}
+      .settingsCard{padding:14px}
+      .settingsGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+      .settingsGrid label{display:block;color:var(--muted);font-size:10px;font-weight:800}
+      .settingsActions{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}
+      .settingsActions .pill{height:auto;padding:11px 12px;text-align:center}
+      .settingsNote{margin-top:8px;color:var(--muted);font-size:9px;line-height:1.45}
+      #spendPaymentWrap{display:block;color:var(--muted);font-size:10px;font-weight:800;margin:8px 0}
+      @media(max-width:360px){.supportGrid,.settingsGrid{grid-template-columns:1fr}}
+    `;
+    d.head.appendChild(style);
+
+    const inject=()=>{
+      const s=d.createElement('script');
+      s.textContent=document.getElementById('enhancement-script').textContent;
+      d.body.appendChild(s);
+    };
+    const leafletJs=d.createElement('script');
+    leafletJs.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    leafletJs.onload=inject;
+    leafletJs.onerror=inject;
+    d.head.appendChild(leafletJs);
+    loading.style.display='none';
+  }catch(err){
+    loading.textContent='앱을 불러오지 못했습니다. 새로고침해 주세요.';
+    console.error(err);
+  }
+});
+</script>
+</body>
+</html>

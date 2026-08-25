@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17120d">
+<title>YOGIBARA V25</title>
+<style>
+html,body{margin:0;width:100%;height:100%;background:#0f0c09;overflow:hidden}
+#appFrame{display:block;width:min(100%,430px);height:100dvh;margin:0 auto;border:0;background:#17120d}
+#loading{position:fixed;inset:0;display:grid;place-items:center;background:#17120d;color:#f7efe5;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-size:14px;z-index:5}
+</style>
+</head>
+<body>
+<div id="loading">YOGIBARA를 여는 중…</div>
+<iframe id="appFrame" src="./app-24.html" title="YOGIBARA" allow="web-share; geolocation; clipboard-write; clipboard-read"></iframe>
+
+<script type="text/plain" id="v25-script">
+(function(){
+  if(window.__YOGIBARA_V25__) return;
+  window.__YOGIBARA_V25__=true;
+  const MAP_URL='https://yogibara-map.vercel.app/';
+
+  function byId(id){return document.getElementById(id)}
+  function q(sel,root=document){return root.querySelector(sel)}
+  function qa(sel,root=document){return [...root.querySelectorAll(sel)]}
+  function textOf(el){return (el?.innerText||el?.textContent||'').trim()}
+
+  function openDonateOnlySheet(preset){
+    if(typeof openEntry!=='function') return;
+    openEntry('spend');
+    setTimeout(()=>{
+      const title=qa('h2,h3,.sheetTitle,.modalTitle').find(el=>textOf(el).includes('요가에 썼어요')||textOf(el).includes('기록'));
+      if(title) title.textContent='기부하기';
+      const cat=byId('spendCategory');
+      if(cat){
+        cat.innerHTML=['요가보따리 구매','기부요가 참여','릴레이 응원 기부(나눔)','직접 카드기부'].map(v=>`<option>${v}</option>`).join('');
+      }
+      const labelList=qa('label');
+      labelList.forEach(lb=>{
+        const t=textOf(lb);
+        if(t.includes('분류')||t.includes('카테고리')) lb.childNodes[0] && (lb.childNodes[0].textContent='기부 항목');
+      });
+      const notes=qa('p,div,small').find(el=>textOf(el).includes('나눔 지출 바로가기'));
+      if(notes) notes.closest('.supportShortcuts,.card,div')?.classList.add('donateModeWrap');
+      const presetMap={
+        bottari:{category:'요가보따리 구매',item:'YOGIBARA 요가보따리',amount:39000,note:'상품 구매로 나눔에 함께합니다.',payment:'카드'},
+        yoga:{category:'기부요가 참여',item:'기부요가 참여',amount:30000,note:'기부 수련에 참여합니다.',payment:'카드'},
+        relay:{category:'릴레이 응원 기부(나눔)',item:'릴레이 응원 기부',amount:5000,note:'릴레이를 응원하며 기부합니다.',payment:'카드'},
+        card:{category:'직접 카드기부',item:'YOGIBARA 카드기부',amount:10000,note:'직접 카드로 기부합니다.',payment:'카드'}
+      };
+      const p=presetMap[preset]||presetMap.card;
+      if(byId('spendCategory')) byId('spendCategory').value=p.category;
+      if(byId('spendItem')) byId('spendItem').value=p.item;
+      if(byId('spendAmount')) byId('spendAmount').value=p.amount;
+      if(byId('spendNote')) byId('spendNote').value=p.note;
+      if(byId('spendPayment')) byId('spendPayment').value=p.payment;
+      if(byId('entryVisibility')) byId('entryVisibility').value='public';
+    },60);
+  }
+  window.openDonateOnlySheet=openDonateOnlySheet;
+
+  function enhanceHome(){
+    const home=byId('home')||document.body;
+    if(!home || byId('compactHomeHub')) return;
+    const purpose=byId('homePurposeBanner');
+    const anchor=purpose || home.firstElementChild;
+    const wrap=document.createElement('div');
+    wrap.id='compactHomeHub';
+    wrap.className='section';
+    wrap.innerHTML=`
+      <div class="compactHomeGrid">
+        <div class="compactHomeCard compactMainCard">
+          <div class="compactKicker">PRACTICE · SHARE · PEACE</div>
+          <h3>수련은, 나에게서 끝나지 않는다.</h3>
+          <p>여정도 만들고, 수련도 남기고, 나눔도 기록하며 서로 연결됩니다. 기록은 가볍게, 나눔은 더 쉽게, 홈은 한눈에 보이도록 정리했습니다.</p>
+          <div class="compactActionRow">
+            <button class="compactBtn primary" onclick="openDonateOnlySheet('card')">기부하기</button>
+            <button class="compactBtn" onclick="go && go('journey')">내 여정 보기</button>
+          </div>
+        </div>
+        <div class="compactQuickSection">
+          <button class="quickTile" onclick="openDonateOnlySheet('relay')"><span>RELAY</span><b>릴레이 참여</b><small>수련으로 마음을 잇기</small></button>
+          <button class="quickTile" onclick="openDonateOnlySheet('bottari')"><span>GOODS</span><b>상품 구매로 나눔</b><small>요가보따리로 함께하기</small></button>
+          <button class="quickTile" onclick="openDonateOnlySheet('yoga')"><span>CLASS</span><b>기부요가 참여</b><small>나누는 수련에 참여하기</small></button>
+          <button class="quickTile" onclick="go && go('connect')"><span>CONNECT</span><b>연결해서 함께하기</b><small>요가와 나눔을 문화로</small></button>
+        </div>
+      </div>
+    `;
+    if(anchor && anchor.parentElement) anchor.insertAdjacentElement('afterend',wrap);
+
+    // hide long/redundant home blocks for a cleaner screen
+    qa('.card,.section',home).forEach(el=>{
+      const t=textOf(el);
+      if(el.id==='compactHomeHub' || el.id==='homePurposeBanner') return;
+      if(t.includes('MY YOGA LIFE') || t.includes('함께 만드는 나눔 문화') || t.includes('공유하고 연결하며 함께해요')) el.classList.add('v25Hidden');
+      if(t.includes('YOGIBARA가 발견한 것')) el.classList.add('v25Hidden');
+    });
+  }
+
+  function enhanceMapPage(){
+    const bridge=byId('journeyMapBridge') || qa('.journeyBridge,.card').find(el=>textOf(el).includes('지도에서 바로 내 여정 추가하기'));
+    if(!bridge || bridge.dataset.v25Map==='1') return;
+    bridge.dataset.v25Map='1';
+    bridge.classList.add('v25MapCard');
+    bridge.innerHTML=`
+      <div class="kicker">YOGIBARA MAP</div>
+      <h3>한 곳에서 여정 · 수련 · 나눔 기록</h3>
+      <p>요기바라맵을 크게 열어 여정을 만들고, 수련과 나눔을 함께 기록할 수 있도록 연결했습니다.</p>
+      <div class="mapPanelWrap"><iframe class="mapPanelFrame" src="${MAP_URL}" title="YOGIBARA MAP"></iframe></div>
+      <div class="cardActions v25MapActions">
+        <a class="pill primary mapLinkBtn" href="${MAP_URL}" target="_blank" rel="noopener">지도 크게 보기</a>
+        <a class="pill mapLinkBtn" href="${MAP_URL}" target="_blank" rel="noopener">여정 만들기</a>
+      </div>
+    `;
+  }
+
+  function groupRecordPage(){
+    const titleEl=qa('h1,h2,h3').find(el=>textOf(el)==='내 기록');
+    if(!titleEl) return;
+    const cards=qa('.entry.card').filter(el=>!el.closest('#recordGroupedView'));
+    if(!cards.length) return;
+    const parent=cards[0].parentElement;
+    if(!parent || byId('recordGroupedView')) return;
+
+    const groups={};
+    cards.forEach(card=>{
+      const main=textOf(q('b',card)) || '기록';
+      const small=textOf(q('small',card));
+      const parts=small.split('·').map(v=>v.trim()).filter(Boolean);
+      const date=parts[0] || '날짜 없음';
+      const sub=parts.slice(1).join(' · ');
+      const tags=qa('.tag',card).map(el=>textOf(el)).filter(Boolean);
+      const amount=textOf(qa('.tag.money',card)[0]);
+      const desc=textOf(q('p',card));
+      if(!groups[date]) groups[date]=[];
+      groups[date].push({main,sub,tags,amount,desc});
+    });
+
+    cards.forEach(c=>c.classList.add('v25Hidden'));
+    const view=document.createElement('div');
+    view.id='recordGroupedView';
+    view.className='recordGroupedView';
+    const sortedDates=Object.keys(groups).sort((a,b)=>b.localeCompare(a));
+    view.innerHTML=sortedDates.map(date=>`
+      <section class="recordDateSection">
+        <div class="recordDateHead">${date}</div>
+        <div class="recordDateList">
+          ${groups[date].map(item=>`
+            <div class="recordRow">
+              <div class="recordRowMain">
+                <div class="recordRowTitle">${item.main}</div>
+                <div class="recordRowSub">${item.sub||''}</div>
+                ${item.desc?`<div class="recordRowDesc">${item.desc}</div>`:''}
+              </div>
+              <div class="recordRowSide">
+                ${item.amount?`<div class="recordAmount">${item.amount}</div>`:''}
+                <div class="recordTagWrap">${item.tags.slice(0,3).map(t=>`<span class="recordTag">${t}</span>`).join('')}</div>
+              </div>
+            </div>`).join('')}
+        </div>
+      </section>`).join('');
+    parent.appendChild(view);
+  }
+
+  function transformSpendSheet(){
+    const modalTitle=qa('h2,h3,.sheetTitle,.modalTitle').find(el=>textOf(el).includes('요가에 썼어요'));
+    if(!modalTitle) return;
+    modalTitle.textContent='기부하기';
+    const wrap=qa('label,div').find(el=>textOf(el).includes('나눔 지출 바로가기'));
+    if(wrap && !byId('donateOnlyIntro')){
+      const box=document.createElement('div');
+      box.id='donateOnlyIntro';
+      box.className='donateOnlyIntro';
+      box.innerHTML=`
+        <div class="donateOnlyTitle">기부할 수 있는 방법</div>
+        <div class="donateOnlyGrid">
+          <button type="button" class="donateMiniBtn" onclick="openDonateOnlySheet('bottari')">요가보따리 구매</button>
+          <button type="button" class="donateMiniBtn" onclick="openDonateOnlySheet('card')">카드로 기부</button>
+          <button type="button" class="donateMiniBtn" onclick="openDonateOnlySheet('relay')">릴레이 응원 기부</button>
+          <button type="button" class="donateMiniBtn" onclick="openDonateOnlySheet('yoga')">기부요가 참여</button>
+        </div>
+      `;
+      wrap.insertAdjacentElement('beforebegin',box);
+    }
+  }
+
+  function simplifyMetrics(){
+    const home=byId('home')||document.body;
+    qa('.card',home).forEach(el=>{
+      const t=textOf(el);
+      if(/^\d+/.test(t) && (t.includes('수련')||t.includes('지출')||t.includes('장소')||t.includes('나눔'))){
+        el.classList.add('metricCompact');
+      }
+    });
+  }
+
+  function applyV25(){
+    enhanceHome();
+    enhanceMapPage();
+    groupRecordPage();
+    transformSpendSheet();
+    simplifyMetrics();
+  }
+
+  const origRenderAll=window.renderAll;
+  if(typeof origRenderAll==='function'){
+    window.renderAll=function(){
+      origRenderAll();
+      setTimeout(applyV25,60);
+      setTimeout(applyV25,220);
+    };
+  }
+  applyV25();
+  setTimeout(applyV25,300);
+})();
+</script>
+
+<script>
+const frame=document.getElementById('appFrame');
+const loading=document.getElementById('loading');
+let injected=false;
+
+function deepInject(win){
+  try{
+    let currentWin=win;
+    let currentDoc=currentWin.document;
+    while(currentDoc.getElementById('appFrame') && currentDoc.getElementById('appFrame').contentWindow){
+      currentWin=currentDoc.getElementById('appFrame').contentWindow;
+      currentDoc=currentWin.document;
+    }
+    if(currentDoc.documentElement.dataset.v25Injected==='1') return;
+    currentDoc.documentElement.dataset.v25Injected='1';
+
+    const style=currentDoc.createElement('style');
+    style.textContent=`
+      .v25Hidden{display:none!important}
+      .compactHomeGrid{display:grid;gap:10px;margin-bottom:10px}.compactMainCard{padding:16px;border:1px solid rgba(255,255,255,.08);border-radius:24px;background:linear-gradient(160deg,rgba(139,154,58,.10),rgba(255,255,255,.03))}.compactKicker{font-size:11px;letter-spacing:.18em;color:#c9ad82;font-weight:900}.compactMainCard h3{margin:9px 0 8px;font-size:28px;line-height:1.35;color:#f4ecdf}.compactMainCard p{margin:0;color:#dcccb8;font-size:12px;line-height:1.72}.compactActionRow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}.compactBtn{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#f6efe4;border-radius:999px;padding:14px 12px;font-size:13px;font-weight:900}.compactBtn.primary{background:#8b9a3a;border-color:#8b9a3a}.compactQuickSection{display:grid;grid-template-columns:1fr 1fr;gap:8px}.quickTile{padding:14px;border-radius:20px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.03));text-align:left;color:#f7efe5}.quickTile span{display:block;font-size:9px;letter-spacing:.16em;color:#aac055;font-weight:900;margin-bottom:6px}.quickTile b{display:block;font-size:17px;line-height:1.35;margin-bottom:4px}.quickTile small{display:block;font-size:10px;color:#d3c2b1;line-height:1.55}
+      .v25MapCard{padding:14px}.v25MapCard h3{margin:6px 0 5px;font-size:24px}.v25MapCard p{margin:0;color:var(--muted);font-size:11px;line-height:1.65}.mapPanelWrap{margin-top:12px;border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:#fff}.mapPanelFrame{display:block;width:100%;height:360px;border:0;background:#fff}.v25MapActions{margin-top:10px}.mapLinkBtn{text-decoration:none;text-align:center}
+      .recordGroupedView{margin-top:10px;display:grid;gap:14px}.recordDateSection{display:grid;gap:8px}.recordDateHead{font-size:13px;font-weight:900;color:#c8b38c;letter-spacing:.02em}.recordDateList{display:grid;gap:8px}.recordRow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:flex-start;padding:14px 14px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}.recordRowTitle{font-size:18px;font-weight:900;color:#f6efe4;line-height:1.4}.recordRowSub{margin-top:4px;color:#c8b7a4;font-size:11px;line-height:1.5}.recordRowDesc{margin-top:6px;color:#e8dccf;font-size:11px;line-height:1.55}.recordRowSide{display:grid;gap:6px;justify-items:end}.recordAmount{font-size:12px;font-weight:900;color:#f3d4b1}.recordTagWrap{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.recordTag{display:inline-flex;align-items:center;padding:6px 9px;border-radius:999px;background:rgba(139,154,58,.20);color:#f0f3df;font-size:9px;font-weight:900}
+      .donateOnlyIntro{margin:10px 0 12px;padding:12px;border-radius:18px;background:rgba(139,154,58,.10);border:1px solid rgba(139,154,58,.14)}.donateOnlyTitle{font-size:12px;font-weight:900;color:#f3eadf;margin-bottom:8px}.donateOnlyGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.donateMiniBtn{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);color:#fff;border-radius:14px;padding:12px 10px;font-size:11px;font-weight:900;text-align:left}
+      .metricCompact{min-height:auto!important}.metricCompact *{text-align:center}
+      @media(max-width:360px){.compactActionRow,.compactQuickSection,.donateOnlyGrid{grid-template-columns:1fr}}
+    `;
+    currentDoc.head.appendChild(style);
+
+    const s=currentDoc.createElement('script');
+    s.textContent=document.getElementById('v25-script').textContent;
+    currentDoc.body.appendChild(s);
+
+    injected=true;
+    loading.style.display='none';
+  }catch(err){console.error(err)}
+}
+
+frame.addEventListener('load',()=>{
+  const run=()=>{ try{ deepInject(frame.contentWindow); }catch(err){ console.error(err); } };
+  setTimeout(run,500);
+  setTimeout(run,1500);
+  setTimeout(run,2800);
+});
+setTimeout(()=>{ if(!injected) loading.style.display='none'; },3800);
+</script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17120d">
+<title>YOGIBARA V23</title>
+<style>
+html,body{margin:0;width:100%;height:100%;background:#0f0c09;overflow:hidden}
+#appFrame{display:block;width:min(100%,430px);height:100dvh;margin:0 auto;border:0;background:#17120d}
+#loading{position:fixed;inset:0;display:grid;place-items:center;background:#17120d;color:#f7efe5;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-size:14px;z-index:5}
+</style>
+</head>
+<body>
+<div id="loading">YOGIBARA를 여는 중…</div>
+<iframe id="appFrame" src="./app-22.html" title="YOGIBARA" allow="web-share; geolocation; clipboard-write; clipboard-read"></iframe>
+
+<script type="text/plain" id="v23-script">
+(function(){
+  if(window.__YOGIBARA_V23__) return;
+  window.__YOGIBARA_V23__=true;
+  const HUB_URL='https://app.notion.com/p/YOGIBARA-Hub-d3ddb38248404e049194ab0a34514fd6?source=copy_link';
+
+  function byId(id){return document.getElementById(id)}
+
+  window.startCulturePreset=function(type){
+    if(type==='relay'){
+      if(typeof openEntry==='function') openEntry('share');
+      setTimeout(()=>{
+        if(byId('shareKind')) byId('shareKind').value='108 릴레이';
+        if(byId('shareName')) byId('shareName').value='릴레이 참여';
+        if(byId('shareAmount')) byId('shareAmount').value='0';
+        if(byId('shareNote')) byId('shareNote').value='수련을 릴레이로 이어 마음을 모았습니다.';
+        if(byId('entryVisibility')) byId('entryVisibility').value='public';
+      },50);
+      return;
+    }
+    if(type==='product'){
+      if(typeof openEntry==='function') openEntry('spend');
+      setTimeout(()=>{
+        if(byId('spendCategory')) byId('spendCategory').value='요가보따리 구매';
+        if(byId('spendItem')) byId('spendItem').value='YOGIBARA 요가보따리';
+        if(byId('spendAmount')) byId('spendAmount').value='39000';
+        if(byId('spendNote')) byId('spendNote').value='상품 구매로 나눔에 함께합니다.';
+        if(byId('spendPayment')) byId('spendPayment').value='카드';
+        if(byId('entryVisibility')) byId('entryVisibility').value='public';
+      },50);
+      return;
+    }
+    if(type==='class'){
+      if(typeof openEntry==='function') openEntry('share');
+      setTimeout(()=>{
+        if(byId('shareKind')) byId('shareKind').value='SHARE PARTNER';
+        if(byId('shareName')) byId('shareName').value='나누는 수업';
+        if(byId('shareAmount')) byId('shareAmount').value='0';
+        if(byId('shareNote')) byId('shareNote').value='나누는 수업으로 사람들과 마음을 잇습니다.';
+        if(byId('entryVisibility')) byId('entryVisibility').value='public';
+      },50);
+      return;
+    }
+    if(type==='connect'){
+      if(typeof go==='function') go('connect');
+      return;
+    }
+    if(type==='hub'){
+      window.open(HUB_URL,'_blank','noopener');
+      return;
+    }
+  };
+
+  function enhanceHeroCard(){
+    const home=byId('home')||document.body;
+    const cards=[...home.querySelectorAll('.card')];
+    const hero=cards.find(el=>el.innerText.includes('MY YOGA LIFE') || el.innerText.includes('+ 오늘 뭐 남길까요?'));
+    if(!hero || hero.dataset.v23Hero==='1') return;
+    hero.dataset.v23Hero='1';
+    hero.classList.add('cultureHeroCard');
+    hero.innerHTML=`
+      <div class="cultureHeroKicker">PRACTICE · SHARE · PEACE</div>
+      <h2>수련은, 나에게서 끝나지 않는다.</h2>
+      <p>YOGIBARA는 요가와 나눔을 함께하는 문화로 만듭니다. 릴레이에 참여하고, 상품 구매로 마음을 보태고, 나누는 수업을 열고, 공유하고 연결하며 함께 이어가요.</p>
+      <button class="cultureHeroBtn" onclick="startCulturePreset('relay')">+ 함께하는 나눔 시작하기</button>
+      <div class="cultureHeroSub">그 외 수련·장소·지출 기록은 나의 요가생활 기록으로 가볍게 남길 수 있습니다.</div>
+    `;
+  }
+
+  function enhanceCultureSection(){
+    const target=byId('homeShareCard');
+    if(!target || byId('cultureMainSection')) return;
+    const wrap=document.createElement('div');
+    wrap.id='cultureMainSection';
+    wrap.className='section';
+    wrap.innerHTML=`
+      <div class="sectionTitle"><b>함께 만드는 나눔 문화</b><small>메인 참여</small></div>
+      <div class="cultureActionGrid">
+        <button class="cultureActionCard" onclick="startCulturePreset('relay')">
+          <span class="cultureActionKicker">RELAY</span>
+          <b>릴레이 참여</b>
+          <small>수련으로 마음을 모아 이어가기</small>
+        </button>
+        <button class="cultureActionCard" onclick="startCulturePreset('product')">
+          <span class="cultureActionKicker">GOODS</span>
+          <b>상품 구매로 나눔</b>
+          <small>요가보따리 구매로 함께하기</small>
+        </button>
+        <button class="cultureActionCard" onclick="startCulturePreset('class')">
+          <span class="cultureActionKicker">CLASS</span>
+          <b>나누는 수업</b>
+          <small>원데이·기부요가·나눔 수업 만들기</small>
+        </button>
+        <button class="cultureActionCard" onclick="startCulturePreset('connect')">
+          <span class="cultureActionKicker">CONNECT</span>
+          <b>연결해서 함께하기</b>
+          <small>다른 사람과 연결해 요가와 나눔을 문화로</small>
+        </button>
+      </div>
+      <div class="cultureFootNote">YOGIBARA의 중심은 기록 자체보다, 나눌 수 있는 수련과 연결입니다. 함께하고 공유하며 문화를 만듭니다.</div>
+    `;
+    target.insertAdjacentElement('beforebegin',wrap);
+  }
+
+  function enhanceHomeShareLead(){
+    const target=byId('homeShareCard');
+    if(!target || byId('shareCultureLead')) return;
+    const lead=document.createElement('div');
+    lead.id='shareCultureLead';
+    lead.className='cultureLead card';
+    lead.innerHTML=`
+      <div class="kicker">SHARE CULTURE</div>
+      <h3>공유하고 연결하며 함께해요</h3>
+      <p>나의 수련을 스토리로 나누고, 다른 사람과 연결하고, 함께 참여하면서 요가와 나눔이 일상적인 문화가 되도록 만듭니다.</p>
+    `;
+    target.insertAdjacentElement('beforebegin',lead);
+  }
+
+  function enhanceConnectPage(){
+    const list=byId('connectList');
+    if(!list || byId('connectCultureIntro')) return;
+    const intro=document.createElement('div');
+    intro.id='connectCultureIntro';
+    intro.className='card connectCultureIntro';
+    intro.innerHTML=`
+      <div class="kicker">TOGETHER</div>
+      <h3>함께하는 요가 · 함께하는 나눔</h3>
+      <p>수련을 공유하고 사람과 연결되면 혼자만의 기록이 문화가 됩니다. 서로의 여정과 나눔을 보고 함께 이어가요.</p>
+    `;
+    list.insertAdjacentElement('beforebegin',intro);
+  }
+
+  function retitleShareButtons(){
+    document.querySelectorAll('button').forEach(btn=>{
+      const t=(btn.textContent||'').trim();
+      if(t==='+ 오늘 뭐 남길까요?') btn.textContent='+ 함께하는 나눔 시작하기';
+    });
+  }
+
+  function applyV23(){
+    enhanceHeroCard();
+    enhanceCultureSection();
+    enhanceHomeShareLead();
+    enhanceConnectPage();
+    retitleShareButtons();
+  }
+
+  const origRenderAll=window.renderAll;
+  if(typeof origRenderAll==='function'){
+    window.renderAll=function(){
+      origRenderAll();
+      setTimeout(applyV23,40);
+    };
+  }
+  applyV23();
+  setTimeout(applyV23,300);
+})();
+</script>
+
+<script>
+const frame=document.getElementById('appFrame');
+const loading=document.getElementById('loading');
+let injected=false;
+
+function deepInject(win){
+  try{
+    let currentWin=win;
+    let currentDoc=currentWin.document;
+    while(currentDoc.getElementById('appFrame') && currentDoc.getElementById('appFrame').contentWindow){
+      currentWin=currentDoc.getElementById('appFrame').contentWindow;
+      currentDoc=currentWin.document;
+    }
+    if(currentDoc.documentElement.dataset.v23Injected==='1') return;
+    currentDoc.documentElement.dataset.v23Injected='1';
+    const style=currentDoc.createElement('style');
+    style.textContent=`
+      .cultureHeroCard{padding:18px}.cultureHeroKicker{font-size:11px;letter-spacing:.18em;color:#c9ad82;font-weight:900}.cultureHeroCard h2{margin:10px 0 12px;font:700 34px/1.34 "Noto Serif KR",Georgia,serif;color:#f4ecdf}.cultureHeroCard p{margin:0;color:#e2d0bb;font-size:13px;line-height:1.78}.cultureHeroBtn{margin-top:18px;width:100%;border:0;border-radius:999px;padding:18px 16px;background:#8b9a3a;color:#fff;font-size:16px;font-weight:900}.cultureHeroSub{margin-top:10px;color:#c5b39f;font-size:10px;line-height:1.6}.cultureLead{padding:15px;margin-bottom:10px}.cultureLead h3,.connectCultureIntro h3{margin:7px 0 5px;font-size:23px}.cultureLead p,.connectCultureIntro p{margin:0;color:var(--muted);font-size:11px;line-height:1.65}.cultureActionGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.cultureActionCard{padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.03));text-align:left;color:#f7efe5}.cultureActionCard .cultureActionKicker{display:block;font-size:10px;letter-spacing:.14em;color:#a9bc4a;font-weight:900;margin-bottom:6px}.cultureActionCard b{display:block;font-size:18px;line-height:1.35;margin-bottom:5px}.cultureActionCard small{display:block;font-size:10px;color:#d5c5b5;line-height:1.55}.cultureFootNote{margin-top:10px;color:var(--muted);font-size:10px;line-height:1.6}.connectCultureIntro{padding:15px;margin-bottom:10px}
+      @media(max-width:360px){.cultureActionGrid{grid-template-columns:1fr}}
+    `;
+    currentDoc.head.appendChild(style);
+    const s=currentDoc.createElement('script');
+    s.textContent=document.getElementById('v23-script').textContent;
+    currentDoc.body.appendChild(s);
+    injected=true;
+    loading.style.display='none';
+  }catch(err){console.error(err)}
+}
+
+frame.addEventListener('load',()=>{
+  const run=()=>{ try{ deepInject(frame.contentWindow); }catch(err){ console.error(err); } };
+  setTimeout(run,500);
+  setTimeout(run,1400);
+  setTimeout(run,2600);
+});
+setTimeout(()=>{ if(!injected) loading.style.display='none'; },3500);
+</script>
+</body>
+</html>

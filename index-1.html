@@ -2,15 +2,30 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>YOGIBARA</title>
-  <script>
-    location.replace(
-      './index-1.html' + location.search + location.hash
-    );
-  </script>
 </head>
 <body>
-  YOGIBARA 불러오는 중...
+  <div style="padding:24px">YOGIBARA 불러오는 중...</div>
+
+  <script>
+  (async () => {
+    const url =
+      'https://cdn.jsdelivr.net/gh/millord2010-dev/Yogibara-map@338b2a30e2ccbbcad9a82a5f30dc41e2852eccf5/index.html';
+
+    const response = await fetch(url, { cache: 'no-store' });
+    if (!response.ok) throw new Error(response.status);
+
+    const html = await response.text();
+
+    document.open();
+    document.write(html);
+    document.close();
+  })().catch(err => {
+    document.body.innerHTML =
+      '<div style="padding:24px">불러오기에 실패했습니다. 새로고침해주세요.</div>';
+    console.error(err);
+  });
+  </script>
 </body>
 </html>

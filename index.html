@@ -167,8 +167,6 @@ function renderConnect(){connectionCount.textContent=state.connections.length+'�
 function renderAll(){renderHome();renderJourney();renderMarket();renderMe();renderConnect();save()}
 joinBtn.onclick=()=>{state.profile.name=joinName.value.trim()||'USER';state.profile.region=joinRegion.value.trim()||'지역 미설정';state.joined=true;save();onboarding.classList.remove('open');renderAll()};if(!state.joined)onboarding.classList.add('open');renderAll();
 </script> 
-  <script src="./yogibara-good-actions.js"></script>
-``` [❶](code://python)
   <script src="./yogibara-good-actions-1.js"></script>
 </body>
 </html>

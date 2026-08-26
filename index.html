@@ -166,6 +166,7 @@ try{const c=new URLSearchParams(location.search).get('connect');if(c){const d=de
 function renderConnect(){connectionCount.textContent=state.connections.length+'명';connectionList.innerHTML=state.connections.length?state.connections.map((c,i)=>`<div class="connection card"><div><b>${esc(c.profile?.name||'USER')}</b><small>${esc(c.profile?.region||'')} · 공개 기록 ${(c.entries||[]).length}개 · ENERGY ${(c.energy||0).toLocaleString('ko-KR')}</small></div><button onclick="heart(${i})">♡ 마음 보태기</button></div>`).join(''):'<div class="empty card">아직 연결된 사람이 없어요. 기록 완료 후 공유하거나 내 연결 링크를 보내보세요.</div>'}window.heart=i=>{state.connections[i].hearts=(state.connections[i].hearts||0)+1;save();renderConnect()};
 function renderAll(){renderHome();renderJourney();renderMarket();renderMe();renderConnect();save()}
 joinBtn.onclick=()=>{state.profile.name=joinName.value.trim()||'USER';state.profile.region=joinRegion.value.trim()||'지역 미설정';state.joined=true;save();onboarding.classList.remove('open');renderAll()};if(!state.joined)onboarding.classList.add('open');renderAll();
-</script>
+</script> 
+<script src="./good-actions-v31.js"></script>
 </body>
 </html>

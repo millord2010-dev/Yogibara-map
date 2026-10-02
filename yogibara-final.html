@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f0e5">
-<title>YOGIBARA</title>
+<title>YOGIBARA ENERGY APP</title>
 <style>
 html,body{margin:0;min-height:100%;background:#f7f0e5;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:#493f36}
 #boot{min-height:100vh;display:grid;place-items:center;padding:24px;text-align:center}
@@ -32,6 +32,19 @@ html,body{margin:0;min-height:100%;background:#f7f0e5;font-family:-apple-system,
     document.open();
     document.write(source);
     document.close();
+    const isMapRoute = window.location.pathname.replace(/\/+$/, '') === '/map';
+    document.title = isMapRoute ? 'YOGIBARA MAP' : 'YOGIBARA ENERGY APP';
+    if (isMapRoute) {
+      const openMapOnly = () => {
+        const mapButton = document.querySelector('.bottom [data-go="mapPage"]');
+        if (!mapButton) { setTimeout(openMapOnly, 60); return; }
+        document.getElementById('onboarding')?.classList.remove('open');
+        mapButton.click();
+        document.querySelector('.topBtns')?.remove();
+        document.querySelector('.bottom')?.remove();
+      };
+      setTimeout(openMapOnly, 120);
+    }
   } catch(err) {
     console.error('[YOGIBARA] bootstrap failed',err);
     document.getElementById('boot').innerHTML='<div><b>YOGIBARA</b><span>업데이트를 불러오지 못했습니다.<br>새로고침해 주세요.</span></div>';
@@ -40,3 +53,4 @@ html,body{margin:0;min-height:100%;background:#f7f0e5;font-family:-apple-system,
 </script>
 </body>
 </html>
+

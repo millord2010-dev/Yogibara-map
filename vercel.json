@@ -3,6 +3,11 @@
     {
       "source": "/map",
       "destination": "/yogibara-final.html"
+    },
+    {
+      "source": "/energy",
+      "destination": "/yogibara-final.html"
     }
   ]
 }
+

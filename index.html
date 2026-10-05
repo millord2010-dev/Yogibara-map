@@ -317,6 +317,31 @@ footer p{font-size:11px;color:var(--muted)}
 
 .relayCountBtn:disabled{opacity:.62;cursor:default}
 .relayCountBtn.joined{background:#66735a}
+
+/* NAVER map directory and scroll-persistent trip builder */
+.mapPage{display:grid;gap:15px;margin-top:16px}
+.mapSticky{position:sticky;top:var(--map-sticky-top,190px);z-index:30;padding:16px;border:1px solid var(--line);border-radius:23px;background:rgba(255,253,248,.97);box-shadow:0 8px 24px rgba(40,35,28,.12);backdrop-filter:blur(12px)}
+.mapStickyTop{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.mapStickyTop>div{display:grid;gap:4px;min-width:0}
+.mapStickyLabel{font-size:10px;font-weight:800;letter-spacing:.12em;color:var(--sage)}
+.mapStickyTop strong{font-size:17px;line-height:1.3}
+.mapStickyTop small{font-size:11px;color:var(--muted);line-height:1.35}
+.mapStickyTop>a{flex:0 0 auto;padding:12px 14px;border-radius:999px;background:var(--teal);color:#fff;text-decoration:none;font-size:11px;font-weight:900;white-space:nowrap}
+.mapRouteHead{display:flex;align-items:center;gap:9px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.mapRouteHead b{font-size:12px}.mapRouteHead span{font-size:11px;color:var(--muted)}
+.mapRouteHead button{margin-left:auto;border:0;background:none;color:var(--muted);font-size:11px;text-decoration:underline;cursor:pointer}
+.mapRouteList{display:flex;gap:7px;overflow-x:auto;padding:9px 0 1px;scrollbar-width:thin}
+.mapRouteEmpty{font-size:11px;color:var(--muted);white-space:nowrap}
+.mapRouteItem{display:inline-flex;align-items:center;flex:0 0 auto;border:1px solid var(--teal);border-radius:999px;background:#fff;overflow:hidden}.mapRouteStop{border:0;padding:7px 7px 7px 10px;background:transparent;color:var(--teal);font-size:10px;font-weight:800;cursor:pointer}.mapRouteRemove{border:0;background:transparent;color:var(--teal);font-size:14px;line-height:1;padding:5px 8px;cursor:pointer}
+.mapDirectory{display:grid;gap:22px}.mapGroup{display:grid;gap:9px}.mapGroup h3{margin:0;font-size:14px;letter-spacing:.04em}
+.mapLocs{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.mapLoc{display:flex;align-items:center;gap:8px;min-width:0;padding:12px;border:1px solid var(--line);border-radius:18px;background:var(--card)}
+.mapLoc.active{border:2px solid var(--teal);padding:11px;box-shadow:0 0 0 2px rgba(53,102,94,.08)}
+.mapSelect{display:flex;align-items:center;gap:9px;flex:1;min-width:0;border:0;background:transparent;text-align:left;cursor:pointer;padding:0}
+.mapPin{display:grid;place-items:center;flex:0 0 24px;width:24px;height:24px;border-radius:50%;background:#f1e9dc;color:var(--teal);font-size:12px}
+.mapLocCopy{display:grid;gap:4px;min-width:0}.mapLocCopy b{font-size:12px;line-height:1.35}.mapLocCopy small{font-size:10px;color:var(--muted);line-height:1.35}
+.mapGo{flex:0 0 auto;color:var(--teal);font-size:10px;font-weight:900;text-decoration:none;white-space:nowrap}.mapAdd{flex:0 0 auto;border:1px solid var(--line);border-radius:50%;width:28px;height:28px;background:#fff;color:var(--teal);font-size:15px;font-weight:900;cursor:pointer;line-height:1}
+@media(max-width:420px){.mapLocs{grid-template-columns:1fr}.mapSticky{padding:13px}.mapStickyTop>a{font-size:10px;padding:11px}.mapAdd{font-size:9px}}
 </style>
 <meta content="#f5f2ea" name="theme-color"/><meta content="yes" name="mobile-web-app-capable"/><meta content="yes" name="apple-mobile-web-app-capable"/></head>
 <body>
@@ -469,9 +494,76 @@ footer p{font-size:11px;color:var(--muted)}
 <details class="partner brand"><summary><small>BRAND PARTNER 01</small><b>Comfort Flow</b></summary><div class="partnerInfo"><div class="addr">쇼룸 : 전농로 9길 20</div><div class="bottariSpot">요가보따리 있는 곳</div><div class="partnerLinks"><a href="https://www.instagram.com/comfortflow_jeju/" rel="noopener" target="_blank">Instagram ↗</a><a href="https://youtu.be/3t0TFeUPpNY?si=IFFI6sKIEx69vmN5" rel="noopener" target="_blank">YouTube ↗</a></div></div></details>
 <details class="partner brand"><summary><small>BRAND PARTNER 02</small><b>더 쉼 · 효소찜질</b></summary><div class="partnerInfo"><div class="addr">제주 제주시 애월읍 예원북길 9</div><div class="partnerLinks"><a href="https://www.instagram.com/the_shim_hyoso?stkn=MXRxamg4a2ZzdjBmZQ==" rel="noopener" target="_blank">Instagram ↗</a></div></div></details>
 </div>
-<div class="mapCta"><div><b>YOGIBARA MAP</b><br/><span>제주의 요가 파트너와 특별한 공간 보기<br/>요가보따리 있는 곳 · 아난드요가원 · Comfort Flow</span></div><button class="mapOpen" data-panel="map" type="button">지도 열기 ↗</button></div>
+<div class="mapCta"><div><b>YOGIBARA MAP</b><br/><span>제주 요가원과 브랜드 파트너 찾기<br/>장소를 골라 나만의 여정 만들기</span></div><button class="mapOpen" data-panel="map" type="button">지도 열기 ↗</button></div>
 </section>
-<section class="panel" id="panel-map"> <div class="panelTop"><div class="tag">YOGIBARA MAP</div><h2 class="sectionTitle">제주의 요가 파트너 지도</h2><p class="lead">장소를 선택하면 지도에서 위치를 확인할 수 있습니다. 지도 ↗를 누르면 지도 앱에서 위치를 엽니다.</p></div> <div class="mapPage"><div class="mapFrameWrap"><iframe id="yogibaraMapFrame" title="요기바라 제주 파트너 지도" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=%EC%95%84%EB%82%9C%EB%93%9C%EC%9A%94%EA%B0%80%EC%9B%90%20%EC%A0%9C%EC%A3%BC%20%EC%A0%9C%EC%A3%BC%EC%8B%9C%20%EB%85%B8%ED%98%95%EB%8F%99%20753-1&amp;output=embed"></iframe></div><div class="mapLocs"><div class="mapLoc"><button class="mapSelect" data-map-query="요가로움 제주 제주시 우정로11길 21" type="button"><b>요가로움</b><span>제주시 우정로11길 21</span></button><a href="https://www.google.com/maps/search/?api=1&amp;query=%EC%9A%94%EA%B0%80%EB%A1%9C%EC%9B%80%20%EC%A0%9C%EC%A3%BC%20%EC%A0%9C%EC%A3%BC%EC%8B%9C%20%EC%9A%B0%EC%A0%95%EB%A1%9C11%EA%B8%B8%2021" rel="noopener" target="_blank">지도 ↗</a></div> <div class="mapLoc"><button class="mapSelect" data-map-query="요가열두달 제주 제주시 중앙로 567" type="button"><b>요가열두달</b><span>제주시 중앙로 567</span></button><a href="https://www.google.com/maps/search/?api=1&amp;query=%EC%9A%94%EA%B0%80%EC%97%B4%EB%91%90%EB%8B%AC%20%EC%A0%9C%EC%A3%BC%20%EC%A0%9C%EC%A3%BC%EC%8B%9C%20%EC%A4%91%EC%95%99%EB%A1%9C%20567" rel="noopener" target="_blank">지도 ↗</a></div> <div class="mapLoc"><button class="mapSelect" data-map-query="애월7일요가원 제주 제주시 애월읍 납읍로4길 29" type="button"><b>애월7일요가원</b><span>제주시 애월읍 납읍로4길 29</span></button><a href="https://www.google.com/maps/search/?api=1&amp;query=%EC%95%A0%EC%9B%947%EC%9D%BC%EC%9A%94%EA%B0%80%EC%9B%90%20%EC%A0%9C%EC%A3%BC%20%EC%A0%9C%EC%A3%BC%EC%8B%9C%20%EC%95%A0%EC%9B%94%EC%9D%8D%20%EB%82%A9%EC%9D%8D%EB%A1%9C4%EA%B8%B8%2029" rel="noopener" target="_blank">지도 ↗</a></div> <div class="mapLoc"><button class="mapSelect" data-map-query="쁘라즈나요가 제주 제주시 아봉로 34" type="button"><b>쁘라즈나요가</b><span>제주시 아봉로 34, 2층</span></button><a href="https://www.google.com/maps/search/?api=1&amp;query=%EC%81%98%EB%9D%BC%EC%A6%88%EB%82%98%EC%9A%94%EA%B0%80%20%EC%A0%9C%EC%A3%BC%20%EC%A0%9C%EC%A3%BC%EC%8B%9C%20%EC%95%84%EB%B4%89%EB%A1%9C%2034" rel="noopener" target="_blank">지도 ↗</a></div> <div class="mapLoc"><button class="mapSelect" data-map-query="바라보다 요가명상 제주 제주시 조천읍 대흘리 1664-3" type="button"><b>바라보다 요가명상</b><span>제주시 조천읍 대흘리 1664-3</span></button><a href="https://www.google.com/maps/search/?api=1&amp;query=%EB%B0%94%EB%9D%BC%EB%B3%B4%EB%8B%A4%20%EC%9A%94%EA%B0%80%EB%AA%85%EC%83%81%20%EC%A0%9C%EC%A3%BC%20%EC%A0%9C%EC%A3%BC%EC%8B%9C%20%EC%A1%B0%EC%B2%9C%EC%9D%8D%20%EB%8C%80%ED%9D%98%EB%A6%AC%201664-3" rel="noopener" target="_blank">지도 ↗</a></div> <div class="mapLoc active"><button class="mapSelect" data-map-query="아난드요가원 제주 제주시 노형동 753-1" type="button"><b>아난드요가원 · SPECIAL</b><span>제주시 노형동 753-1 · 요가보따리</span></button><a href="https://www.google.com/maps/search/?api=1&amp;query=%EC%95%84%EB%82%9C%EB%93%9C%EC%9A%94%EA%B0%80%EC%9B%90%20%EC%A0%9C%EC%A3%BC%20%EC%A0%9C%EC%A3%BC%EC%8B%9C%20%EB%85%B8%ED%98%95%EB%8F%99%20753-1" rel="noopener" target="_blank">지도 ↗</a></div> <div class="mapLoc"><button class="mapSelect" data-map-query="Comfort Flow 제주 전농로9길 20" type="button"><b>Comfort Flow</b><span>제주 전농로9길 20 · 쇼룸</span></button><a href="https://www.google.com/maps/search/?api=1&amp;query=Comfort%20Flow%20%EC%A0%9C%EC%A3%BC%20%EC%A0%84%EB%86%8D%EB%A1%9C9%EA%B8%B8%2020" rel="noopener" target="_blank">지도 ↗</a></div> <div class="mapLoc"><button class="mapSelect" data-map-query="더 쉼 효소찜질 제주 제주시 애월읍 예원북길 9" type="button"><b>더 쉼 · 효소찜질</b><span>제주시 애월읍 예원북길 9</span></button><a href="https://www.google.com/maps/search/?api=1&amp;query=%EB%8D%94%20%EC%89%BC%20%ED%9A%A8%EC%86%8C%EC%B0%9C%EC%A7%88%20%EC%A0%9C%EC%A3%BC%20%EC%A0%9C%EC%A3%BC%EC%8B%9C%20%EC%95%A0%EC%9B%94%EC%9D%8D%20%EC%98%88%EC%9B%90%EB%B6%81%EA%B8%B8%209" rel="noopener" target="_blank">지도 ↗</a></div></div></div> </section> <section class="panel" id="panel-bottari">
+<section class="panel" id="panel-map">
+ <div class="panelTop"><div class="tag">YOGIBARA MAP</div><h2 class="sectionTitle">제주의 요가 파트너 지도</h2><p class="lead">장소별 지도 버튼을 누르면 네이버 지도로 연결됩니다. 여정에 담을 곳은 ＋ 버튼으로 순서를 정해보세요.</p></div>
+ <div class="mapPage">
+  <div class="mapSticky" id="mapSticky">
+   <div class="mapStickyTop"><div><span class="mapStickyLabel">선택한 장소</span><strong id="mapSelectedName">요가로움</strong><small id="mapSelectedAddress">제주시 우정로11길 21</small></div><a id="naverMapLaunch" href="https://map.naver.com/p/search/%EC%A0%9C%EC%A3%BC%20%EC%9A%94%EA%B0%80%EB%A1%9C%EC%9B%80%20%EC%A0%9C%EC%A3%BC%EC%8B%9C%20%EC%9A%B0%EC%A0%95%EB%A1%9C11%EA%B8%B8%2021" target="_blank" rel="noopener">네이버 지도 열기 ↗</a></div>
+   <div class="mapRouteHead"><b>나의 여정</b><span id="mapRouteCount">0곳</span><button id="mapRouteClear" type="button">비우기</button></div>
+   <div id="mapRouteList" class="mapRouteList"><span class="mapRouteEmpty">아래 장소에서 ‘여정에 추가’를 눌러 순서를 정해보세요.</span></div>
+  </div>
+  <div class="mapDirectory"><section class="mapGroup"><h3>요가원 파트너</h3><div class="mapLocs"><article class="mapLoc" data-map-query="제주 요가로움 제주시 우정로11길 21" data-map-name="요가로움" data-map-address="제주시 우정로11길 21">
+  <button class="mapSelect" type="button" aria-label="요가로움 선택"><span class="mapPin" aria-hidden="true">●</span><span class="mapLocCopy"><b>요가로움</b><small>제주시 우정로11길 21</small></span></button>
+  <a class="mapGo" target="_blank" rel="noopener" href="https://map.naver.com/p/search/%EC%A0%9C%EC%A3%BC%20%EC%9A%94%EA%B0%80%EB%A1%9C%EC%9B%80%20%EC%A0%9C%EC%A3%BC%EC%8B%9C%20%EC%9A%B0%EC%A0%95%EB%A1%9C11%EA%B8%B8%2021" aria-label="요가로움 네이버 지도에서 열기">지도 ↗</a>
+  <button class="mapAdd" type="button" aria-label="요가로움 여정에 추가">여정에 추가 ＋</button>
+</article><article class="mapLoc" data-map-query="제주 요가열두달 제주시 중앙로 567" data-map-name="요가열두달" data-map-address="제주시 중앙로 567">
+  <button class="mapSelect" type="button" aria-label="요가열두달 선택"><span class="mapPin" aria-hidden="true">●</span><span class="mapLocCopy"><b>요가열두달</b><small>제주시 중앙로 567</small></span></button>
+  <a class="mapGo" target="_blank" rel="noopener" href="https://map.naver.com/p/search/%EC%A0%9C%EC%A3%BC%20%EC%9A%94%EA%B0%80%EC%97%B4%EB%91%90%EB%8B%AC%20%EC%A0%9C%EC%A3%BC%EC%8B%9C%20%EC%A4%91%EC%95%99%EB%A1%9C%20567" aria-label="요가열두달 네이버 지도에서 열기">지도 ↗</a>
+  <button class="mapAdd" type="button" aria-label="요가열두달 여정에 추가">여정에 추가 ＋</button>
+</article><article class="mapLoc" data-map-query="제주 애월7일요가원 납읍로4길 29" data-map-name="애월7일요가원" data-map-address="제주시 애월읍 납읍로4길 29">
+  <button class="mapSelect" type="button" aria-label="애월7일요가원 선택"><span class="mapPin" aria-hidden="true">●</span><span class="mapLocCopy"><b>애월7일요가원</b><small>제주시 애월읍 납읍로4길 29</small></span></button>
+  <a class="mapGo" target="_blank" rel="noopener" href="https://map.naver.com/p/search/%EC%A0%9C%EC%A3%BC%20%EC%95%A0%EC%9B%947%EC%9D%BC%EC%9A%94%EA%B0%80%EC%9B%90%20%EB%82%A9%EC%9D%8D%EB%A1%9C4%EA%B8%B8%2029" aria-label="애월7일요가원 네이버 지도에서 열기">지도 ↗</a>
+  <button class="mapAdd" type="button" aria-label="애월7일요가원 여정에 추가">여정에 추가 ＋</button>
+</article><article class="mapLoc" data-map-query="제주 쁘라즈나요가 아봉로 34" data-map-name="쁘라즈나요가" data-map-address="제주시 아봉로 34, 2층">
+  <button class="mapSelect" type="button" aria-label="쁘라즈나요가 선택"><span class="mapPin" aria-hidden="true">●</span><span class="mapLocCopy"><b>쁘라즈나요가</b><small>제주시 아봉로 34, 2층</small></span></button>
+  <a class="mapGo" target="_blank" rel="noopener" href="https://map.naver.com/p/search/%EC%A0%9C%EC%A3%BC%20%EC%81%98%EB%9D%BC%EC%A6%88%EB%82%98%EC%9A%94%EA%B0%80%20%EC%95%84%EB%B4%89%EB%A1%9C%2034" aria-label="쁘라즈나요가 네이버 지도에서 열기">지도 ↗</a>
+  <button class="mapAdd" type="button" aria-label="쁘라즈나요가 여정에 추가">여정에 추가 ＋</button>
+</article><article class="mapLoc" data-map-query="제주 바라보다 요가명상 대흘리 1664-3" data-map-name="바라보다 요가명상" data-map-address="제주시 조천읍 대흘리 1664-3">
+  <button class="mapSelect" type="button" aria-label="바라보다 요가명상 선택"><span class="mapPin" aria-hidden="true">●</span><span class="mapLocCopy"><b>바라보다 요가명상</b><small>제주시 조천읍 대흘리 1664-3</small></span></button>
+  <a class="mapGo" target="_blank" rel="noopener" href="https://map.naver.com/p/search/%EC%A0%9C%EC%A3%BC%20%EB%B0%94%EB%9D%BC%EB%B3%B4%EB%8B%A4%20%EC%9A%94%EA%B0%80%EB%AA%85%EC%83%81%20%EB%8C%80%ED%9D%98%EB%A6%AC%201664-3" aria-label="바라보다 요가명상 네이버 지도에서 열기">지도 ↗</a>
+  <button class="mapAdd" type="button" aria-label="바라보다 요가명상 여정에 추가">여정에 추가 ＋</button>
+</article><article class="mapLoc" data-map-query="제주 아난드요가원 노형동 753-1" data-map-name="아난드요가원 · SPECIAL" data-map-address="제주시 노형동 753-1 · 요가보따리">
+  <button class="mapSelect" type="button" aria-label="아난드요가원 · SPECIAL 선택"><span class="mapPin" aria-hidden="true">●</span><span class="mapLocCopy"><b>아난드요가원 · SPECIAL</b><small>제주시 노형동 753-1 · 요가보따리</small></span></button>
+  <a class="mapGo" target="_blank" rel="noopener" href="https://map.naver.com/p/search/%EC%A0%9C%EC%A3%BC%20%EC%95%84%EB%82%9C%EB%93%9C%EC%9A%94%EA%B0%80%EC%9B%90%20%EB%85%B8%ED%98%95%EB%8F%99%20753-1" aria-label="아난드요가원 · SPECIAL 네이버 지도에서 열기">지도 ↗</a>
+  <button class="mapAdd" type="button" aria-label="아난드요가원 · SPECIAL 여정에 추가">여정에 추가 ＋</button>
+</article></div></section><section class="mapGroup"><h3>브랜드 파트너</h3><div class="mapLocs"><article class="mapLoc" data-map-query="제주 Comfort Flow 전농로9길 20" data-map-name="Comfort Flow" data-map-address="제주시 전농로9길 20 · 쇼룸">
+  <button class="mapSelect" type="button" aria-label="Comfort Flow 선택"><span class="mapPin" aria-hidden="true">●</span><span class="mapLocCopy"><b>Comfort Flow</b><small>제주시 전농로9길 20 · 쇼룸</small></span></button>
+  <a class="mapGo" target="_blank" rel="noopener" href="https://map.naver.com/p/search/%EC%A0%9C%EC%A3%BC%20Comfort%20Flow%20%EC%A0%84%EB%86%8D%EB%A1%9C9%EA%B8%B8%2020" aria-label="Comfort Flow 네이버 지도에서 열기">지도 ↗</a>
+  <button class="mapAdd" type="button" aria-label="Comfort Flow 여정에 추가">여정에 추가 ＋</button>
+</article><article class="mapLoc" data-map-query="제주 더 쉼 효소찜질 예원북길 9" data-map-name="더 쉼 · 효소찜질" data-map-address="제주시 애월읍 예원북길 9">
+  <button class="mapSelect" type="button" aria-label="더 쉼 · 효소찜질 선택"><span class="mapPin" aria-hidden="true">●</span><span class="mapLocCopy"><b>더 쉼 · 효소찜질</b><small>제주시 애월읍 예원북길 9</small></span></button>
+  <a class="mapGo" target="_blank" rel="noopener" href="https://map.naver.com/p/search/%EC%A0%9C%EC%A3%BC%20%EB%8D%94%20%EC%89%BC%20%ED%9A%A8%EC%86%8C%EC%B0%9C%EC%A7%88%20%EC%98%88%EC%9B%90%EB%B6%81%EA%B8%B8%209" aria-label="더 쉼 · 효소찜질 네이버 지도에서 열기">지도 ↗</a>
+  <button class="mapAdd" type="button" aria-label="더 쉼 · 효소찜질 여정에 추가">여정에 추가 ＋</button>
+</article></div></section><section class="mapGroup"><h3>함께 표시한 제주 요가 공간</h3><div class="mapLocs"><article class="mapLoc" data-map-query="제주 한주훈 요가원" data-map-name="한주훈 요가원" data-map-address="제주">
+  <button class="mapSelect" type="button" aria-label="한주훈 요가원 선택"><span class="mapPin" aria-hidden="true">●</span><span class="mapLocCopy"><b>한주훈 요가원</b><small>제주</small></span></button>
+  <a class="mapGo" target="_blank" rel="noopener" href="https://map.naver.com/p/search/%EC%A0%9C%EC%A3%BC%20%ED%95%9C%EC%A3%BC%ED%9B%88%20%EC%9A%94%EA%B0%80%EC%9B%90" aria-label="한주훈 요가원 네이버 지도에서 열기">지도 ↗</a>
+  <button class="mapAdd" type="button" aria-label="한주훈 요가원 여정에 추가">여정에 추가 ＋</button>
+</article><article class="mapLoc" data-map-query="제주 발런싱요가 일도점" data-map-name="발런싱요가 일도점" data-map-address="제주">
+  <button class="mapSelect" type="button" aria-label="발런싱요가 일도점 선택"><span class="mapPin" aria-hidden="true">●</span><span class="mapLocCopy"><b>발런싱요가 일도점</b><small>제주</small></span></button>
+  <a class="mapGo" target="_blank" rel="noopener" href="https://map.naver.com/p/search/%EC%A0%9C%EC%A3%BC%20%EB%B0%9C%EB%9F%B0%EC%8B%B1%EC%9A%94%EA%B0%80%20%EC%9D%BC%EB%8F%84%EC%A0%90" aria-label="발런싱요가 일도점 네이버 지도에서 열기">지도 ↗</a>
+  <button class="mapAdd" type="button" aria-label="발런싱요가 일도점 여정에 추가">여정에 추가 ＋</button>
+</article><article class="mapLoc" data-map-query="제주 비수난다요가" data-map-name="비수난다요가" data-map-address="제주">
+  <button class="mapSelect" type="button" aria-label="비수난다요가 선택"><span class="mapPin" aria-hidden="true">●</span><span class="mapLocCopy"><b>비수난다요가</b><small>제주</small></span></button>
+  <a class="mapGo" target="_blank" rel="noopener" href="https://map.naver.com/p/search/%EC%A0%9C%EC%A3%BC%20%EB%B9%84%EC%88%98%EB%82%9C%EB%8B%A4%EC%9A%94%EA%B0%80" aria-label="비수난다요가 네이버 지도에서 열기">지도 ↗</a>
+  <button class="mapAdd" type="button" aria-label="비수난다요가 여정에 추가">여정에 추가 ＋</button>
+</article><article class="mapLoc" data-map-query="제주 yoga 드림원" data-map-name="yoga 드림원" data-map-address="제주">
+  <button class="mapSelect" type="button" aria-label="yoga 드림원 선택"><span class="mapPin" aria-hidden="true">●</span><span class="mapLocCopy"><b>yoga 드림원</b><small>제주</small></span></button>
+  <a class="mapGo" target="_blank" rel="noopener" href="https://map.naver.com/p/search/%EC%A0%9C%EC%A3%BC%20yoga%20%EB%93%9C%EB%A6%BC%EC%9B%90" aria-label="yoga 드림원 네이버 지도에서 열기">지도 ↗</a>
+  <button class="mapAdd" type="button" aria-label="yoga 드림원 여정에 추가">여정에 추가 ＋</button>
+</article><article class="mapLoc" data-map-query="제주 요가늘" data-map-name="요가늘" data-map-address="제주">
+  <button class="mapSelect" type="button" aria-label="요가늘 선택"><span class="mapPin" aria-hidden="true">●</span><span class="mapLocCopy"><b>요가늘</b><small>제주</small></span></button>
+  <a class="mapGo" target="_blank" rel="noopener" href="https://map.naver.com/p/search/%EC%A0%9C%EC%A3%BC%20%EC%9A%94%EA%B0%80%EB%8A%98" aria-label="요가늘 네이버 지도에서 열기">지도 ↗</a>
+  <button class="mapAdd" type="button" aria-label="요가늘 여정에 추가">여정에 추가 ＋</button>
+</article><article class="mapLoc" data-map-query="제주 열두달 정원 카페" data-map-name="열두달 정원 카페" data-map-address="제주">
+  <button class="mapSelect" type="button" aria-label="열두달 정원 카페 선택"><span class="mapPin" aria-hidden="true">●</span><span class="mapLocCopy"><b>열두달 정원 카페</b><small>제주</small></span></button>
+  <a class="mapGo" target="_blank" rel="noopener" href="https://map.naver.com/p/search/%EC%A0%9C%EC%A3%BC%20%EC%97%B4%EB%91%90%EB%8B%AC%20%EC%A0%95%EC%9B%90%20%EC%B9%B4%ED%8E%98" aria-label="열두달 정원 카페 네이버 지도에서 열기">지도 ↗</a>
+  <button class="mapAdd" type="button" aria-label="열두달 정원 카페 여정에 추가">여정에 추가 ＋</button>
+</article></div></section></div>
+ </div>
+</section>
+<section class="panel" id="panel-bottari">
 <div class="shopIntro"><div><div class="tag">요가보따리</div><h2 class="sectionTitle" style="margin-bottom:0">요가보따리</h2></div><div class="shopShip">배송비 5,000원<small>합배송 가능</small></div></div>
 <p class="lead" style="margin-bottom:15px">요가와 일상에서 사용하는 물건, 손으로 만든 소량 제품, 그리고 나눔으로 이어지는 협업 제품을 모았습니다.</p>
 <div class="shopGrid">
@@ -527,7 +619,23 @@ footer p{font-size:11px;color:var(--muted)}
   panelButtons.forEach(b=>b.addEventListener('click',()=>showPanel(b.dataset.panel)));
   document.querySelectorAll('.jump').forEach(b=>b.addEventListener('click',()=>showPanel(b.dataset.panel)));
   document.querySelectorAll('.mapOpen').forEach(b=>b.addEventListener('click',()=>showPanel(b.dataset.panel)));
-  document.querySelectorAll('.mapSelect').forEach(button=>button.addEventListener('click',()=>{const loc=button.closest('.mapLoc'); const frame=document.getElementById('yogibaraMapFrame'); frame.src='https://maps.google.com/maps?q='+encodeURIComponent(button.dataset.mapQuery)+'&output=embed'; document.querySelectorAll('.mapLoc').forEach(item=>item.classList.toggle('active',item===loc));}));
+  const header=document.querySelector('.stickyHead');
+  function syncMapStickyTop(){document.documentElement.style.setProperty('--map-sticky-top',(Math.ceil(header.getBoundingClientRect().height)+10)+'px');}
+  syncMapStickyTop();window.addEventListener('resize',syncMapStickyTop);
+  const naverMapUrl=q=>'https://map.naver.com/p/search/'+encodeURIComponent(q);
+  const mapRows=[...document.querySelectorAll('.mapLoc')];
+  const selectedName=document.getElementById('mapSelectedName');
+  const selectedAddress=document.getElementById('mapSelectedAddress');
+  const naverLaunch=document.getElementById('naverMapLaunch');
+  const routeList=document.getElementById('mapRouteList');
+  const routeCount=document.getElementById('mapRouteCount');
+  const route=[];
+  let selectedRow=mapRows[0];
+  function selectMapRow(row){selectedRow=row;mapRows.forEach(item=>item.classList.toggle('active',item===row));selectedName.textContent=row.dataset.mapName;selectedAddress.textContent=row.dataset.mapAddress;naverLaunch.href=naverMapUrl(row.dataset.mapQuery);}
+  function renderMapRoute(){routeCount.textContent=route.length+'곳';routeList.replaceChildren();if(!route.length){const empty=document.createElement('span');empty.className='mapRouteEmpty';empty.textContent='아래 장소에서 ‘여정에 추가’를 눌러 순서를 정해보세요.';routeList.append(empty);return;}route.forEach((row,index)=>{const stop=document.createElement('span');stop.className='mapRouteItem';const chip=document.createElement('button');chip.type='button';chip.className='mapRouteStop';chip.textContent=(index+1)+'. '+row.dataset.mapName;chip.title='눌러서 장소 선택';chip.addEventListener('click',()=>selectMapRow(row));const remove=document.createElement('button');remove.type='button';remove.className='mapRouteRemove';remove.textContent='×';remove.setAttribute('aria-label',row.dataset.mapName+' 여정에서 삭제');remove.addEventListener('click',()=>{route.splice(index,1);renderMapRoute();});stop.append(chip,remove);routeList.append(stop);});}
+  mapRows.forEach(row=>{row.querySelector('.mapSelect').addEventListener('click',()=>selectMapRow(row));row.querySelector('.mapAdd').addEventListener('click',()=>{if(!route.includes(row)){route.push(row);renderMapRoute();}selectMapRow(row);});});
+  document.getElementById('mapRouteClear').addEventListener('click',()=>{route.splice(0);renderMapRoute();});
+  selectMapRow(selectedRow);renderMapRoute();
   const initial=(location.hash||'#home').slice(1);
   if(['home','story','share','relay','partners','bottari','map'].includes(initial)) showPanel(initial,false);
 
